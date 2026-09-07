@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khu Vực Riêng Tư | Bảng Điều Khiển Bảo Mật</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+  <!-- AUTH GUARD SCRIPT -->
+  <script src="js/auth.js"></script>
+  <script>
+    if (!DevLogAuth.isAuthenticated()) {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <!-- HEADER -->
+  <header class="private-header">
+    <div class="container private-nav">
+      <div class="private-brand">
+        <a href="index.html" class="brand-logo" title="Về trang chủ">
+          <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+          <span class="logo-text">DevLog<span class="accent-dot">.</span></span>
+        </a>
+        <span class="badge-secret"><i class="fa-solid fa-user-shield"></i> Khu Vực Riêng Tư</span>
+      </div>
+
+      <div class="private-actions">
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="icon-btn" title="Chuyển chế độ Sáng / Tối">
+          <i class="fa-regular fa-moon dark-icon"></i>
+          <i class="fa-regular fa-sun light-icon"></i>
+        </button>
+
+        <!-- Change Password Button -->
+        <button id="openChangePassBtn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
+          <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
+        </button>
+
+        <!-- Logout Button -->
+        <button id="logoutBtn" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem; background: var(--danger);">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng Xuất
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- DASHBOARD HERO -->
+    <section class="dashboard-hero">
+      <div class="dashboard-welcome">
+        <div class="welcome-text">
+          <h1>Xin chào, Quản trị viên 👋</h1>
+          <p>Không gian lưu trữ nhật ký cá nhân, ý tưởng dự án và tài liệu mật của riêng bạn.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="openAddNoteBtn" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Tạo Ghi Chú Mới
+          </button>
+          <button id="exportNotesBtn" class="btn btn-secondary" title="Tải file dữ liệu JSON về máy">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Sao Lưu (Backup)
+          </button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="dash-stats-grid">
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon"><i class="fa-solid fa-book-bookmark"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statTotalNotes">0</h4>
+            <span>Tổng mục lưu trữ</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #3b82f6; background: rgba(59,130,246,0.15);"><i class="fa-solid fa-feather-pointed"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statDiaryNotes">0</h4>
+            <span>Nhật ký riêng</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #a855f7; background: rgba(168,85,247,0.15);"><i class="fa-solid fa-lightbulb"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statIdeaNotes">0</h4>
+            <span>Ý tưởng dự án</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #ef4444; background: rgba(239,68,68,0.15);"><i class="fa-solid fa-vault"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statAccountNotes">0</h4>
+            <span>Tài khoản / Khóa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="dashboard-toolbar">
+        <div class="search-private-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchPrivateInput" placeholder="Tìm kiếm ghi chú riêng tư..." />
+        </div>
+
+        <div class="categories-filter" style="margin-bottom: 0;">
+          <button class="filter-btn active" data-tag="all">Tất cả</button>
+          <button class="filter-btn" data-tag="diary">Nhật ký</button>
+          <button class="filter-btn" data-tag="idea">Ý tưởng</button>
+          <button class="filter-btn" data-tag="account">Tài khoản</button>
+          <button class="filter-btn" data-tag="work">Công việc</button>
+        </div>
+      </div>
+
+      <!-- NOTES LIST -->
+      <div class="private-notes-grid" id="privateNotesGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL THÊM GHI CHÚ MỚI -->
+  <div class="article-modal" id="addNoteModal" aria-hidden="true">
+    <div class="modal-backdrop" id="addNoteBackdrop"></div>
+    <div class="modal-container" style="max-width: 580px;">
+      <button class="modal-close-btn" id="closeAddNoteBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-bottom: 20px;">
+          <i class="fa-solid fa-pen-to-square"></i> Tạo Ghi Chú Riêng Tư
+        </h2>
+        <form id="newNoteForm">
+          <div class="modal-form-group">
+            <label for="noteTitleInput">Tiêu đề ghi chú</label>
+            <input type="text" id="noteTitleInput" placeholder="Ví dụ: Kế hoạch tuần tới..." required />
+          </div>
+
+          <div class="modal-form-group">
+            <label for="noteCategorySelect">Phân loại danh mục</label>
+            <select id="noteCategorySelect">
+              <option value="diary">Nhật ký cá nhân</option>
+              <option value="idea">Ý tưởng mật / Dự án mới</option>
+              <option value="account">Tài khoản / Mật khẩu / Server</option>
+              <option value="work">Công việc / To-do list</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="noteContentInput">Nội dung ghi chú</label>
+            <textarea id="noteContentInput" placeholder="Nhập nội dung bảo mật của bạn..." required></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelAddNoteBtn">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu Ghi Chú</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ĐỔI MẬT KHẨU -->
+  <div class="article-modal" id="changePassModal" aria-hidden="true">
+    <div class="modal-backdrop" id="changePassBackdrop"></div>
+    <div class="modal-container" style="max-width: 480px;">
+      <button class="modal-close-btn" id="closeChangePassBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 20px;">
+          <i class="fa-solid fa-key"></i> Đổi Mật Khẩu Đăng Nhập
+        </h2>
+        <form id="changePassForm">
+          <div class="modal-form-group">
+            <label for="newPassInput">Mật khẩu mới</label>
+            <input type="password" id="newPassInput" placeholder="Nhập mật khẩu mới (tối thiểu 4 ký tự)..." required />
+          </div>
+          <div class="modal-form-group">
+            <label for="confirmPassInput">Xác nhận mật khẩu mới</label>
+            <input type="password" id="confirmPassInput" placeholder="Nhập lại mật khẩu mới..." required />
+          </div>
+          <div id="passChangeFeedback" style="font-size: 0.88rem; margin-top: 10px;"></div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelChangePassBtn">Hủy</button>
+            <button type="submit" class="btn btn-primary">Cập Nhật Mật Khẩu</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIVATE APP SCRIPT -->
+  <script>
+    // Theme sync
+    const savedTheme = localStorage.getItem("devlog-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const nextTheme = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      localStorage.setItem("devlog-theme", nextTheme);
+    });
+
+    // Logout
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      if (confirm("Bạn có chắc chắn muốn đăng xuất khỏi khu vực riêng tư?")) {
+        DevLogAuth.logout();
+      }
+    });
+
+    // State & Rendering
+    let currentTag = "all";
+    let filterQuery = "";
+    let notes = DevLogAuth.getPrivateNotes();
+
+    const notesGrid = document.getElementById("privateNotesGrid");
+    const statTotalNotes = document.getElementById("statTotalNotes");
+    const statDiaryNotes = document.getElementById("statDiaryNotes");
+    const statIdeaNotes = document.getElementById("statIdeaNotes");
+    const statAccountNotes = document.getElementById("statAccountNotes");
+    const searchPrivateInput = document.getElementById("searchPrivateInput");
+
+    function updateStats() {
+      statTotalNotes.textContent = notes.length;
+      statDiaryNotes.textContent = notes.filter(n => n.category === "diary").length;
+      statIdeaNotes.textContent = notes.filter(n => n.category === "idea").length;
+      statAccountNotes.textContent = notes.filter(n => n.category === "account").length;
+    }
+
+    function renderNotes() {
+      updateStats();
+      const filtered = notes.filter(n => {
+        const matchTag = currentTag === "all" || n.category === currentTag;
+        const matchSearch = n.title.toLowerCase().includes(filterQuery.toLowerCase()) ||
+                            n.content.toLowerCase().includes(filterQuery.toLowerCase());
+        return matchTag && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        notesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <i class="fa-regular fa-folder-open" style="font-size: 2.5rem; margin-bottom: 12px; display: block;"></i>
+            <h3>Chưa có ghi chú nào</h3>
+            <p>Bấm nút "Tạo Ghi Chú Mới" để lưu thông tin bí mật đầu tiên của bạn.</p>
+          </div>
+        `;
+        return;
+      }
+
+      notesGrid.innerHTML = filtered.map(note => `
+        <div class="private-note-card">
+          <div class="note-header">
+            <span class="note-tag tag-${note.category}">${note.categoryName}</span>
+            <div class="note-actions">
+              <button class="btn-icon-sm" onclick="deleteNote(${note.id})" title="Xóa ghi chú này">
+                <i class="fa-regular fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+          <h3 class="note-title">${escapeHtml(note.title)}</h3>
+          <div class="note-body">${escapeHtml(note.content)}</div>
+          <div class="note-footer">
+            <span><i class="fa-regular fa-calendar"></i> ${note.date}</span>
+            <span style="color: var(--success);"><i class="fa-solid fa-lock"></i> Đã bảo mật</span>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Category filter
+    document.querySelectorAll(".dashboard-toolbar .filter-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".dashboard-toolbar .filter-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTag = btn.getAttribute("data-tag");
+        renderNotes();
+      });
+    });
+
+    // Search filter
+    searchPrivateInput.addEventListener("input", (e) => {
+      filterQuery = e.target.value.trim();
+      renderNotes();
+    });
+
+    // Delete note
+    window.deleteNote = function(id) {
+      if (confirm("Bạn có chắc chắn muốn xóa ghi chú này không? Thao tác này không thể hoàn tác.")) {
+        notes = notes.filter(n => n.id !== id);
+        DevLogAuth.savePrivateNotes(notes);
+        renderNotes();
+      }
+    };
+
+    // Add note modal
+    const addNoteModal = document.getElementById("addNoteModal");
+    const openAddNoteBtn = document.getElementById("openAddNoteBtn");
+    const closeAddNoteBtn = document.getElementById("closeAddNoteBtn");
+    const cancelAddNoteBtn = document.getElementById("cancelAddNoteBtn");
+    const addNoteBackdrop = document.getElementById("addNoteBackdrop");
+    const newNoteForm = document.getElementById("newNoteForm");
+
+    function openModal() {
+      addNoteModal.classList.add("active");
+    }
+    function closeModal() {
+      addNoteModal.classList.remove("active");
+      newNoteForm.reset();
+    }
+
+    openAddNoteBtn.addEventListener("click", openModal);
+    closeAddNoteBtn.addEventListener("click", closeModal);
+    cancelAddNoteBtn.addEventListener("click", closeModal);
+    addNoteBackdrop.addEventListener("click", closeModal);
+
+    newNoteForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("noteTitleInput").value.trim();
+      const category = document.getElementById("noteCategorySelect").value;
+      const content = document.getElementById("noteContentInput").value.trim();
+
+      const categoryMap = {
+        diary: "Nhật ký",
+        idea: "Ý tưởng mật",
+        account: "Tài khoản",
+        work: "Công việc"
+      };
+
+      const now = new Date();
+      const dateStr = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+
+      const newNote = {
+        id: Date.now(),
+        title,
+        category,
+        categoryName: categoryMap[category] || "Khác",
+        date: dateStr,
+        content
+      };
+
+      notes.unshift(newNote);
+      DevLogAuth.savePrivateNotes(notes);
+      closeModal();
+      renderNotes();
+    });
+
+    // Backup / Export
+    document.getElementById("exportNotesBtn").addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `devlog_backup_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    });
+
+    // Change Password Modal
+    const changePassModal = document.getElementById("changePassModal");
+    const openChangePassBtn = document.getElementById("openChangePassBtn");
+    const closeChangePassBtn = document.getElementById("closeChangePassBtn");
+    const cancelChangePassBtn = document.getElementById("cancelChangePassBtn");
+    const changePassBackdrop = document.getElementById("changePassBackdrop");
+    const changePassForm = document.getElementById("changePassForm");
+    const passFeedback = document.getElementById("passChangeFeedback");
+
+    openChangePassBtn.addEventListener("click", () => {
+      changePassModal.classList.add("active");
+      passFeedback.textContent = "";
+    });
+
+    function closePassModal() {
+      changePassModal.classList.remove("active");
+      changePassForm.reset();
+      passFeedback.textContent = "";
+    }
+
+    closeChangePassBtn.addEventListener("click", closePassModal);
+    cancelChangePassBtn.addEventListener("click", closePassModal);
+    changePassBackdrop.addEventListener("click", closePassModal);
+
+    changePassForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newPass = document.getElementById("newPassInput").value;
+      const confirmPass = document.getElementById("confirmPassInput").value;
+
+      if (newPass !== confirmPass) {
+        passFeedback.style.color = "var(--danger)";
+        passFeedback.textContent = "Mật khẩu xác nhận không khớp!";
+        return;
+      }
+
+      const res = DevLogAuth.updatePassword(newPass);
+      if (res.success) {
+        passFeedback.style.color = "var(--success)";
+        passFeedback.textContent = "Đổi mật khẩu thành công!";
+        setTimeout(() => {
+          closePassModal();
+        }, 1200);
+      } else {
+        passFeedback.style.color = "var(--danger)";
+        passFeedback.textContent = res.message;
+      }
+    });
+
+    // Initial render
+    renderNotes();
+  </script>
+</body>
+</html>

@@ -12,6 +12,7 @@ Dự án tương thích 100% với **GitHub Pages** (Hosting miễn phí trọn 
 - **Bộ lọc & Tìm kiếm tức thì**: Lọc bài theo chuyên mục (AI, Lập trình, UI/Frontend, Đời sống) và tìm theo từ khóa.
 - **Trình đọc bài viết (Interactive Reader)**: Xem chi tiết bài viết với banner, định dạng code block, trích dẫn nổi bật.
 - **Responsive 100%**: Hiển thị hoàn hảo trên Điện thoại, Tablet và Máy tính.
+- **Khu Vực Riêng Tư & Đăng Nhập Bảo Mật**: Truy cập nhật ký mật, ý tưởng dự án và tài khoản cá nhân thông qua trang `login.html` và `private.html`.
 - **Không cần cài đặt**: Chỉ cần mở trực tiếp file `index.html` trên bất kỳ trình duyệt nào là hoạt động ngay.
 
 ---
@@ -20,14 +21,27 @@ Dự án tương thích 100% với **GitHub Pages** (Hosting miễn phí trọn 
 
 ```text
 personal-blog/
-├── index.html        # Trang giao diện chính
+├── index.html        # Trang giao diện chính của Blog
+├── login.html        # Trang Đăng nhập vào Khu vực riêng tư
+├── private.html      # Trang Bảng điều khiển & Quản lý dữ liệu bí mật
 ├── css/
-│   └── style.css     # Định dạng CSS, biến màu sắc, Dark Mode & Animation
+│   ├── style.css     # Định dạng CSS, biến màu sắc, Dark Mode & Animation
+│   └── auth.css      # CSS cho trang Đăng nhập và Dashboard bảo mật
 ├── js/
-│   └── app.js        # Dữ liệu bài viết và logic tương tác
+│   ├── app.js        # Dữ liệu bài viết công khai và logic blog
+│   └── auth.js       # Xử lý xác thực, bảo mật phiên và lưu trữ ghi chú riêng tư
 ├── .gitignore        # Các file bỏ qua khi dùng Git
 └── README.md         # Hướng dẫn chi tiết
 ```
+
+---
+
+## 🔐 Thông Tin Đăng Nhập Mặc Định
+
+- Đường dẫn trang đăng nhập: `login.html` (hoặc bấm biểu tượng Ổ Khóa ở thanh Menu / Footer).
+- **Tên đăng nhập**: `admin`
+- **Mật khẩu**: `cuong1012`
+*(Bạn có thể đổi mật khẩu bất kỳ lúc nào trực tiếp trong trang quản lý riêng tư).*
 
 ---
 
