@@ -103,3 +103,20 @@ git push -u origin main
    - Chọn thư mục: `/(root)`
    - Bấm **Save**.
 4. Chờ khoảng 1-2 phút, GitHub sẽ hiển thị đường link trang web trực tuyến của bạn (dạng: `https://<USERNAME>.github.io/<REPO-NAME>/`).
+
+---
+
+## ☁️ Hướng Dẫn Kết Nối Google Sheets / Drive Làm Cơ Sở Dữ Liệu
+
+1. Truy cập [sheets.new](https://sheets.new) để tạo 1 file Google Sheets mới trên Google Drive của bạn.
+2. Trên thanh menu, chọn: **Tiện ích mở rộng (Extensions) > Apps Script**.
+3. Mở tệp `google-apps-script.js` trong thư mục dự án, copy toàn bộ code và dán đè vào trình soạn thảo Apps Script.
+4. Bấm nút **Triển khai (Deploy)** ở góc trên bên phải > **Quản lý bản triển khai mới (New deployment)**:
+   - Nhấp biểu tượng bánh răng ⚙️ > Chọn **Ứng dụng web (Web app)**.
+   - **Thực thi dưới dạng**: `Tôi (Me)`.
+   - **Ai có quyền truy cập**: `Bất kỳ ai (Anyone)`.
+   - Bấm **Triển khai (Deploy)** và cấp quyền khi Google hỏi.
+5. Sao chép đường link Web App (có đuôi `/exec`) nhận được.
+6. Mở trang `private.html` trên web của bạn, bấm nút **"Cài Đặt Drive"**, dán link vào và bấm **"Kiểm Tra & Lưu"**.
+   > 🎉 Từ nay, mọi ghi chú cá nhân của bạn sẽ tự động lưu trực tiếp vào Google Drive!
+

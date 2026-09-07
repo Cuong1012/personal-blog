@@ -1,6 +1,6 @@
 /**
  * DEVLOG - AUTHENTICATION & PRIVATE PORTAL LOGIC
- * Client-side secure portal with LocalStorage persistence.
+ * Client-side secure portal with LocalStorage persistence + Google Drive / Sheets Cloud Sync.
  */
 
 const AUTH_CONFIG = {
@@ -10,7 +10,8 @@ const AUTH_CONFIG = {
   REMEMBER_KEY: "devlog_auth_remember",
   CUSTOM_USER_KEY: "devlog_custom_user",
   CUSTOM_PASS_KEY: "devlog_custom_pass",
-  NOTES_KEY: "devlog_private_notes"
+  NOTES_KEY: "devlog_private_notes",
+  GDRIVE_API_KEY: "devlog_gdrive_api_url"
 };
 
 // ==========================================
@@ -56,7 +57,7 @@ function updatePassword(newPassword) {
 }
 
 // ==========================================
-// 2. DEFAULT PRIVATE DATA
+// 2. DEFAULT PRIVATE DATA & LOCAL STORAGE
 // ==========================================
 const DEFAULT_NOTES = [
   {
@@ -102,7 +103,108 @@ function savePrivateNotes(notes) {
   localStorage.setItem(AUTH_CONFIG.NOTES_KEY, JSON.stringify(notes));
 }
 
-// Export functions for HTML pages
+// ==========================================
+// 3. GOOGLE DRIVE / SHEETS CLOUD API
+// ==========================================
+function getCloudApiUrl() {
+  return localStorage.getItem(AUTH_CONFIG.GDRIVE_API_KEY) || "";
+}
+
+function setCloudApiUrl(url) {
+  if (url) {
+    localStorage.setItem(AUTH_CONFIG.GDRIVE_API_KEY, url.trim());
+  } else {
+    localStorage.removeItem(AUTH_CONFIG.GDRIVE_API_KEY);
+  }
+}
+
+function isCloudConnected() {
+  const url = getCloudApiUrl();
+  return Boolean(url && url.startsWith("http"));
+}
+
+/**
+ * Fetch notes from Google Sheets via Google Apps Script
+ */
+async function fetchNotesFromCloud() {
+  const url = getCloudApiUrl();
+  if (!url) return { success: false, message: "Chưa cấu hình URL Google Apps Script" };
+
+  try {
+    const response = await fetch(url, { method: "GET" });
+    const result = await response.json();
+    if (result.status === "success" && Array.isArray(result.data)) {
+      // Save to local cache as well
+      savePrivateNotes(result.data);
+      return { success: true, notes: result.data };
+    }
+    return { success: false, message: result.message || "Lỗi đọc dữ liệu từ Google Drive" };
+  } catch (error) {
+    return { success: false, message: "Không thể kết nối đến Google Sheets: " + error.message };
+  }
+}
+
+/**
+ * Add a single note to Google Sheet
+ */
+async function addNoteToCloud(note) {
+  const url = getCloudApiUrl();
+  if (!url) return { success: false, offline: true };
+
+  try {
+    // Send as text/plain to avoid preflight CORS blockage in Google Apps Script
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "add", note: note })
+    });
+    return { success: true };
+  } catch (err) {
+    console.warn("Lỗi gửi dữ liệu lên Cloud, đã lưu cục bộ:", err);
+    return { success: false, error: err };
+  }
+}
+
+/**
+ * Delete a single note on Google Sheet by ID
+ */
+async function deleteNoteFromCloud(noteId) {
+  const url = getCloudApiUrl();
+  if (!url) return { success: false, offline: true };
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "delete", id: noteId })
+    });
+    return { success: true };
+  } catch (err) {
+    console.warn("Lỗi gửi lệnh xóa lên Cloud:", err);
+    return { success: false, error: err };
+  }
+}
+
+/**
+ * Upload all local notes to Cloud in bulk
+ */
+async function syncAllNotesToCloud(notes) {
+  const url = getCloudApiUrl();
+  if (!url) return { success: false, message: "Chưa thiết lập URL Google Apps Script" };
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ action: "sync_all", notes: notes })
+    });
+    return { success: true };
+  } catch (err) {
+    return { success: false, message: err.message };
+  }
+}
+
+// Export for application use
 window.DevLogAuth = {
   isAuthenticated,
   login,
@@ -110,5 +212,13 @@ window.DevLogAuth = {
   updatePassword,
   getPrivateNotes,
   savePrivateNotes,
-  getStoredCredentials
+  getStoredCredentials,
+  // Google Drive Cloud Methods
+  getCloudApiUrl,
+  setCloudApiUrl,
+  isCloudConnected,
+  fetchNotesFromCloud,
+  addNoteToCloud,
+  deleteNoteFromCloud,
+  syncAllNotesToCloud
 };

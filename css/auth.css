@@ -515,3 +515,68 @@
   border-color: var(--primary);
   outline: none;
 }
+
+/* --- Cloud Sync UI Styles --- */
+.cloud-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 1px solid transparent;
+}
+
+.cloud-status-badge.connected {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.cloud-status-badge.connected:hover {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.cloud-status-badge.disconnected {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.25);
+}
+
+.cloud-status-badge.disconnected:hover {
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.sync-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.cloud-steps-list {
+  margin: 16px 0;
+  padding-left: 20px;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+}
+
+.cloud-steps-list li {
+  list-style: decimal;
+  margin-bottom: 6px;
+}
+
+.cloud-steps-list code {
+  font-family: var(--font-mono);
+  background: var(--bg-hover);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--primary);
+}
+

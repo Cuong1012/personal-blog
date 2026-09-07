@@ -37,6 +37,12 @@
       </div>
 
       <div class="private-actions">
+        <!-- Google Drive Cloud Status Badge -->
+        <div id="cloudStatusBadge" class="cloud-status-badge disconnected" title="Bấm để cấu hình kết nối Google Drive / Google Sheets">
+          <i class="fa-solid fa-cloud"></i>
+          <span id="cloudStatusText">Chưa kết nối Drive</span>
+        </div>
+
         <!-- Theme Toggle -->
         <button id="themeToggle" class="icon-btn" title="Chuyển chế độ Sáng / Tối">
           <i class="fa-regular fa-moon dark-icon"></i>
@@ -62,14 +68,20 @@
       <div class="dashboard-welcome">
         <div class="welcome-text">
           <h1>Xin chào, Quản trị viên 👋</h1>
-          <p>Không gian lưu trữ nhật ký cá nhân, ý tưởng dự án và tài liệu mật của riêng bạn.</p>
+          <p>Không gian lưu trữ nhật ký cá nhân, ý tưởng dự án và dữ liệu đám mây Google Drive.</p>
         </div>
         <div class="toolbar-actions">
           <button id="openAddNoteBtn" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> Tạo Ghi Chú Mới
           </button>
+          <button id="syncCloudBtn" class="btn btn-secondary" title="Đồng bộ dữ liệu với Google Sheet">
+            <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i> Đồng Bộ Drive
+          </button>
+          <button id="openCloudConfigBtn" class="btn btn-secondary" title="Cài đặt kết nối Google Sheets">
+            <i class="fa-brands fa-google-drive"></i> Cài Đặt Drive
+          </button>
           <button id="exportNotesBtn" class="btn btn-secondary" title="Tải file dữ liệu JSON về máy">
-            <i class="fa-solid fa-cloud-arrow-down"></i> Sao Lưu (Backup)
+            <i class="fa-solid fa-cloud-arrow-down"></i> Sao Lưu
           </button>
         </div>
       </div>
@@ -161,7 +173,52 @@
 
           <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
             <button type="button" class="btn btn-secondary" id="cancelAddNoteBtn">Hủy</button>
-            <button type="submit" class="btn btn-primary">Lưu Ghi Chú</button>
+            <button type="submit" class="btn btn-primary" id="saveNoteSubmitBtn">Lưu Ghi Chú</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CẤU HÌNH GOOGLE DRIVE / SHEETS -->
+  <div class="article-modal" id="cloudConfigModal" aria-hidden="true">
+    <div class="modal-backdrop" id="cloudConfigBackdrop"></div>
+    <div class="modal-container" style="max-width: 600px;">
+      <button class="modal-close-btn" id="closeCloudConfigBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px;">
+          <i class="fa-brands fa-google-drive" style="color: #34a853;"></i> Kết Nối Google Sheets / Drive
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+          Lưu trữ toàn bộ ghi chú riêng tư trực tiếp vào một file Google Sheet trong Google Drive của bạn (Miễn phí 100%).
+        </p>
+
+        <ol class="cloud-steps-list">
+          <li>Tạo 1 file Google Sheets mới tại <a href="https://sheets.new" target="_blank" rel="noopener" style="color:var(--primary); text-decoration:underline;">sheets.new</a>.</li>
+          <li>Bấm <strong>Tiện ích mở rộng (Extensions) &gt; Apps Script</strong>.</li>
+          <li>Copy toàn bộ mã trong file <code>google-apps-script.js</code> (có sẵn trong dự án) dán vào.</li>
+          <li>Bấm <strong>Triển khai (Deploy) &gt; Quản lý bản triển khai mới</strong>, chọn loại <strong>Ứng dụng web (Web app)</strong>, quyền truy cập: <strong>Bất kỳ ai (Anyone)</strong>.</li>
+          <li>Copy đường link <code>.../exec</code> nhận được và dán vào ô bên dưới:</li>
+        </ol>
+
+        <form id="cloudConfigForm">
+          <div class="modal-form-group">
+            <label for="gdriveApiUrlInput">Đường link Google Apps Script Web App (URL)</label>
+            <input type="url" id="gdriveApiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" required />
+          </div>
+
+          <div id="cloudFeedback" style="font-size: 0.88rem; margin: 12px 0;"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="disconnectCloudBtn" style="color: var(--danger); display: none;">
+              <i class="fa-solid fa-trash-can"></i> Ngắt Kết Nối
+            </button>
+            <div style="display: flex; gap: 10px; margin-left: auto;">
+              <button type="button" class="btn btn-secondary" id="cancelCloudConfigBtn">Đóng</button>
+              <button type="submit" class="btn btn-primary" id="saveCloudBtn">
+                <i class="fa-solid fa-plug"></i> Kiểm Tra &amp; Lưu
+              </button>
+            </div>
           </div>
         </form>
       </div>
@@ -229,6 +286,24 @@
     const statIdeaNotes = document.getElementById("statIdeaNotes");
     const statAccountNotes = document.getElementById("statAccountNotes");
     const searchPrivateInput = document.getElementById("searchPrivateInput");
+
+    // Cloud Status Elements
+    const cloudStatusBadge = document.getElementById("cloudStatusBadge");
+    const cloudStatusText = document.getElementById("cloudStatusText");
+    const syncCloudBtn = document.getElementById("syncCloudBtn");
+    const syncIcon = document.getElementById("syncIcon");
+
+    function updateCloudBadge() {
+      if (DevLogAuth.isCloudConnected()) {
+        cloudStatusBadge.className = "cloud-status-badge connected";
+        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> <span>Google Drive: Đã kết nối</span>';
+        document.getElementById("disconnectCloudBtn").style.display = "inline-flex";
+      } else {
+        cloudStatusBadge.className = "cloud-status-badge disconnected";
+        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> <span>Google Drive: Chưa kết nối</span>';
+        document.getElementById("disconnectCloudBtn").style.display = "none";
+      }
+    }
 
     function updateStats() {
       statTotalNotes.textContent = notes.length;
@@ -300,11 +375,16 @@
     });
 
     // Delete note
-    window.deleteNote = function(id) {
+    window.deleteNote = async function(id) {
       if (confirm("Bạn có chắc chắn muốn xóa ghi chú này không? Thao tác này không thể hoàn tác.")) {
         notes = notes.filter(n => n.id !== id);
         DevLogAuth.savePrivateNotes(notes);
         renderNotes();
+
+        // If cloud connected, delete from Google Sheet as well
+        if (DevLogAuth.isCloudConnected()) {
+          DevLogAuth.deleteNoteFromCloud(id);
+        }
       }
     };
 
@@ -329,7 +409,7 @@
     cancelAddNoteBtn.addEventListener("click", closeModal);
     addNoteBackdrop.addEventListener("click", closeModal);
 
-    newNoteForm.addEventListener("submit", (e) => {
+    newNoteForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const title = document.getElementById("noteTitleInput").value.trim();
       const category = document.getElementById("noteCategorySelect").value;
@@ -354,10 +434,101 @@
         content
       };
 
+      // Save locally first
       notes.unshift(newNote);
       DevLogAuth.savePrivateNotes(notes);
       closeModal();
       renderNotes();
+
+      // If cloud connected, send to Google Sheet in background
+      if (DevLogAuth.isCloudConnected()) {
+        syncIcon.classList.add("sync-spinner");
+        await DevLogAuth.addNoteToCloud(newNote);
+        syncIcon.classList.remove("sync-spinner");
+      }
+    });
+
+    // Cloud Sync Button
+    syncCloudBtn.addEventListener("click", async () => {
+      if (!DevLogAuth.isCloudConnected()) {
+        openCloudConfig();
+        return;
+      }
+
+      syncIcon.classList.add("sync-spinner");
+      const res = await DevLogAuth.fetchNotesFromCloud();
+      syncIcon.classList.remove("sync-spinner");
+
+      if (res.success) {
+        notes = res.notes;
+        renderNotes();
+        alert(`Đã đồng bộ thành công ${notes.length} ghi chú từ Google Sheets!`);
+      } else {
+        alert(res.message);
+      }
+    });
+
+    // Cloud Config Modal
+    const cloudConfigModal = document.getElementById("cloudConfigModal");
+    const openCloudConfigBtn = document.getElementById("openCloudConfigBtn");
+    const closeCloudConfigBtn = document.getElementById("closeCloudConfigBtn");
+    const cancelCloudConfigBtn = document.getElementById("cancelCloudConfigBtn");
+    const cloudConfigBackdrop = document.getElementById("cloudConfigBackdrop");
+    const cloudConfigForm = document.getElementById("cloudConfigForm");
+    const gdriveApiUrlInput = document.getElementById("gdriveApiUrlInput");
+    const cloudFeedback = document.getElementById("cloudFeedback");
+    const disconnectCloudBtn = document.getElementById("disconnectCloudBtn");
+
+    function openCloudConfig() {
+      gdriveApiUrlInput.value = DevLogAuth.getCloudApiUrl();
+      cloudFeedback.textContent = "";
+      updateCloudBadge();
+      cloudConfigModal.classList.add("active");
+    }
+
+    function closeCloudConfig() {
+      cloudConfigModal.classList.remove("active");
+    }
+
+    openCloudConfigBtn.addEventListener("click", openCloudConfig);
+    cloudStatusBadge.addEventListener("click", openCloudConfig);
+    closeCloudConfigBtn.addEventListener("click", closeCloudConfig);
+    cancelCloudConfigBtn.addEventListener("click", closeCloudConfig);
+    cloudConfigBackdrop.addEventListener("click", closeCloudConfig);
+
+    cloudConfigForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = gdriveApiUrlInput.value.trim();
+      if (!url.startsWith("https://script.google.com")) {
+        cloudFeedback.style.color = "var(--danger)";
+        cloudFeedback.textContent = "URL phải bắt đầu bằng https://script.google.com/...";
+        return;
+      }
+
+      cloudFeedback.style.color = "var(--primary)";
+      cloudFeedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang kiểm tra kết nối với Google Sheets...';
+
+      DevLogAuth.setCloudApiUrl(url);
+      const testRes = await DevLogAuth.fetchNotesFromCloud();
+      if (testRes.success) {
+        cloudFeedback.style.color = "var(--success)";
+        cloudFeedback.textContent = "Kết nối thành công! Đã đồng bộ dữ liệu.";
+        notes = testRes.notes;
+        renderNotes();
+        updateCloudBadge();
+        setTimeout(closeCloudConfig, 1500);
+      } else {
+        cloudFeedback.style.color = "var(--danger)";
+        cloudFeedback.textContent = testRes.message;
+      }
+    });
+
+    disconnectCloudBtn.addEventListener("click", () => {
+      if (confirm("Bạn có chắc chắn muốn ngắt kết nối Google Drive? (Dữ liệu trên máy sẽ được giữ nguyên)")) {
+        DevLogAuth.setCloudApiUrl("");
+        updateCloudBadge();
+        closeCloudConfig();
+      }
     });
 
     // Backup / Export
@@ -419,8 +590,20 @@
       }
     });
 
-    // Initial render
+    // Initial render & Cloud auto-pull if connected
+    updateCloudBadge();
     renderNotes();
+
+    if (DevLogAuth.isCloudConnected()) {
+      syncIcon.classList.add("sync-spinner");
+      DevLogAuth.fetchNotesFromCloud().then(res => {
+        syncIcon.classList.remove("sync-spinner");
+        if (res.success) {
+          notes = res.notes;
+          renderNotes();
+        }
+      });
+    }
   </script>
 </body>
 </html>
