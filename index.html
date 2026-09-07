@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Góc Nhìn & Chia Sẻ | Blog Cá Nhân</title>
+  <meta name="description" content="Trang blog cá nhân chia sẻ về lập trình, công nghệ, tư duy phát triển và cuộc sống thường nhật." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- HEADER & NAVIGATION -->
+  <header class="header" id="header">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+        <span class="logo-text">DevLog<span class="accent-dot">.</span></span>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Trang chủ</a></li>
+          <li><a href="#articles" class="nav-link">Bài viết</a></li>
+          <li><a href="#about" class="nav-link">Về tôi</a></li>
+          <li><a href="#newsletter" class="nav-link">Đăng ký</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Chuyển chế độ giao diện" title="Chuyển chế độ Sáng / Tối">
+          <i class="fa-regular fa-moon dark-icon"></i>
+          <i class="fa-regular fa-sun light-icon"></i>
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Mở menu điều hướng">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero-section" id="home">
+      <div class="container hero-container">
+        <div class="hero-content">
+          <div class="badge hero-badge">
+            <span class="pulse-dot"></span> Xin chào, chào mừng bạn ghé thăm!
+          </div>
+          <h1 class="hero-title">
+            Nơi tôi chia sẻ về <span class="gradient-text">Lập trình</span>, Công nghệ và Cuộc sống.
+          </h1>
+          <p class="hero-desc">
+            Không gian lưu trữ những trải nghiệm học tập, ghi chép kỹ thuật, các dự án nhỏ và những suy ngẫm mỗi ngày trên hành trình phát triển bản thân.
+          </p>
+          <div class="hero-cta">
+            <a href="#articles" class="btn btn-primary">
+              <i class="fa-solid fa-book-open"></i> Đọc bài viết mới nhất
+            </a>
+            <a href="#about" class="btn btn-secondary">
+              <i class="fa-regular fa-user"></i> Về tác giả
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-avatar-wrapper">
+          <div class="avatar-card">
+            <div class="avatar-img-container">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=80" alt="Ảnh đại diện tác giả" class="avatar-img" />
+              <div class="avatar-status" title="Sẵn sàng kết nối!">
+                <i class="fa-solid fa-sparkles"></i>
+              </div>
+            </div>
+            <div class="avatar-info">
+              <h3>Tác Giả Blog</h3>
+              <p>Software Engineer & Tech Enthusiast</p>
+              <div class="social-pills">
+                <a href="https://github.com" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                <a href="mailto:contact@example.com" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTICLES SECTION -->
+    <section class="articles-section" id="articles">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Bài viết gần đây</h2>
+            <p class="section-subtitle">Khám phá các bài viết kỹ thuật, cẩm nang và ghi chép thực tế</p>
+          </div>
+
+          <!-- Search Bar -->
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Tìm kiếm bài viết theo từ khóa..." autocomplete="off" />
+            <button id="clearSearchBtn" class="clear-search-btn" title="Xóa tìm kiếm">&times;</button>
+          </div>
+        </div>
+
+        <!-- Filter Categories -->
+        <div class="categories-filter" id="categoriesFilter">
+          <button class="filter-btn active" data-category="all">Tất cả</button>
+          <button class="filter-btn" data-category="dev">Lập trình & Tech</button>
+          <button class="filter-btn" data-category="frontend">Frontend & UI</button>
+          <button class="filter-btn" data-category="ai">AI & Công cụ</button>
+          <button class="filter-btn" data-category="life">Góc đời sống</button>
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="posts-grid" id="postsGrid">
+          <!-- Rendered dynamically by JavaScript -->
+        </div>
+
+        <!-- Empty State (when search has no results) -->
+        <div class="empty-state" id="emptyState" style="display: none;">
+          <i class="fa-regular fa-folder-open empty-icon"></i>
+          <h3>Không tìm thấy bài viết phù hợp</h3>
+          <p>Thử tìm kiếm với từ khóa khác hoặc chọn xem "Tất cả" danh mục nhé.</p>
+          <button class="btn btn-secondary reset-filter-btn" id="resetFilterBtn">Xem tất cả bài viết</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section" id="about">
+      <div class="container about-container">
+        <div class="about-content">
+          <span class="badge">Đôi lời về tác giả</span>
+          <h2 class="section-title">Xin chào, mình là một người đam mê công nghệ & sáng tạo.</h2>
+          <p class="about-text">
+            Chào mừng bạn đến với góc nhỏ trên Internet của mình! Mình bắt đầu viết blog nhằm lưu giữ lại những kiến thức đã học, các bài học kinh nghiệm trong quá trình xây dựng sản phẩm và chia sẻ cùng cộng đồng.
+          </p>
+          <p class="about-text">
+            Tại blog này, bạn sẽ tìm thấy các bài viết về Web Development, cách tối ưu hiệu năng, những công cụ AI mới nhất hỗ trợ công việc và những góc nhìn nhẹ nhàng về cuộc sống.
+          </p>
+
+          <div class="tech-stack">
+            <h4>Công nghệ mình yêu thích:</h4>
+            <div class="tech-badges">
+              <span class="tech-tag"><i class="fa-brands fa-html5"></i> HTML5/CSS3</span>
+              <span class="tech-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
+              <span class="tech-tag"><i class="fa-brands fa-react"></i> React / Next.js</span>
+              <span class="tech-tag"><i class="fa-brands fa-node-js"></i> Node.js</span>
+              <span class="tech-tag"><i class="fa-brands fa-git-alt"></i> Git & GitHub</span>
+              <span class="tech-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> GenAI</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats-box">
+          <div class="stat-card">
+            <div class="stat-num">5+</div>
+            <div class="stat-label">Năm kinh nghiệm</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">50+</div>
+            <div class="stat-label">Bài viết chia sẻ</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">10k+</div>
+            <div class="stat-label">Lượt người đọc</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Đam mê & Tâm huyết</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NEWSLETTER SECTION -->
+    <section class="newsletter-section" id="newsletter">
+      <div class="container">
+        <div class="newsletter-card">
+          <div class="newsletter-icon">
+            <i class="fa-regular fa-paper-plane"></i>
+          </div>
+          <h2 class="newsletter-title">Nhận thông báo khi có bài viết mới</h2>
+          <p class="newsletter-desc">
+            Không spam! Chỉ gửi những bài viết chất lượng cao về công nghệ, lập trình và kinh nghiệm thực tiễn định kỳ hàng tháng.
+          </p>
+          <form class="newsletter-form" id="newsletterForm">
+            <div class="input-group">
+              <input type="email" id="newsletterEmail" placeholder="Nhập địa chỉ email của bạn..." required />
+              <button type="submit" class="btn btn-primary">
+                Đăng ký ngay <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+          </form>
+          <div class="form-feedback" id="formFeedback"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL ĐỌC BÀI VIẾT CHI TIẾT -->
+  <div class="article-modal" id="articleModal" aria-hidden="true" role="dialog">
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-container">
+      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Đóng bài viết">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <article class="modal-body" id="modalBody">
+        <!-- Content will be injected by JavaScript -->
+      </article>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalShareBtn">
+          <i class="fa-solid fa-share-nodes"></i> Chia sẻ bài viết
+        </button>
+        <button class="btn btn-primary" id="modalDoneBtn">
+          <i class="fa-solid fa-check"></i> Đóng bài viết
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <a href="#" class="brand-logo footer-logo">
+          <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+          <span class="logo-text">DevLog<span class="accent-dot">.</span></span>
+        </a>
+        <p class="footer-copy">
+          &copy; <span id="currentYear"></span> DevLog. Xây dựng với tình yêu công nghệ và chia sẻ kiến thức miễn phí.
+        </p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-socials">
+          <a href="https://github.com" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+          <a href="https://facebook.com" target="_blank" rel="noopener" title="Facebook"><i class="fa-brands fa-facebook"></i></a>
+          <a href="#home" class="back-to-top" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom JavaScript -->
+  <script src="js/app.js"></script>
+</body>
+</html>
