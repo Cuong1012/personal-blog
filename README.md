@@ -118,5 +118,15 @@ git push -u origin main
    - Bấm **Triển khai (Deploy)** và cấp quyền khi Google hỏi.
 5. Sao chép đường link Web App (có đuôi `/exec`) nhận được.
 6. Mở trang `private.html` trên web của bạn, bấm nút **"Cài Đặt Drive"**, dán link vào và bấm **"Kiểm Tra & Lưu"**.
-   > 🎉 Từ nay, mọi ghi chú cá nhân của bạn sẽ tự động lưu trực tiếp vào Google Drive!
+   > 🎉 Từ nay, mọi ghi chú cá nhân và tệp tải lên sẽ tự động lưu trực tiếp vào Google Drive của bạn!
+
+---
+
+## 📁 Tính Năng Tải Tệp Trực Tiếp Lên Google Drive
+
+1. Đăng nhập vào trang `private.html`, chuyển sang tab **"Tệp & Tài Liệu Drive"**.
+2. Kéo thả file bất kỳ (ảnh, PDF, Word, Excel, ZIP) hoặc bấm để chọn tệp từ máy tính.
+3. Tệp sẽ tự động được tải lên và lưu vào thư mục **`DevLog Uploads`** trên Google Drive của bạn.
+4. Bạn có thể mở xem trực tiếp trên Google Drive hoặc sao chép link tệp để chia sẻ bất cứ lúc nào.
+
 

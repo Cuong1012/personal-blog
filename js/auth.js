@@ -1,6 +1,6 @@
 /**
  * DEVLOG - AUTHENTICATION & PRIVATE PORTAL LOGIC
- * Client-side secure portal with LocalStorage persistence + Google Drive / Sheets Cloud Sync.
+ * Client-side secure portal with LocalStorage persistence + Google Drive / Sheets Cloud Sync & File Uploads.
  */
 
 const AUTH_CONFIG = {
@@ -11,6 +11,7 @@ const AUTH_CONFIG = {
   CUSTOM_USER_KEY: "devlog_custom_user",
   CUSTOM_PASS_KEY: "devlog_custom_pass",
   NOTES_KEY: "devlog_private_notes",
+  FILES_KEY: "devlog_uploaded_files",
   GDRIVE_API_KEY: "devlog_gdrive_api_url"
 };
 
@@ -57,7 +58,7 @@ function updatePassword(newPassword) {
 }
 
 // ==========================================
-// 2. DEFAULT PRIVATE DATA & LOCAL STORAGE
+// 2. NOTES DATA & LOCAL STORAGE
 // ==========================================
 const DEFAULT_NOTES = [
   {
@@ -104,7 +105,24 @@ function savePrivateNotes(notes) {
 }
 
 // ==========================================
-// 3. GOOGLE DRIVE / SHEETS CLOUD API
+// 3. UPLOADED FILES DATA (LOCAL CACHE)
+// ==========================================
+function getUploadedFiles() {
+  const data = localStorage.getItem(AUTH_CONFIG.FILES_KEY);
+  if (!data) return [];
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveUploadedFiles(files) {
+  localStorage.setItem(AUTH_CONFIG.FILES_KEY, JSON.stringify(files));
+}
+
+// ==========================================
+// 4. GOOGLE DRIVE / SHEETS CLOUD API
 // ==========================================
 function getCloudApiUrl() {
   return localStorage.getItem(AUTH_CONFIG.GDRIVE_API_KEY) || "";
@@ -124,24 +142,39 @@ function isCloudConnected() {
 }
 
 /**
- * Fetch notes from Google Sheets via Google Apps Script
+ * Fetch all notes and files from Google Apps Script
  */
-async function fetchNotesFromCloud() {
+async function fetchAllFromCloud() {
   const url = getCloudApiUrl();
   if (!url) return { success: false, message: "Chưa cấu hình URL Google Apps Script" };
 
   try {
-    const response = await fetch(url, { method: "GET" });
+    const response = await fetch(url + (url.includes("?") ? "&" : "?") + "type=all");
     const result = await response.json();
-    if (result.status === "success" && Array.isArray(result.data)) {
-      // Save to local cache as well
-      savePrivateNotes(result.data);
-      return { success: true, notes: result.data };
+    if (result.status === "success") {
+      if (Array.isArray(result.data)) {
+        savePrivateNotes(result.data);
+      }
+      if (Array.isArray(result.files)) {
+        saveUploadedFiles(result.files);
+      }
+      return { success: true, notes: result.data || [], files: result.files || [] };
     }
     return { success: false, message: result.message || "Lỗi đọc dữ liệu từ Google Drive" };
   } catch (error) {
     return { success: false, message: "Không thể kết nối đến Google Sheets: " + error.message };
   }
+}
+
+/**
+ * Fetch notes from Google Sheets
+ */
+async function fetchNotesFromCloud() {
+  const res = await fetchAllFromCloud();
+  if (res.success) {
+    return { success: true, notes: res.notes };
+  }
+  return res;
 }
 
 /**
@@ -152,7 +185,6 @@ async function addNoteToCloud(note) {
   if (!url) return { success: false, offline: true };
 
   try {
-    // Send as text/plain to avoid preflight CORS blockage in Google Apps Script
     await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -186,21 +218,80 @@ async function deleteNoteFromCloud(noteId) {
 }
 
 /**
- * Upload all local notes to Cloud in bulk
+ * Upload a file directly to Google Drive via Apps Script
  */
-async function syncAllNotesToCloud(notes) {
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+
+async function uploadFileToDrive(file) {
   const url = getCloudApiUrl();
-  if (!url) return { success: false, message: "Chưa thiết lập URL Google Apps Script" };
+  if (!url) {
+    return { success: false, message: "Vui lòng kết nối Google Drive trước khi tải tệp!" };
+  }
+
+  // Maximum file size warning (Google Apps Script limit ~25MB payload)
+  if (file.size > 25 * 1024 * 1024) {
+    return { success: false, message: "Kích thước tệp vượt quá 25MB. Vui lòng chọn tệp nhỏ hơn." };
+  }
+
+  try {
+    const base64Data = await fileToBase64(file);
+    const payload = {
+      action: "upload_file",
+      filename: file.name,
+      mimeType: file.type || "application/octet-stream",
+      fileData: base64Data
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.status === "success" && result.file) {
+      // Add to local cache
+      const currentFiles = getUploadedFiles();
+      currentFiles.unshift(result.file);
+      saveUploadedFiles(currentFiles);
+      return { success: true, file: result.file };
+    }
+    return { success: false, message: result.message || "Lỗi khi lưu tệp vào Google Drive" };
+  } catch (err) {
+    return { success: false, message: "Lỗi kết nối khi tải tệp: " + err.message };
+  }
+}
+
+/**
+ * Delete a file from Google Drive
+ */
+async function deleteFileFromDrive(fileId) {
+  const url = getCloudApiUrl();
+  if (!url) return { success: false };
 
   try {
     await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ action: "sync_all", notes: notes })
+      body: JSON.stringify({ action: "delete_file", id: fileId })
     });
+    // Remove from local cache
+    let currentFiles = getUploadedFiles();
+    currentFiles = currentFiles.filter(f => f.id !== fileId);
+    saveUploadedFiles(currentFiles);
     return { success: true };
   } catch (err) {
-    return { success: false, message: err.message };
+    return { success: false, error: err };
   }
 }
 
@@ -212,13 +303,17 @@ window.DevLogAuth = {
   updatePassword,
   getPrivateNotes,
   savePrivateNotes,
+  getUploadedFiles,
+  saveUploadedFiles,
   getStoredCredentials,
   // Google Drive Cloud Methods
   getCloudApiUrl,
   setCloudApiUrl,
   isCloudConnected,
+  fetchAllFromCloud,
   fetchNotesFromCloud,
   addNoteToCloud,
   deleteNoteFromCloud,
-  syncAllNotesToCloud
+  uploadFileToDrive,
+  deleteFileFromDrive
 };

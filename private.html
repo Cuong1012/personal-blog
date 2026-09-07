@@ -62,19 +62,31 @@
     </div>
   </header>
 
-  <main class="container">
-    <!-- DASHBOARD HERO -->
-    <section class="dashboard-hero">
+  <main class="container" style="padding-top: 30px;">
+    <!-- PORTAL TAB SWITCHER -->
+    <div class="portal-tabs">
+      <button class="portal-tab-btn active" id="tabNotesBtn">
+        <i class="fa-solid fa-book-bookmark"></i> Ghi Chú &amp; Nhật Ký
+      </button>
+      <button class="portal-tab-btn" id="tabFilesBtn">
+        <i class="fa-brands fa-google-drive"></i> Tệp &amp; Tài Liệu Drive (<span id="fileCountBadge">0</span>)
+      </button>
+    </div>
+
+    <!-- =========================================================
+         VIEW 1: GHI CHÚ & NHẬT KÝ (NOTES VIEW)
+         ========================================================= -->
+    <section class="dashboard-hero" id="notesView">
       <div class="dashboard-welcome">
         <div class="welcome-text">
-          <h1>Xin chào, Quản trị viên 👋</h1>
-          <p>Không gian lưu trữ nhật ký cá nhân, ý tưởng dự án và dữ liệu đám mây Google Drive.</p>
+          <h1>Xin chào, Trịnh Việt Cường 👋</h1>
+          <p>Không gian lưu trữ nhật ký cá nhân, ý tưởng dự án và đồng bộ Google Drive.</p>
         </div>
         <div class="toolbar-actions">
           <button id="openAddNoteBtn" class="btn btn-primary">
             <i class="fa-solid fa-plus"></i> Tạo Ghi Chú Mới
           </button>
-          <button id="syncCloudBtn" class="btn btn-secondary" title="Đồng bộ dữ liệu với Google Sheet">
+          <button id="syncCloudBtn" class="btn btn-secondary" title="Đồng bộ dữ liệu với Google Drive">
             <i class="fa-solid fa-arrows-rotate" id="syncIcon"></i> Đồng Bộ Drive
           </button>
           <button id="openCloudConfigBtn" class="btn btn-secondary" title="Cài đặt kết nối Google Sheets">
@@ -139,6 +151,62 @@
         <!-- Rendered by JS -->
       </div>
     </section>
+
+    <!-- =========================================================
+         VIEW 2: TỆP & TÀI LIỆU DRIVE (FILES VIEW)
+         ========================================================= -->
+    <section class="dashboard-hero" id="filesView" style="display: none;">
+      <div class="dashboard-welcome">
+        <div class="welcome-text">
+          <h1>Tệp &amp; Tài Liệu Google Drive 📁</h1>
+          <p>Tải tệp trực tiếp lên thư mục <strong>"DevLog Uploads"</strong> trong Google Drive cá nhân của bạn.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="triggerUploadBtn" class="btn btn-primary">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Chọn Tệp Tải Lên
+          </button>
+          <button id="refreshFilesBtn" class="btn btn-secondary">
+            <i class="fa-solid fa-arrows-rotate" id="refreshFilesIcon"></i> Tải Lại Danh Sách
+          </button>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Upload Zone -->
+      <div class="upload-dropzone" id="uploadDropzone">
+        <input type="file" id="fileInput" multiple hidden />
+        <div class="dropzone-icon">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <h3 class="dropzone-title">Kéo thả tệp vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">chọn từ máy tính</span></h3>
+        <p class="dropzone-hint">Hỗ trợ Ảnh (PNG, JPG, WebP), PDF, Word, Excel, File nén (ZIP, RAR) tối đa 25MB.</p>
+
+        <!-- Progress Indicator -->
+        <div class="upload-progress-container" id="uploadProgressContainer">
+          <div class="upload-progress-bar">
+            <div class="upload-progress-fill"></div>
+          </div>
+          <div class="upload-progress-text" id="uploadProgressText">
+            <i class="fa-solid fa-spinner fa-spin"></i> Đang tải tệp lên Google Drive...
+          </div>
+        </div>
+      </div>
+
+      <!-- Files Search Bar -->
+      <div class="dashboard-toolbar">
+        <div class="search-private-box" style="max-width: 360px;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchFilesInput" placeholder="Tìm kiếm tệp theo tên..." />
+        </div>
+        <div style="font-size: 0.9rem; color: var(--text-muted);">
+          Tệp được lưu trữ vĩnh viễn trong Google Drive của bạn.
+        </div>
+      </div>
+
+      <!-- Files Grid -->
+      <div class="files-grid" id="filesGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
   </main>
 
   <!-- MODAL THÊM GHI CHÚ MỚI -->
@@ -183,14 +251,14 @@
   <!-- MODAL CẤU HÌNH GOOGLE DRIVE / SHEETS -->
   <div class="article-modal" id="cloudConfigModal" aria-hidden="true">
     <div class="modal-backdrop" id="cloudConfigBackdrop"></div>
-    <div class="modal-container" style="max-width: 600px;">
+    <div class="modal-container" style="max-width: 620px;">
       <button class="modal-close-btn" id="closeCloudConfigBtn">&times;</button>
       <div class="modal-body" style="padding: 32px;">
         <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px;">
           <i class="fa-brands fa-google-drive" style="color: #34a853;"></i> Kết Nối Google Sheets / Drive
         </h2>
         <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
-          Lưu trữ toàn bộ ghi chú riêng tư trực tiếp vào một file Google Sheet trong Google Drive của bạn (Miễn phí 100%).
+          Lưu trữ toàn bộ ghi chú và tệp tải lên trực tiếp vào Google Drive cá nhân của bạn (Miễn phí 100%).
         </p>
 
         <ol class="cloud-steps-list">
@@ -275,7 +343,31 @@
       }
     });
 
-    // State & Rendering
+    // ==========================================
+    // TAB SWITCHING (NOTES VS FILES)
+    // ==========================================
+    const tabNotesBtn = document.getElementById("tabNotesBtn");
+    const tabFilesBtn = document.getElementById("tabFilesBtn");
+    const notesView = document.getElementById("notesView");
+    const filesView = document.getElementById("filesView");
+
+    tabNotesBtn.addEventListener("click", () => {
+      tabNotesBtn.classList.add("active");
+      tabFilesBtn.classList.remove("active");
+      notesView.style.display = "block";
+      filesView.style.display = "none";
+    });
+
+    tabFilesBtn.addEventListener("click", () => {
+      tabFilesBtn.classList.add("active");
+      tabNotesBtn.classList.remove("active");
+      filesView.style.display = "block";
+      notesView.style.display = "none";
+    });
+
+    // ==========================================
+    // NOTES STATE & RENDERING
+    // ==========================================
     let currentTag = "all";
     let filterQuery = "";
     let notes = DevLogAuth.getPrivateNotes();
@@ -289,7 +381,6 @@
 
     // Cloud Status Elements
     const cloudStatusBadge = document.getElementById("cloudStatusBadge");
-    const cloudStatusText = document.getElementById("cloudStatusText");
     const syncCloudBtn = document.getElementById("syncCloudBtn");
     const syncIcon = document.getElementById("syncIcon");
 
@@ -381,7 +472,6 @@
         DevLogAuth.savePrivateNotes(notes);
         renderNotes();
 
-        // If cloud connected, delete from Google Sheet as well
         if (DevLogAuth.isCloudConnected()) {
           DevLogAuth.deleteNoteFromCloud(id);
         }
@@ -396,13 +486,8 @@
     const addNoteBackdrop = document.getElementById("addNoteBackdrop");
     const newNoteForm = document.getElementById("newNoteForm");
 
-    function openModal() {
-      addNoteModal.classList.add("active");
-    }
-    function closeModal() {
-      addNoteModal.classList.remove("active");
-      newNoteForm.reset();
-    }
+    function openModal() { addNoteModal.classList.add("active"); }
+    function closeModal() { addNoteModal.classList.remove("active"); newNoteForm.reset(); }
 
     openAddNoteBtn.addEventListener("click", openModal);
     closeAddNoteBtn.addEventListener("click", closeModal);
@@ -434,13 +519,11 @@
         content
       };
 
-      // Save locally first
       notes.unshift(newNote);
       DevLogAuth.savePrivateNotes(notes);
       closeModal();
       renderNotes();
 
-      // If cloud connected, send to Google Sheet in background
       if (DevLogAuth.isCloudConnected()) {
         syncIcon.classList.add("sync-spinner");
         await DevLogAuth.addNoteToCloud(newNote);
@@ -456,19 +539,216 @@
       }
 
       syncIcon.classList.add("sync-spinner");
-      const res = await DevLogAuth.fetchNotesFromCloud();
+      const res = await DevLogAuth.fetchAllFromCloud();
       syncIcon.classList.remove("sync-spinner");
 
       if (res.success) {
         notes = res.notes;
+        files = res.files;
         renderNotes();
-        alert(`Đã đồng bộ thành công ${notes.length} ghi chú từ Google Sheets!`);
+        renderFiles();
+        alert(`Đã đồng bộ thành công ${notes.length} ghi chú và ${files.length} tệp từ Google Drive!`);
       } else {
         alert(res.message);
       }
     });
 
-    // Cloud Config Modal
+    // ==========================================
+    // FILES MANAGEMENT & UPLOAD LOGIC
+    // ==========================================
+    let files = DevLogAuth.getUploadedFiles();
+    let fileFilterQuery = "";
+
+    const filesGrid = document.getElementById("filesGrid");
+    const fileCountBadge = document.getElementById("fileCountBadge");
+    const fileInput = document.getElementById("fileInput");
+    const uploadDropzone = document.getElementById("uploadDropzone");
+    const triggerUploadBtn = document.getElementById("triggerUploadBtn");
+    const uploadProgressContainer = document.getElementById("uploadProgressContainer");
+    const uploadProgressText = document.getElementById("uploadProgressText");
+    const searchFilesInput = document.getElementById("searchFilesInput");
+    const refreshFilesBtn = document.getElementById("refreshFilesBtn");
+    const refreshFilesIcon = document.getElementById("refreshFilesIcon");
+
+    function getFileIconClass(mimeType, filename) {
+      const lowerName = filename.toLowerCase();
+      if (mimeType.startsWith("image/") || lowerName.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
+        return { icon: "fa-regular fa-image", class: "file-icon-image" };
+      }
+      if (mimeType === "application/pdf" || lowerName.endsWith(".pdf")) {
+        return { icon: "fa-regular fa-file-pdf", class: "file-icon-pdf" };
+      }
+      if (lowerName.match(/\.(doc|docx|txt|md)$/)) {
+        return { icon: "fa-regular fa-file-word", class: "file-icon-doc" };
+      }
+      if (lowerName.match(/\.(xls|xlsx|csv)$/)) {
+        return { icon: "fa-regular fa-file-excel", class: "file-icon-doc" };
+      }
+      if (lowerName.match(/\.(zip|rar|7z|tar|gz)$/)) {
+        return { icon: "fa-regular fa-file-zipper", class: "file-icon-zip" };
+      }
+      return { icon: "fa-regular fa-file", class: "file-icon-other" };
+    }
+
+    function renderFiles() {
+      fileCountBadge.textContent = files.length;
+      const filtered = files.filter(f => f.name.toLowerCase().includes(fileFilterQuery.toLowerCase()));
+
+      if (filtered.length === 0) {
+        filesGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+            <i class="fa-regular fa-folder-open" style="font-size: 2.5rem; margin-bottom: 12px; display: block;"></i>
+            <h3>Chưa có tệp nào được tải lên</h3>
+            <p>Kéo thả tệp vào khung bên trên để lưu trữ trực tiếp vào Google Drive.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filesGrid.innerHTML = filtered.map(file => {
+        const iconInfo = getFileIconClass(file.mimeType || "", file.name);
+        return `
+          <div class="file-card">
+            <div class="file-card-top">
+              <div class="file-icon-box ${iconInfo.class}">
+                <i class="${iconInfo.icon}"></i>
+              </div>
+              <div class="file-info">
+                <div class="file-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</div>
+                <div class="file-meta">${file.sizeFormatted || "Đang cập nhật"} • ${file.date || "Hôm nay"}</div>
+              </div>
+            </div>
+            <div class="file-card-actions">
+              <a href="${file.url}" target="_blank" rel="noopener" class="btn-file-open">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở trên Drive
+              </a>
+              <div class="file-action-buttons">
+                <button class="btn-icon-sm" onclick="copyFileLink('${file.url}')" title="Sao chép đường link tệp">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
+                <button class="btn-icon-sm" onclick="deleteFile('${file.id}')" title="Xóa tệp này">
+                  <i class="fa-regular fa-trash-can"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    searchFilesInput.addEventListener("input", (e) => {
+      fileFilterQuery = e.target.value.trim();
+      renderFiles();
+    });
+
+    // Copy file link helper
+    window.copyFileLink = function(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        alert("Đã sao chép link tệp vào bộ nhớ tạm!");
+      });
+    };
+
+    // Delete file
+    window.deleteFile = async function(fileId) {
+      if (confirm("Bạn có chắc chắn muốn xóa tệp này khỏi Google Drive?")) {
+        files = files.filter(f => f.id !== fileId);
+        DevLogAuth.saveUploadedFiles(files);
+        renderFiles();
+        if (DevLogAuth.isCloudConnected()) {
+          await DevLogAuth.deleteFileFromDrive(fileId);
+        }
+      }
+    };
+
+    // Dropzone Events
+    uploadDropzone.addEventListener("click", (e) => {
+      if (e.target !== fileInput) {
+        fileInput.click();
+      }
+    });
+
+    triggerUploadBtn.addEventListener("click", () => {
+      fileInput.click();
+    });
+
+    ["dragenter", "dragover"].forEach(eventName => {
+      uploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadDropzone.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(eventName => {
+      uploadDropzone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadDropzone.classList.remove("dragover");
+      });
+    });
+
+    uploadDropzone.addEventListener("drop", (e) => {
+      const dt = e.dataTransfer;
+      const droppedFiles = dt.files;
+      if (droppedFiles && droppedFiles.length > 0) {
+        handleFilesUpload(droppedFiles);
+      }
+    });
+
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        handleFilesUpload(e.target.files);
+      }
+    });
+
+    // Process file uploading
+    async function handleFilesUpload(fileList) {
+      if (!DevLogAuth.isCloudConnected()) {
+        alert("Vui lòng bấm 'Cài Đặt Drive' và kết nối URL Google Apps Script trước khi tải tệp lên!");
+        openCloudConfig();
+        return;
+      }
+
+      uploadProgressContainer.style.display = "block";
+
+      for (let i = 0; i < fileList.length; i++) {
+        const currentFile = fileList[i];
+        uploadProgressText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang tải lên (${i + 1}/${fileList.length}): <strong>${escapeHtml(currentFile.name)}</strong>...`;
+
+        const result = await DevLogAuth.uploadFileToDrive(currentFile);
+        if (result.success) {
+          files = DevLogAuth.getUploadedFiles();
+          renderFiles();
+        } else {
+          alert(`Lỗi khi tải tệp ${currentFile.name}: ${result.message}`);
+        }
+      }
+
+      uploadProgressText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--success);"></i> Hoàn tất tải lên Google Drive!`;
+      setTimeout(() => {
+        uploadProgressContainer.style.display = "none";
+        fileInput.value = "";
+      }, 2500);
+    }
+
+    refreshFilesBtn.addEventListener("click", async () => {
+      if (!DevLogAuth.isCloudConnected()) {
+        openCloudConfig();
+        return;
+      }
+      refreshFilesIcon.classList.add("sync-spinner");
+      const res = await DevLogAuth.fetchAllFromCloud();
+      refreshFilesIcon.classList.remove("sync-spinner");
+      if (res.success) {
+        files = res.files;
+        renderFiles();
+        alert("Đã cập nhật danh sách tệp mới nhất từ Google Drive!");
+      }
+    });
+
+    // ==========================================
+    // CLOUD CONFIG MODAL & ACTIONS
+    // ==========================================
     const cloudConfigModal = document.getElementById("cloudConfigModal");
     const openCloudConfigBtn = document.getElementById("openCloudConfigBtn");
     const closeCloudConfigBtn = document.getElementById("closeCloudConfigBtn");
@@ -506,15 +786,17 @@
       }
 
       cloudFeedback.style.color = "var(--primary)";
-      cloudFeedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang kiểm tra kết nối với Google Sheets...';
+      cloudFeedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang kiểm tra kết nối với Google Drive...';
 
       DevLogAuth.setCloudApiUrl(url);
-      const testRes = await DevLogAuth.fetchNotesFromCloud();
+      const testRes = await DevLogAuth.fetchAllFromCloud();
       if (testRes.success) {
         cloudFeedback.style.color = "var(--success)";
         cloudFeedback.textContent = "Kết nối thành công! Đã đồng bộ dữ liệu.";
         notes = testRes.notes;
+        files = testRes.files;
         renderNotes();
+        renderFiles();
         updateCloudBadge();
         setTimeout(closeCloudConfig, 1500);
       } else {
@@ -533,7 +815,7 @@
 
     // Backup / Export
     document.getElementById("exportNotesBtn").addEventListener("click", () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(notes, null, 2));
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ notes, files }, null, 2));
       const downloadAnchor = document.createElement("a");
       downloadAnchor.setAttribute("href", dataStr);
       downloadAnchor.setAttribute("download", `devlog_backup_${new Date().toISOString().slice(0, 10)}.json`);
@@ -593,14 +875,17 @@
     // Initial render & Cloud auto-pull if connected
     updateCloudBadge();
     renderNotes();
+    renderFiles();
 
     if (DevLogAuth.isCloudConnected()) {
       syncIcon.classList.add("sync-spinner");
-      DevLogAuth.fetchNotesFromCloud().then(res => {
+      DevLogAuth.fetchAllFromCloud().then(res => {
         syncIcon.classList.remove("sync-spinner");
         if (res.success) {
           notes = res.notes;
+          files = res.files;
           renderNotes();
+          renderFiles();
         }
       });
     }
