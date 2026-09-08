@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8" />
@@ -388,6 +388,7 @@
         <!-- ACTION TOOLS -->
         <div class="toolbar-group">
           <button class="tool-btn" id="copyImgBtn" title="Sao chép lại vào bộ nhớ tạm"><i class="fa-regular fa-copy"></i> Sao chép</button>
+          <button class="tool-btn" id="openNewTabBtn" title="Mở ảnh trong tab mới"><i class="fa-solid fa-arrow-up-right-from-square"></i> Mở tab mới</button>
           <button class="tool-btn" id="downloadBtn" title="Tải ảnh về máy"><i class="fa-solid fa-download"></i> Tải về</button>
           <button class="tool-btn primary" id="uploadDriveBtn" title="Lưu thẳng vào Google Drive của bạn"><i class="fa-brands fa-google-drive"></i> Lưu vào Drive</button>
           <button class="tool-btn danger" id="clearImgBtn" title="Đóng và dán ảnh mới"><i class="fa-solid fa-trash-can"></i> Đổi ảnh</button>
@@ -521,6 +522,7 @@
     const fullscreenBtn = document.getElementById('fullscreenBtn');
 
     const copyImgBtn = document.getElementById('copyImgBtn');
+    const openNewTabBtn = document.getElementById('openNewTabBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const uploadDriveBtn = document.getElementById('uploadDriveBtn');
     const clearImgBtn = document.getElementById('clearImgBtn');
@@ -841,6 +843,22 @@
         showToast('Đã sao chép hình ảnh vào bộ nhớ tạm (Clipboard)!');
       } catch (err) {
         showToast('Lỗi sao chép ảnh: ' + err.message, 'error');
+      }
+    });
+
+    openNewTabBtn.addEventListener('click', () => {
+      if (!currentBlob && !currentDataUrl) return;
+      try {
+        if (currentBlob) {
+          const blobUrl = URL.createObjectURL(currentBlob);
+          window.open(blobUrl, '_blank');
+        } else {
+          const win = window.open();
+          win.document.write('<iframe src="' + currentDataUrl + '" frameborder="0" style="border:0; top:0px; left:0px; bottom:0px; right:0px; width:100%; height:100%;" allowfullscreen></iframe>');
+        }
+        showToast('Đã mở ảnh trong tab mới!');
+      } catch (err) {
+        showToast('Lỗi mở ảnh: ' + err.message, 'error');
       }
     });
 
