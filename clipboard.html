@@ -266,6 +266,134 @@
       pointer-events: none;
     }
 
+        /* Fine Rotation Slider Bar */
+    .viewer-rotate-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      padding: 7px 18px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.84rem;
+      user-select: none;
+    }
+
+    .rotate-controls-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .rotate-bar-label {
+      font-weight: 700;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+    }
+
+    .fine-rotate-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 220px;
+      height: 6px;
+      border-radius: 99px;
+      background: var(--bg-hover);
+      outline: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .fine-rotate-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 0 0 2px var(--bg-surface), 0 2px 6px rgba(0,0,0,0.3);
+      transition: transform 0.1s ease;
+    }
+
+    .fine-rotate-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.2);
+    }
+
+    .fine-rotate-slider::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      border: 2px solid var(--bg-surface);
+    }
+
+    .rotate-step-btn {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.76rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: var(--font-mono);
+    }
+
+    .rotate-step-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .rotate-angle-badge {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--primary);
+      background: var(--primary-glow);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .rotate-reset-btn {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 3px 9px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .rotate-reset-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+      border-color: var(--text-muted);
+    }
+
+    .rotate-hint-text {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Viewer Info Bar */
     .viewer-infobar {
       display: flex;
@@ -832,6 +960,21 @@
         </div>
       </div>
 
+      <!-- FINE ROTATION SLIDER BAR -->
+      <div class="viewer-rotate-bar" id="viewerRotateBar">
+        <div class="rotate-controls-wrap">
+          <span class="rotate-bar-label"><i class="fa-solid fa-arrows-spin" style="color: var(--primary);"></i> Xoay góc nhỏ:</span>
+          <button type="button" class="rotate-step-btn" id="rotateMinusBtn" title="Xoay trái -0.5°">-0.5°</button>
+          <input type="range" id="fineRotateSlider" min="-45" max="45" step="0.5" value="0" class="fine-rotate-slider" title="Kéo để xoay tinh chỉnh góc nhỏ (-45° đến +45°)" />
+          <button type="button" class="rotate-step-btn" id="rotatePlusBtn" title="Xoay phải +0.5°">+0.5°</button>
+          <span class="rotate-angle-badge" id="rotateAngleBadge">0.0°</span>
+          <button type="button" class="rotate-reset-btn" id="rotateResetBtn" title="Đặt lại góc xoay về 0°"><i class="fa-solid fa-arrow-rotate-left"></i> Về 0°</button>
+        </div>
+        <div class="rotate-hint-text">
+          <span><i class="fa-regular fa-compass"></i> Kéo thanh trượt để xoay thẳng ảnh/tài liệu bị nghiêng trước khi quét chữ</span>
+        </div>
+      </div>
+
       <!-- STATUS & INFO BAR -->
       <div class="viewer-infobar">
         <div class="info-tags">
@@ -1065,6 +1208,8 @@
     let posX = 0;
     let posY = 0;
     let rotation = 0;
+    let baseRotation = 0;
+    let fineAngle = 0;
     let flipH = 1;
     let flipV = 1;
 
@@ -1111,9 +1256,13 @@
       scale = 1;
       posX = 0;
       posY = 0;
+      baseRotation = 0;
+      fineAngle = 0;
       rotation = 0;
       flipH = 1;
       flipV = 1;
+      if (typeof fineRotateSlider !== 'undefined' && fineRotateSlider) fineRotateSlider.value = 0;
+      if (typeof rotateAngleBadge !== 'undefined' && rotateAngleBadge) rotateAngleBadge.textContent = '0.0°';
       applyTransform();
     }
 
@@ -1325,14 +1474,57 @@
 
     // Rotate & Flip Buttons
     rotateLeftBtn.addEventListener('click', () => {
-      rotation = (rotation - 90) % 360;
+      baseRotation = (baseRotation - 90) % 360;
+      rotation = baseRotation + fineAngle;
       applyTransform();
     });
 
     rotateRightBtn.addEventListener('click', () => {
-      rotation = (rotation + 90) % 360;
+      baseRotation = (baseRotation + 90) % 360;
+      rotation = baseRotation + fineAngle;
       applyTransform();
     });
+
+    // Fine Rotation Slider Controls
+    const fineRotateSlider = document.getElementById('fineRotateSlider');
+    const rotateAngleBadge = document.getElementById('rotateAngleBadge');
+    const rotateMinusBtn = document.getElementById('rotateMinusBtn');
+    const rotatePlusBtn = document.getElementById('rotatePlusBtn');
+    const rotateResetBtn = document.getElementById('rotateResetBtn');
+
+    function updateFineRotation(val) {
+      fineAngle = Math.round(parseFloat(val) * 10) / 10;
+      rotation = baseRotation + fineAngle;
+      fineRotateSlider.value = fineAngle;
+      rotateAngleBadge.textContent = (fineAngle > 0 ? '+' : '') + fineAngle.toFixed(1) + '°';
+      applyTransform();
+    }
+
+    if (fineRotateSlider) {
+      fineRotateSlider.addEventListener('input', (e) => {
+        updateFineRotation(e.target.value);
+      });
+    }
+
+    if (rotateMinusBtn) {
+      rotateMinusBtn.addEventListener('click', () => {
+        const nextVal = Math.max(-45, fineAngle - 0.5);
+        updateFineRotation(nextVal);
+      });
+    }
+
+    if (rotatePlusBtn) {
+      rotatePlusBtn.addEventListener('click', () => {
+        const nextVal = Math.min(45, fineAngle + 0.5);
+        updateFineRotation(nextVal);
+      });
+    }
+
+    if (rotateResetBtn) {
+      rotateResetBtn.addEventListener('click', () => {
+        updateFineRotation(0);
+      });
+    }
 
     flipHBtn.addEventListener('click', () => {
       flipH *= -1;
