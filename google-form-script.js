@@ -1,21 +1,13 @@
 /**
  * ===================================================================
- * GOOGLE APPS SCRIPT - THU THẬP THÔNG TIN & ẢNH CHÂN DUNG TỰ ĐỘNG
+ * GOOGLE APPS SCRIPT - THU THẬP & TRUY XUẤT THÔNG TIN KHAI BÁO
  * ===================================================================
  * 
- * HƯỚNG DẪN CÀI ĐẶT 3 BƯỚC CỰC KỲ ĐƠN GIẢN (CHỈ MẤT 1 PHÚT):
- * 
- * Bước 1: Mở trình duyệt, vào link: https://sheets.new để tạo một file Google Sheet mới.
- * Bước 2: Đặt tên cho Google Sheet (ví dụ: "Danh Sách Khai Báo Thông Tin").
- *         - Trên thanh menu, chọn: Tiện ích mở rộng (Extensions) > Apps Script.
- *         - Xóa hết code mặc định, copy TOÀN BỘ file này dán vào.
- * Bước 3: Bấm nút "Triển khai" (Deploy) ở góc trên bên phải:
- *         - Chọn "Quản lý bản triển khai mới" (New deployment).
- *         - Bấm biểu tượng bánh răng ⚙️ > Chọn "Ứng dụng web" (Web app).
- *         - Thực thi dưới dạng (Execute as): Chọn "Tôi" (Me).
- *         - Ai có quyền truy cập (Who has access): Chọn "Bất kỳ ai" (Anyone).
- *         - Bấm "Triển khai" (Deploy) và cấp quyền khi Google hỏi.
- * Bước 4: Copy đường link "URL của ứng dụng web" (có đuôi /exec) và dán vào trang web form.html!
+ * HƯỚNG DẪN CẬP NHẬT (CHỈ MẤT 30 GIÂY):
+ * 1. Mở file Google Sheet của bạn > Tiện ích mở rộng (Extensions) > Apps Script.
+ * 2. Copy toàn bộ code file này dán đè vào Apps Script > Bấm Lưu (Ctrl + S).
+ * 3. Bấm Triển khai (Deploy) > Quản lý bản triển khai (Manage deployments).
+ * 4. Bấm biểu tượng cây bút chì ✏️ > Tại dòng Phiên bản (Version) chọn "Phiên bản mới" (New version) > Bấm Triển khai (Deploy).
  * ===================================================================
  */
 
@@ -40,7 +32,6 @@ function setupSheetIfEmpty(sheet) {
       "Link ảnh chân dung (Google Drive)",
       "Ghi chú bổ sung"
     ]);
-    // Trang trí tiêu đề đẹp mắt
     var headerRange = sheet.getRange("A1:F1");
     headerRange.setFontWeight("bold");
     headerRange.setBackground("#2563eb");
@@ -55,18 +46,59 @@ function setupSheetIfEmpty(sheet) {
   }
 }
 
-// Kiểm tra trạng thái hoạt động (GET)
+// Lấy danh sách toàn bộ hồ sơ đã nộp để hiển thị lên trang private.html (GET)
 function doGet(e) {
-  return ContentService.createTextOutput(JSON.stringify({
-    status: "online",
-    message: "Hệ thống tiếp nhận thông tin và ảnh chân dung đang hoạt động bình thường!"
-  })).setMimeType(ContentService.MimeType.JSON);
+  var lock = LockService.getScriptLock();
+  lock.tryLock(10000);
+
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    setupSheetIfEmpty(sheet);
+
+    var lastRow = sheet.getLastRow();
+    var list = [];
+
+    if (lastRow > 1) {
+      var data = sheet.getRange(2, 1, lastRow - 1, 6).getValues();
+      for (var i = 0; i < data.length; i++) {
+        var row = data[i];
+        if (row[1] || row[2]) { // Nếu có họ tên hoặc mã số
+          list.push({
+            id: i + 1,
+            time: String(row[0] || ""),
+            fullName: String(row[1] || ""),
+            codeId: String(row[2] || ""),
+            phone: String(row[3] || ""),
+            photoUrl: String(row[4] || ""),
+            note: String(row[5] || "")
+          });
+        }
+      }
+    }
+
+    // Đảo ngược để hồ sơ mới nhất nằm ở đầu danh sách
+    list.reverse();
+
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "online",
+      total: list.length,
+      data: list
+    })).setMimeType(ContentService.MimeType.JSON);
+
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 // Tiếp nhận dữ liệu người dùng gửi từ form trên web (POST)
 function doPost(e) {
   var lock = LockService.getScriptLock();
-  lock.tryLock(30000); // Khóa 30 giây tránh trùng lặp ghi dữ liệu
+  lock.tryLock(30000);
 
   try {
     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
@@ -95,7 +127,6 @@ function doPost(e) {
       var folder = getOrCreatePhotoFolder();
       var driveFile = folder.createFile(blob);
 
-      // Cho phép ai có link cũng xem được ảnh chân dung
       try {
         driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
       } catch (err) {}
@@ -103,10 +134,8 @@ function doPost(e) {
       photoUrl = driveFile.getUrl();
     }
 
-    // Thời gian nộp theo múi giờ Việt Nam
     var timeString = Utilities.formatDate(new Date(), "GMT+7", "dd/MM/yyyy HH:mm:ss");
 
-    // Thêm dòng mới vào Google Sheet
     sheet.appendRow([
       timeString,
       fullName,

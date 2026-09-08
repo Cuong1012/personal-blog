@@ -68,6 +68,9 @@
       <button class="portal-tab-btn active" id="tabNotesBtn">
         <i class="fa-solid fa-book-bookmark"></i> Ghi Chú &amp; Nhật Ký
       </button>
+      <button class="portal-tab-btn" id="tabDeclarationsBtn">
+        <i class="fa-solid fa-id-card"></i> Danh Sách Khai Báo (<span id="declCountBadge">0</span>)
+      </button>
       <button class="portal-tab-btn" id="tabFilesBtn">
         <i class="fa-brands fa-google-drive"></i> Tệp &amp; Tài Liệu Drive (<span id="fileCountBadge">0</span>)
       </button>
@@ -207,6 +210,61 @@
         <!-- Rendered by JS -->
       </div>
     </section>
+
+    <!-- =========================================================
+         VIEW 3: DANH SÁCH KHAI BÁO (DECLARATIONS VIEW)
+         ========================================================= -->
+    <section class="dashboard-hero" id="declarationsView" style="display: none;">
+      <div class="dashboard-welcome">
+        <div class="welcome-text">
+          <h1>Hồ Sơ &amp; Danh Sách Khai Báo 📋</h1>
+          <p>Xem toàn bộ thông tin và ảnh chân dung mọi người đã gửi qua trang biểu mẫu trực tuyến.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="refreshDeclBtn" class="btn btn-primary">
+            <i class="fa-solid fa-arrows-rotate" id="refreshDeclIcon"></i> Tải Lại Danh Sách
+          </button>
+          <a href="https://docs.google.com/spreadsheets" target="_blank" rel="noopener" class="btn btn-secondary">
+            <i class="fa-solid fa-table"></i> Mở Google Sheet
+          </a>
+          <a href="form.html" target="_blank" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Trang Form
+          </a>
+        </div>
+      </div>
+
+      <!-- Declarations Toolbar -->
+      <div class="dashboard-toolbar">
+        <div class="search-private-box" style="max-width: 420px;">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchDeclInput" placeholder="Tìm kiếm theo họ tên, mã số, số điện thoại..." />
+        </div>
+        <div style="font-size: 0.95rem; color: var(--text-muted);">
+          Tổng số hồ sơ: <strong id="totalDeclCount" style="color: var(--primary);">0</strong> người đã khai báo
+        </div>
+      </div>
+
+      <!-- Declarations Table Wrapper -->
+      <div class="declarations-table-wrapper">
+        <table class="declarations-table" id="declarationsTable">
+          <thead>
+            <tr>
+              <th style="width: 50px;">STT</th>
+              <th style="width: 80px;">Ảnh chân dung</th>
+              <th>Họ và tên</th>
+              <th>Mã số</th>
+              <th>Số điện thoại</th>
+              <th>Thời gian gửi</th>
+              <th>Ghi chú</th>
+              <th style="text-align: right;">Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="declarationsTableBody">
+            <!-- Rendered by JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <!-- MODAL THÊM GHI CHÚ MỚI -->
@@ -344,26 +402,28 @@
     });
 
     // ==========================================
-    // TAB SWITCHING (NOTES VS FILES)
+    // TAB SWITCHING (NOTES VS DECLARATIONS VS FILES)
     // ==========================================
     const tabNotesBtn = document.getElementById("tabNotesBtn");
+    const tabDeclarationsBtn = document.getElementById("tabDeclarationsBtn");
     const tabFilesBtn = document.getElementById("tabFilesBtn");
     const notesView = document.getElementById("notesView");
+    const declarationsView = document.getElementById("declarationsView");
     const filesView = document.getElementById("filesView");
 
-    tabNotesBtn.addEventListener("click", () => {
-      tabNotesBtn.classList.add("active");
-      tabFilesBtn.classList.remove("active");
-      notesView.style.display = "block";
-      filesView.style.display = "none";
-    });
+    function switchTab(activeBtn, activeView) {
+      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn].forEach(b => b.classList.remove("active"));
+      [notesView, declarationsView, filesView].forEach(v => v.style.display = "none");
+      activeBtn.classList.add("active");
+      activeView.style.display = "block";
+    }
 
-    tabFilesBtn.addEventListener("click", () => {
-      tabFilesBtn.classList.add("active");
-      tabNotesBtn.classList.remove("active");
-      filesView.style.display = "block";
-      notesView.style.display = "none";
+    tabNotesBtn.addEventListener("click", () => switchTab(tabNotesBtn, notesView));
+    tabDeclarationsBtn.addEventListener("click", () => {
+      switchTab(tabDeclarationsBtn, declarationsView);
+      loadDeclarations();
     });
+    tabFilesBtn.addEventListener("click", () => switchTab(tabFilesBtn, filesView));
 
     // ==========================================
     // NOTES STATE & RENDERING
@@ -872,10 +932,117 @@
       }
     });
 
+    // ==========================================
+    // DECLARATIONS (HỒ SƠ KHAI BÁO) MANAGEMENT
+    // ==========================================
+    const DECLARATION_API_URL = "https://script.google.com/macros/s/AKfycbwyjbkHSziMEcQzB4kPT1885-BDE4fLRT3VinZTQ1yJQr-eHxETcnIYQ283_XFf7vL5/exec";
+    let declarationsList = [];
+    let declSearchQuery = "";
+
+    const declarationsTableBody = document.getElementById("declarationsTableBody");
+    const declCountBadge = document.getElementById("declCountBadge");
+    const totalDeclCount = document.getElementById("totalDeclCount");
+    const searchDeclInput = document.getElementById("searchDeclInput");
+    const refreshDeclBtn = document.getElementById("refreshDeclBtn");
+    const refreshDeclIcon = document.getElementById("refreshDeclIcon");
+
+    async function loadDeclarations() {
+      refreshDeclIcon.classList.add("sync-spinner");
+      try {
+        const res = await fetch(DECLARATION_API_URL);
+        const json = await res.json();
+        if (json.status === "online" && Array.isArray(json.data)) {
+          declarationsList = json.data;
+          renderDeclarations();
+        } else if (Array.isArray(json.data)) {
+          declarationsList = json.data;
+          renderDeclarations();
+        }
+      } catch (err) {
+        console.warn("Lỗi tải danh sách hồ sơ:", err);
+      } finally {
+        refreshDeclIcon.classList.remove("sync-spinner");
+      }
+    }
+
+    function renderDeclarations() {
+      declCountBadge.textContent = declarationsList.length;
+      totalDeclCount.textContent = declarationsList.length;
+
+      const filtered = declarationsList.filter(d => {
+        const query = declSearchQuery.toLowerCase();
+        return (d.fullName || "").toLowerCase().includes(query) ||
+               (d.codeId || "").toLowerCase().includes(query) ||
+               (d.phone || "").toLowerCase().includes(query) ||
+               (d.note && d.note.toLowerCase().includes(query));
+      });
+
+      if (filtered.length === 0) {
+        declarationsTableBody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
+              <i class="fa-regular fa-folder-open" style="font-size: 2.2rem; margin-bottom: 10px; display: block;"></i>
+              Chưa có hồ sơ khai báo nào được ghi nhận trên Google Sheet.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      declarationsTableBody.innerHTML = filtered.map((item, idx) => {
+        let photoHtml = `<span style="color: var(--text-muted); font-size: 0.8rem;">Không có</span>`;
+        if (item.photoUrl && item.photoUrl.startsWith("http")) {
+          let directThumb = item.photoUrl;
+          if (directThumb.includes("drive.google.com/file/d/")) {
+            const fileId = directThumb.split('/d/')[1].split('/')[0];
+            directThumb = `https://lh3.googleusercontent.com/d/${fileId}=w200`;
+          }
+          photoHtml = `
+            <a href="${item.photoUrl}" target="_blank" rel="noopener" title="Bấm để xem ảnh gốc trên Google Drive">
+              <img src="${directThumb}" 
+                   onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80';"
+                   class="decl-thumb-img" alt="${escapeHtml(item.fullName)}" />
+            </a>
+          `;
+        }
+
+        return `
+          <tr>
+            <td><strong>#${idx + 1}</strong></td>
+            <td>${photoHtml}</td>
+            <td><strong style="color: var(--text-main); font-size: 1rem;">${escapeHtml(item.fullName)}</strong></td>
+            <td><span class="decl-badge-code">${escapeHtml(item.codeId)}</span></td>
+            <td>
+              <a href="tel:${escapeHtml(item.phone)}" class="decl-phone-link">
+                <i class="fa-solid fa-phone"></i> ${escapeHtml(item.phone)}
+              </a>
+            </td>
+            <td style="font-size: 0.82rem; color: var(--text-muted);">${escapeHtml(item.time)}</td>
+            <td style="font-size: 0.88rem; max-width: 220px;">${escapeHtml(item.note || "—")}</td>
+            <td style="text-align: right; white-space: nowrap;">
+              ${item.photoUrl && item.photoUrl.startsWith("http") 
+                ? `<a href="${item.photoUrl}" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem; border-color: var(--primary); color: var(--primary);">
+                     <i class="fa-solid fa-arrow-up-right-from-square"></i> Xem Ảnh Drive
+                   </a>`
+                : ''}
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    searchDeclInput.addEventListener("input", (e) => {
+      declSearchQuery = e.target.value.trim();
+      renderDeclarations();
+    });
+
+    refreshDeclBtn.addEventListener("click", loadDeclarations);
+
     // Initial render & Cloud auto-pull if connected
     updateCloudBadge();
     renderNotes();
     renderFiles();
+    loadDeclarations();
 
     if (DevLogAuth.isCloudConnected()) {
       syncIcon.classList.add("sync-spinner");
