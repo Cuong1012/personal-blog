@@ -49,6 +49,11 @@
           <i class="fa-regular fa-sun light-icon"></i>
         </button>
 
+        <!-- Open Clipboard Viewer Button -->
+        <a href="clipboard.html" target="_blank" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.88rem;" title="Mở Trình Xem & Dán Ảnh Clipboard">
+          <i class="fa-regular fa-image"></i> Xem Ảnh Clipboard
+        </a>
+
         <!-- Change Password Button -->
         <button id="openChangePassBtn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
           <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
@@ -171,6 +176,9 @@
           <button id="triggerUploadBtn" class="btn btn-primary">
             <i class="fa-solid fa-cloud-arrow-up"></i> Chọn Tệp Tải Lên
           </button>
+          <a href="clipboard.html" target="_blank" class="btn btn-secondary" title="Mở Trình Xem & Dán Ảnh Clipboard">
+            <i class="fa-regular fa-image"></i> Xem Ảnh Clipboard ↗
+          </a>
           <button id="refreshFilesBtn" class="btn btn-secondary">
             <i class="fa-solid fa-arrows-rotate" id="refreshFilesIcon"></i> Tải Lại Danh Sách
           </button>
@@ -183,7 +191,7 @@
         <div class="dropzone-icon">
           <i class="fa-solid fa-cloud-arrow-up"></i>
         </div>
-        <h3 class="dropzone-title">Kéo thả tệp vào đây, hoặc <span style="color: var(--primary); text-decoration: underline;">chọn từ máy tính</span></h3>
+        <h3 class="dropzone-title">Kéo thả tệp vào đây, bấm <span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary);">Ctrl + V</span> để dán ảnh, hoặc <span style="color: var(--primary); text-decoration: underline;">chọn từ máy tính</span></h3>
         <p class="dropzone-hint">Hỗ trợ Ảnh (PNG, JPG, WebP), PDF, Word, Excel, File nén (ZIP, RAR) tối đa 25MB.</p>
 
         <!-- Progress Indicator -->
@@ -915,6 +923,34 @@
     fileInput.addEventListener("change", (e) => {
       if (e.target.files && e.target.files.length > 0) {
         handleFilesUpload(e.target.files);
+      }
+    });
+
+    // Global Clipboard Paste (Ctrl + V) support for images
+    window.addEventListener("paste", (e) => {
+      const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : "";
+      if (activeTag === "input" || activeTag === "textarea") return;
+
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      let pastedImageFile = null;
+
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          pastedImageFile = items[i].getAsFile();
+          break;
+        }
+      }
+
+      if (pastedImageFile) {
+        e.preventDefault();
+        switchTab("files");
+        const formattedName = `screenshot_${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.png`;
+        const fileWithProperName = new File([pastedImageFile], formattedName, { type: pastedImageFile.type || "image/png" });
+        
+        const confirmUpload = confirm(`📋 Bạn vừa dán 1 hình ảnh từ Clipboard.\n\nBạn có muốn tải ảnh này lên Google Drive ngay không?`);
+        if (confirmUpload) {
+          handleFilesUpload([fileWithProperName]);
+        }
       }
     });
 

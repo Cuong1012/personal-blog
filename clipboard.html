@@ -1,0 +1,860 @@
+﻿<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trình Xem & Mở Ảnh Clipboard | cuongtv.</title>
+  <meta name="description" content="Trình xem, chỉnh sửa và mở ảnh nhanh từ bộ nhớ tạm (clipboard) bằng trình duyệt. Hỗ trợ phóng to, xoay, xem kích thước và lưu vào Google Drive." />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Main Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* Custom styles for Clipboard Viewer */
+    .clipboard-page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-body);
+      color: var(--text-main);
+    }
+
+    .clipboard-header {
+      padding: 24px 0 16px;
+      text-align: center;
+    }
+
+    .clipboard-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .clipboard-subtitle {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .clipboard-key-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 0 var(--border-color);
+      color: var(--primary);
+    }
+
+    /* Drop / Paste Zone */
+    .paste-zone-card {
+      background: var(--bg-surface);
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 60px 24px;
+      text-align: center;
+      transition: var(--transition);
+      cursor: pointer;
+      margin: 20px auto;
+      max-width: 800px;
+      position: relative;
+    }
+
+    .paste-zone-card:hover, .paste-zone-card.dragover {
+      border-color: var(--primary);
+      background: var(--primary-glow);
+      transform: translateY(-2px);
+    }
+
+    .paste-icon {
+      font-size: 3.5rem;
+      color: var(--primary);
+      margin-bottom: 18px;
+      display: inline-block;
+      animation: floatIcon 3s ease-in-out infinite;
+    }
+
+    @keyframes floatIcon {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .paste-prompt-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .paste-prompt-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .paste-actions-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Viewer Container */
+    .viewer-container {
+      display: none;
+      flex-direction: column;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-xl);
+      margin-bottom: 30px;
+    }
+
+    .viewer-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 12px 18px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      user-select: none;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tool-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tool-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .tool-btn.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .tool-btn.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .tool-btn.danger {
+      color: var(--danger);
+    }
+
+    .tool-btn.danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--danger);
+    }
+
+    .zoom-level-badge {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+      min-width: 58px;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Viewer Stage */
+    .viewer-stage {
+      position: relative;
+      height: 65vh;
+      min-height: 480px;
+      overflow: hidden;
+      background-color: #0b0f19;
+      background-image: 
+        linear-gradient(45deg, #131b2e 25%, transparent 25%), 
+        linear-gradient(-45deg, #131b2e 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #131b2e 75%), 
+        linear-gradient(-45deg, transparent 75%, #131b2e 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+    }
+
+    .viewer-stage:active {
+      cursor: grabbing;
+    }
+
+    .viewer-img-wrapper {
+      position: absolute;
+      transform-origin: center center;
+      transition: transform 0.05s ease-out;
+      will-change: transform;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .viewer-img-wrapper img {
+      display: block;
+      max-width: none;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      pointer-events: none;
+    }
+
+    /* Viewer Info Bar */
+    .viewer-infobar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border-top: 1px solid var(--border-color);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .info-tags {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .info-tag-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .info-tag-item strong {
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+    }
+
+    /* Toast Notification */
+    .toast-popup {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-left: 4px solid var(--primary);
+      padding: 14px 20px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-main);
+      z-index: 9999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+
+    .toast-popup.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast-popup.success { border-left-color: var(--success); }
+    .toast-popup.error { border-left-color: var(--danger); }
+  </style>
+</head>
+<body class="clipboard-page-wrapper">
+
+  <!-- HEADER & NAVIGATION -->
+  <header class="header" id="header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+        <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+          <li><a href="form.html" class="nav-link"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
+          <li><a href="clipboard.html" class="nav-link active" style="color:var(--primary); font-weight:700;"><i class="fa-regular fa-image"></i> Xem ảnh Clipboard</a></li>
+          <li><a href="login.html" class="nav-link"><i class="fa-solid fa-lock"></i> Khu vực riêng tư</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="theme-toggle" aria-label="Đổi giao diện">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="container" style="flex: 1; padding: 20px 20px 40px;">
+    <!-- HEADER INTRO -->
+    <div class="clipboard-header">
+      <h1 class="clipboard-title">
+        <i class="fa-regular fa-clipboard" style="color: var(--primary);"></i>
+        Trình Mở Ảnh Clipboard
+      </h1>
+      <p class="clipboard-subtitle">
+        Nhấn <span class="clipboard-key-badge">Ctrl</span> + <span class="clipboard-key-badge">V</span> ở bất kỳ đâu để mở ảnh chụp màn hình, hoặc dán từ bộ nhớ tạm.
+      </p>
+    </div>
+
+    <!-- 1. EMPTY / PASTE ZONE (Hiển thị khi chưa có ảnh) -->
+    <div class="paste-zone-card" id="pasteZoneCard">
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" />
+      <div class="paste-icon">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+      </div>
+      <h2 class="paste-prompt-title">Dán hoặc Kéo thả ảnh vào đây</h2>
+      <p class="paste-prompt-desc">
+        Chụp màn hình (PrintScreen / Snipping Tool), rồi bấm <span class="clipboard-key-badge">Ctrl + V</span> để xem ngay lập tức mà không cần lưu vào máy.
+      </p>
+
+      <div class="paste-actions-row">
+        <button type="button" class="btn btn-primary" id="pasteFromClipboardBtn">
+          <i class="fa-regular fa-paste"></i> Dán Ảnh từ Clipboard
+        </button>
+        <button type="button" class="btn btn-secondary" id="browseFileBtn">
+          <i class="fa-regular fa-folder-open"></i> Chọn Ảnh từ Máy
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. VIEWER CONTAINER (Hiển thị khi đã có ảnh) -->
+    <div class="viewer-container" id="viewerContainer">
+      <!-- TOOLBAR -->
+      <div class="viewer-toolbar">
+        <!-- ZOOM & TRANSFORM TOOLS -->
+        <div class="toolbar-group">
+          <button class="tool-btn" id="zoomOutBtn" title="Thu nhỏ (Cuộn chuột xuống)"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+          <span class="zoom-level-badge" id="zoomBadge">100%</span>
+          <button class="tool-btn" id="zoomInBtn" title="Phóng to (Cuộn chuột lên)"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+          <button class="tool-btn" id="zoomResetBtn" title="Kích thước gốc 100%"><i class="fa-solid fa-expand"></i> 1:1</button>
+          <button class="tool-btn" id="fitScreenBtn" title="Vừa khít khung xem"><i class="fa-solid fa-compress"></i> Vừa khung</button>
+        </div>
+
+        <div class="toolbar-group">
+          <button class="tool-btn" id="rotateLeftBtn" title="Xoay trái 90°"><i class="fa-solid fa-rotate-left"></i></button>
+          <button class="tool-btn" id="rotateRightBtn" title="Xoay phải 90°"><i class="fa-solid fa-rotate-right"></i></button>
+          <button class="tool-btn" id="flipHBtn" title="Lật ngang"><i class="fa-solid fa-arrows-left-right"></i></button>
+          <button class="tool-btn" id="flipVBtn" title="Lật dọc"><i class="fa-solid fa-arrows-up-down"></i></button>
+          <button class="tool-btn" id="fullscreenBtn" title="Toàn màn hình"><i class="fa-solid fa-maximize"></i></button>
+        </div>
+
+        <!-- ACTION TOOLS -->
+        <div class="toolbar-group">
+          <button class="tool-btn" id="copyImgBtn" title="Sao chép lại vào bộ nhớ tạm"><i class="fa-regular fa-copy"></i> Sao chép</button>
+          <button class="tool-btn" id="downloadBtn" title="Tải ảnh về máy"><i class="fa-solid fa-download"></i> Tải về</button>
+          <button class="tool-btn primary" id="uploadDriveBtn" title="Lưu thẳng vào Google Drive của bạn"><i class="fa-brands fa-google-drive"></i> Lưu vào Drive</button>
+          <button class="tool-btn danger" id="clearImgBtn" title="Đóng và dán ảnh mới"><i class="fa-solid fa-trash-can"></i> Đổi ảnh</button>
+        </div>
+      </div>
+
+      <!-- VIEWPORT STAGE -->
+      <div class="viewer-stage" id="viewerStage">
+        <div class="viewer-img-wrapper" id="viewerWrapper">
+          <img id="mainImage" src="" alt="Clipboard Image" />
+        </div>
+      </div>
+
+      <!-- STATUS & INFO BAR -->
+      <div class="viewer-infobar">
+        <div class="info-tags">
+          <div class="info-tag-item"><i class="fa-solid fa-arrows-left-right-to-line"></i> Độ phân giải: <strong id="infoDimensions">0 × 0 px</strong></div>
+          <div class="info-tag-item"><i class="fa-regular fa-file"></i> Dung lượng: <strong id="infoFileSize">0 KB</strong></div>
+          <div class="info-tag-item"><i class="fa-solid fa-tag"></i> Định dạng: <strong id="infoMime">PNG</strong></div>
+        </div>
+        <div class="info-hints">
+          <span><i class="fa-regular fa-lightbulb"></i> Mẹo: Nhấp &amp; kéo chuột để di chuyển ảnh | Cuộn chuột để phóng to/thu nhỏ</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-popup" id="toastPopup">
+    <i class="fa-solid fa-circle-check" id="toastIcon" style="color: var(--success); font-size: 1.2rem;"></i>
+    <span id="toastMessage">Thông báo</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <a href="index.html" class="brand-logo footer-logo">
+          <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+          <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
+        </a>
+        <p class="footer-copy">
+          Trình xem và xử lý ảnh clipboard trực tiếp trên trình duyệt.
+        </p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-socials">
+          <a href="https://github.com/Cuong1012" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="login.html" title="Đăng nhập riêng tư"><i class="fa-solid fa-lock"></i></a>
+          <a href="#" class="back-to-top" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/auth.js"></script>
+  <script>
+    // ==========================================
+    // THEME MANAGEMENT
+    // ==========================================
+    const themeToggleBtn = document.getElementById("themeToggle");
+    const savedTheme = localStorage.getItem("devlog-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    updateThemeIcon(savedTheme);
+
+    themeToggleBtn.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const nextTheme = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      localStorage.setItem("devlog-theme", nextTheme);
+      updateThemeIcon(nextTheme);
+    });
+
+    function updateThemeIcon(theme) {
+      const icon = themeToggleBtn.querySelector("i");
+      if (theme === "dark") {
+        icon.className = "fa-solid fa-sun";
+      } else {
+        icon.className = "fa-solid fa-moon";
+      }
+    }
+
+    // ==========================================
+    // TOAST UTILITY
+    // ==========================================
+    const toastPopup = document.getElementById("toastPopup");
+    const toastIcon = document.getElementById("toastIcon");
+    const toastMessage = document.getElementById("toastMessage");
+    let toastTimeout = null;
+
+    function showToast(msg, type = "success") {
+      clearTimeout(toastTimeout);
+      toastMessage.textContent = msg;
+      toastPopup.className = 	oast-popup show ;
+      if (type === "success") {
+        toastIcon.className = "fa-solid fa-circle-check";
+        toastIcon.style.color = "var(--success)";
+      } else {
+        toastIcon.className = "fa-solid fa-triangle-exclamation";
+        toastIcon.style.color = "var(--danger)";
+      }
+      toastTimeout = setTimeout(() => {
+        toastPopup.classList.remove("show");
+      }, 3500);
+    }
+
+    // ==========================================
+    // STATE & DOM ELEMENTS
+    // ==========================================
+    const pasteZoneCard = document.getElementById("pasteZoneCard");
+    const viewerContainer = document.getElementById("viewerContainer");
+    const fileInput = document.getElementById("fileInput");
+    const pasteFromClipboardBtn = document.getElementById("pasteFromClipboardBtn");
+    const browseFileBtn = document.getElementById("browseFileBtn");
+
+    const viewerStage = document.getElementById("viewerStage");
+    const viewerWrapper = document.getElementById("viewerWrapper");
+    const mainImage = document.getElementById("mainImage");
+
+    const zoomBadge = document.getElementById("zoomBadge");
+    const zoomInBtn = document.getElementById("zoomInBtn");
+    const zoomOutBtn = document.getElementById("zoomOutBtn");
+    const zoomResetBtn = document.getElementById("zoomResetBtn");
+    const fitScreenBtn = document.getElementById("fitScreenBtn");
+
+    const rotateLeftBtn = document.getElementById("rotateLeftBtn");
+    const rotateRightBtn = document.getElementById("rotateRightBtn");
+    const flipHBtn = document.getElementById("flipHBtn");
+    const flipVBtn = document.getElementById("flipVBtn");
+    const fullscreenBtn = document.getElementById("fullscreenBtn");
+
+    const copyImgBtn = document.getElementById("copyImgBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const uploadDriveBtn = document.getElementById("uploadDriveBtn");
+    const clearImgBtn = document.getElementById("clearImgBtn");
+
+    const infoDimensions = document.getElementById("infoDimensions");
+    const infoFileSize = document.getElementById("infoFileSize");
+    const infoMime = document.getElementById("infoMime");
+
+    // Current Image Transformation State
+    let currentBlob = null;
+    let currentDataUrl = "";
+    let naturalWidth = 0;
+    let naturalHeight = 0;
+    let currentFileName = "clipboard_image.png";
+
+    let scale = 1;
+    let posX = 0;
+    let posY = 0;
+    let rotation = 0;
+    let flipH = 1;
+    let flipV = 1;
+
+    let isDragging = false;
+    let startX = 0;
+    let startY = 0;
+
+    // ==========================================
+    // IMAGE LOADING & PROCESSING
+    // ==========================================
+    function loadImageFromFile(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        showToast("Tệp được chọn không phải là định dạng hình ảnh hợp lệ!", "error");
+        return;
+      }
+
+      currentBlob = file;
+      currentFileName = file.name || clipboard_.png;
+      infoMime.textContent = file.type.replace("image/", "").toUpperCase();
+      infoFileSize.textContent = formatBytes(file.size);
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        currentDataUrl = e.target.result;
+        mainImage.src = currentDataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    mainImage.onload = () => {
+      naturalWidth = mainImage.naturalWidth;
+      naturalHeight = mainImage.naturalHeight;
+      infoDimensions.textContent = ${naturalWidth} ×  px;
+
+      // Switch view
+      pasteZoneCard.style.display = "none";
+      viewerContainer.style.display = "flex";
+
+      // Reset transformations and fit
+      resetTransformations();
+      fitToScreen();
+      showToast("Đã mở ảnh thành công! Bạn có thể zoom, xoay hoặc lưu ảnh.");
+    };
+
+    function resetTransformations() {
+      scale = 1;
+      posX = 0;
+      posY = 0;
+      rotation = 0;
+      flipH = 1;
+      flipV = 1;
+      applyTransform();
+    }
+
+    function applyTransform() {
+      viewerWrapper.style.transform = 	ranslate(px, px) scale() rotate(deg) scaleX() scaleY();
+      zoomBadge.textContent = ${Math.round(scale * 100)}%;
+    }
+
+    function fitToScreen() {
+      if (!naturalWidth || !naturalHeight) return;
+      const stageRect = viewerStage.getBoundingClientRect();
+      const padding = 40;
+      const availW = stageRect.width - padding;
+      const availH = stageRect.height - padding;
+
+      const scaleW = availW / naturalWidth;
+      const scaleH = availH / naturalHeight;
+      scale = Math.min(scaleW, scaleH, 1);
+      posX = 0;
+      posY = 0;
+      applyTransform();
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes || bytes === 0) return "0 Bytes";
+      const k = 1024;
+      const sizes = ["Bytes", "KB", "MB", "GB"];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    }
+
+    // ==========================================
+    // CLIPBOARD PASTE LISTENER (GLOBAL)
+    // ==========================================
+    window.addEventListener("paste", (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      let foundImage = false;
+
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type.indexOf("image") !== -1) {
+          const blob = item.getAsFile();
+          loadImageFromFile(blob);
+          foundImage = true;
+          break;
+        }
+      }
+
+      if (foundImage) {
+        e.preventDefault();
+      }
+    });
+
+    // Button: Dán từ Clipboard (Async API)
+    pasteFromClipboardBtn.addEventListener("click", async () => {
+      try {
+        if (!navigator.clipboard || !navigator.clipboard.read) {
+          showToast("Trình duyệt không hỗ trợ đọc tự động. Hãy nhấn Ctrl + V!", "error");
+          return;
+        }
+
+        const clipboardItems = await navigator.clipboard.read();
+        let found = false;
+
+        for (const item of clipboardItems) {
+          const imageType = item.types.find(t => t.startsWith("image/"));
+          if (imageType) {
+            const blob = await item.getType(imageType);
+            loadImageFromFile(blob);
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          showToast("Không tìm thấy hình ảnh nào trong Clipboard! Hãy chụp màn hình hoặc Copy ảnh trước.", "error");
+        }
+      } catch (err) {
+        showToast("Vui lòng cho phép quyền truy cập bộ nhớ tạm hoặc nhấn phím Ctrl + V!", "error");
+      }
+    });
+
+    // File selection
+    browseFileBtn.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        loadImageFromFile(e.target.files[0]);
+      }
+    });
+
+    // Drag & Drop
+    ["dragenter", "dragover"].forEach(name => {
+      pasteZoneCard.addEventListener(name, (e) => {
+        e.preventDefault();
+        pasteZoneCard.classList.add("dragover");
+      });
+    });
+
+    ["dragleave", "drop"].forEach(name => {
+      pasteZoneCard.addEventListener(name, (e) => {
+        e.preventDefault();
+        pasteZoneCard.classList.remove("dragover");
+      });
+    });
+
+    pasteZoneCard.addEventListener("drop", (e) => {
+      if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+        loadImageFromFile(e.dataTransfer.files[0]);
+      }
+    });
+
+    // ==========================================
+    // VIEWER INTERACTIONS (PAN & ZOOM)
+    // ==========================================
+    viewerStage.addEventListener("mousedown", (e) => {
+      if (e.button !== 0) return;
+      isDragging = true;
+      startX = e.clientX - posX;
+      startY = e.clientY - posY;
+      viewerStage.style.cursor = "grabbing";
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      posX = e.clientX - startX;
+      posY = e.clientY - startY;
+      applyTransform();
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (isDragging) {
+        isDragging = false;
+        viewerStage.style.cursor = "grab";
+      }
+    });
+
+    // Mouse Wheel Zoom
+    viewerStage.addEventListener("wheel", (e) => {
+      e.preventDefault();
+      const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+      const newScale = scale * zoomFactor;
+
+      if (newScale >= 0.05 && newScale <= 30) {
+        scale = newScale;
+        applyTransform();
+      }
+    }, { passive: false });
+
+    // Zoom Buttons
+    zoomInBtn.addEventListener("click", () => {
+      scale = Math.min(scale * 1.25, 30);
+      applyTransform();
+    });
+
+    zoomOutBtn.addEventListener("click", () => {
+      scale = Math.max(scale * 0.8, 0.05);
+      applyTransform();
+    });
+
+    zoomResetBtn.addEventListener("click", () => {
+      scale = 1;
+      posX = 0;
+      posY = 0;
+      applyTransform();
+    });
+
+    fitScreenBtn.addEventListener("click", fitToScreen);
+
+    // Rotate & Flip Buttons
+    rotateLeftBtn.addEventListener("click", () => {
+      rotation = (rotation - 90) % 360;
+      applyTransform();
+    });
+
+    rotateRightBtn.addEventListener("click", () => {
+      rotation = (rotation + 90) % 360;
+      applyTransform();
+    });
+
+    flipHBtn.addEventListener("click", () => {
+      flipH *= -1;
+      applyTransform();
+    });
+
+    flipVBtn.addEventListener("click", () => {
+      flipV *= -1;
+      applyTransform();
+    });
+
+    // Fullscreen
+    fullscreenBtn.addEventListener("click", () => {
+      if (!document.fullscreenElement) {
+        viewerStage.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // ==========================================
+    // ACTION TOOLS (COPY, DOWNLOAD, DRIVE, CLEAR)
+    // ==========================================
+    // 1. Sao chép lại vào Clipboard
+    copyImgBtn.addEventListener("click", async () => {
+      if (!currentBlob) return;
+      try {
+        if (!navigator.clipboard || !window.ClipboardItem) {
+          showToast("Trình duyệt không hỗ trợ sao chép ảnh tự động.", "error");
+          return;
+        }
+
+        const item = new ClipboardItem({ [currentBlob.type]: currentBlob });
+        await navigator.clipboard.write([item]);
+        showToast("Đã sao chép hình ảnh vào bộ nhớ tạm (Clipboard)!");
+      } catch (err) {
+        showToast("Lỗi sao chép ảnh: " + err.message, "error");
+      }
+    });
+
+    // 2. Tải ảnh về máy tính
+    downloadBtn.addEventListener("click", () => {
+      if (!currentDataUrl) return;
+      const a = document.createElement("a");
+      a.href = currentDataUrl;
+      a.download = currentFileName || cuongtv_image_.png;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("Đang tải ảnh về máy tính...");
+    });
+
+    // 3. Tải thẳng lên Google Drive cá nhân
+    uploadDriveBtn.addEventListener("click", async () => {
+      if (!currentBlob) return;
+
+      const origText = uploadDriveBtn.innerHTML;
+      uploadDriveBtn.disabled = true;
+      uploadDriveBtn.innerHTML = <i class="fa-solid fa-spinner fa-spin"></i> Đang tải lên Drive...;
+
+      try {
+        const res = await DevLogAuth.uploadFileToDrive(currentBlob);
+        if (res.success) {
+          showToast("Đã lưu ảnh thành công vào Google Drive của bạn!");
+        } else {
+          showToast("Lỗi tải lên Drive: " + res.message, "error");
+        }
+      } catch (err) {
+        showToast("Lỗi kết nối tới Google Drive: " + err.message, "error");
+      } finally {
+        uploadDriveBtn.disabled = false;
+        uploadDriveBtn.innerHTML = origText;
+      }
+    });
+
+    // 4. Đóng ảnh để dán ảnh mới
+    clearImgBtn.addEventListener("click", () => {
+      currentBlob = null;
+      currentDataUrl = "";
+      mainImage.src = "";
+      fileInput.value = "";
+
+      viewerContainer.style.display = "none";
+      pasteZoneCard.style.display = "block";
+      showToast("Đã dọn khung xem. Bạn có thể bấm Ctrl + V để dán ảnh mới!");
+    });
+  </script>
+</body>
+</html>
