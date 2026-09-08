@@ -302,6 +302,145 @@
     .toast-popup.success { border-left-color: var(--success); }
     .toast-popup.error { border-left-color: var(--danger); }
 
+    
+    /* ==========================================
+       CROP / REGION SELECTION STYLES
+       ========================================== */
+    .crop-banner {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.88rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 100;
+      user-select: none;
+      pointer-events: auto;
+    }
+
+    .crop-banner.active {
+      display: inline-flex;
+    }
+
+    .crop-banner-tip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #e2e8f0;
+    }
+
+    .crop-cancel-btn {
+      background: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 3px 12px;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .crop-cancel-btn:hover {
+      background: rgba(239, 68, 68, 0.4);
+      color: #ffffff;
+    }
+
+    .crop-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    .crop-overlay.active {
+      display: block;
+    }
+
+    .crop-box {
+      position: absolute;
+      border: 2px dashed #10b981;
+      background: rgba(16, 185, 129, 0.16);
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+      display: none;
+      pointer-events: none;
+    }
+
+    .crop-box-badge {
+      position: absolute;
+      top: -24px;
+      left: 0;
+      background: #10b981;
+      color: #ffffff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-family: var(--font-mono);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .crop-actions-bar {
+      position: absolute;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 6px 10px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(16, 185, 129, 0.5);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      z-index: 120;
+      user-select: none;
+      pointer-events: auto;
+    }
+
+    .crop-act-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.84rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+    }
+
+    .crop-act-btn.primary {
+      background: #10b981;
+      color: #ffffff;
+    }
+
+    .crop-act-btn.primary:hover {
+      background: #059669;
+    }
+
+    .crop-act-btn.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .crop-act-btn.secondary:hover {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+    }
+
     /* OCR Modal Styles */
     .ocr-modal-backdrop {
       position: fixed;
@@ -591,7 +730,8 @@
 
         <!-- ACTION TOOLS -->
         <div class="toolbar-group">
-          <button class="tool-btn" id="ocrBtn" style="background: rgba(99, 102, 241, 0.12); color: var(--accent); border-color: rgba(99, 102, 241, 0.35); font-weight: 700;" title="Chuyển chữ trong ảnh thành văn bản (AI OCR)"><i class="fa-solid fa-wand-magic-sparkles"></i> Lấy chữ (OCR)</button>
+          <button class="tool-btn" id="cropOcrBtn" style="background: rgba(16, 185, 129, 0.14); color: #10b981; border-color: rgba(16, 185, 129, 0.4); font-weight: 700;" title="Khoanh vùng một đoạn chữ trên ảnh để quét riêng vùng đó"><i class="fa-solid fa-crop-simple"></i> Quét Vùng Chọn</button>
+          <button class="tool-btn" id="ocrBtn" style="background: rgba(99, 102, 241, 0.12); color: var(--accent); border-color: rgba(99, 102, 241, 0.35); font-weight: 700;" title="Chuyển chữ toàn bộ ảnh thành văn bản (AI OCR)"><i class="fa-solid fa-wand-magic-sparkles"></i> Lấy chữ toàn ảnh</button>
           <button class="tool-btn" id="copyImgBtn" title="Sao chép lại vào bộ nhớ tạm"><i class="fa-regular fa-copy"></i> Sao chép</button>
           <button class="tool-btn" id="openNewTabBtn" title="Mở ảnh trong tab mới"><i class="fa-solid fa-arrow-up-right-from-square"></i> Mở tab mới</button>
           <button class="tool-btn" id="downloadBtn" title="Tải ảnh về máy"><i class="fa-solid fa-download"></i> Tải về</button>
@@ -602,6 +742,23 @@
 
       <!-- VIEWPORT STAGE -->
       <div class="viewer-stage" id="viewerStage">
+        <!-- Crop Banner -->
+        <div class="crop-banner" id="cropBanner">
+          <span class="crop-banner-tip"><i class="fa-solid fa-crop-simple" style="color: #10b981;"></i> Kéo chuột để khoanh vùng chữ cần quét. Nhấn <strong>Hủy</strong> hoặc phím <strong>ESC</strong> để thoát.</span>
+          <button type="button" class="crop-cancel-btn" id="exitCropBtn"><i class="fa-solid fa-xmark"></i> Hủy</button>
+        </div>
+
+        <!-- Crop Overlay & Selection Box -->
+        <div class="crop-overlay" id="cropOverlay">
+          <div class="crop-box" id="cropBox">
+            <span class="crop-box-badge" id="cropBoxBadge">0 × 0 px</span>
+          </div>
+          <div class="crop-actions-bar" id="cropActionsBar">
+            <button type="button" class="crop-act-btn primary" id="doCropOcrBtn"><i class="fa-solid fa-wand-magic-sparkles"></i> Quét Chữ Vùng Này</button>
+            <button type="button" class="crop-act-btn secondary" id="clearCropSelectionBtn"><i class="fa-solid fa-rotate-left"></i> Chọn lại</button>
+          </div>
+        </div>
+
         <div class="viewer-img-wrapper" id="viewerWrapper">
           <img id="mainImage" src="" alt="Clipboard Image" />
         </div>
@@ -628,6 +785,9 @@
       <div class="ocr-modal-title">
         <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
         <h3>Chuyển Chữ Trong Ảnh Thành Text (AI OCR)</h3>
+        <span id="ocrTargetBadge" style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 9999px; font-size: 0.78rem; font-weight: 700; border: 1px solid rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.1); color: var(--accent); margin-left: 8px;">
+          <i class="fa-regular fa-image"></i> Toàn bộ ảnh
+        </span>
       </div>
       <button class="ocr-close-btn" id="closeOcrBtn" aria-label="Đóng">&times;</button>
     </div>
@@ -1200,9 +1360,20 @@
     });
 
     // ==========================================
-    // 6. OCR (TEXT RECOGNITION FROM IMAGE)
+    // 6. OCR & CROP REGION SELECTION
     // ==========================================
     const ocrBtn = document.getElementById('ocrBtn');
+    const cropOcrBtn = document.getElementById('cropOcrBtn');
+    const cropBanner = document.getElementById('cropBanner');
+    const exitCropBtn = document.getElementById('exitCropBtn');
+    const cropOverlay = document.getElementById('cropOverlay');
+    const cropBox = document.getElementById('cropBox');
+    const cropBoxBadge = document.getElementById('cropBoxBadge');
+    const cropActionsBar = document.getElementById('cropActionsBar');
+    const doCropOcrBtn = document.getElementById('doCropOcrBtn');
+    const clearCropSelectionBtn = document.getElementById('clearCropSelectionBtn');
+    const ocrTargetBadge = document.getElementById('ocrTargetBadge');
+
     const ocrModal = document.getElementById('ocrModal');
     const ocrModalBackdrop = document.getElementById('ocrModalBackdrop');
     const closeOcrBtn = document.getElementById('closeOcrBtn');
@@ -1219,18 +1390,249 @@
     const saveOcrToNotesBtn = document.getElementById('saveOcrToNotesBtn');
 
     let isTesseractLoaded = false;
+    let isCropMode = false;
+    let isSelectingCrop = false;
+    let cropStartX = 0, cropStartY = 0;
+    let activeOcrBlob = null;
+    let activeCropDims = null;
 
-    function openOcrModal() {
+    // --- CROP MODE HANDLERS ---
+    function enterCropMode() {
       if (!currentBlob) {
+        showToast('Vui lòng mở hoặc dán ảnh trước khi chọn vùng quét!', 'error');
+        return;
+      }
+      isCropMode = true;
+      cropBanner.classList.add('active');
+      cropOverlay.classList.add('active');
+      cropBox.style.display = 'none';
+      cropActionsBar.style.display = 'none';
+      viewerStage.style.cursor = 'crosshair';
+      cropOcrBtn.style.background = 'rgba(16, 185, 129, 0.3)';
+      cropOcrBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Thoát Khoanh Vùng';
+      showToast('Hãy kéo chuột khoanh vùng văn bản cần quét chữ!');
+    }
+
+    function exitCropMode() {
+      isCropMode = false;
+      isSelectingCrop = false;
+      cropBanner.classList.remove('active');
+      cropOverlay.classList.remove('active');
+      cropBox.style.display = 'none';
+      cropActionsBar.style.display = 'none';
+      viewerStage.style.cursor = 'grab';
+      cropOcrBtn.style.background = 'rgba(16, 185, 129, 0.14)';
+      cropOcrBtn.innerHTML = '<i class="fa-solid fa-crop-simple"></i> Quét Vùng Chọn';
+    }
+
+    cropOcrBtn.addEventListener('click', () => {
+      if (isCropMode) {
+        exitCropMode();
+      } else {
+        enterCropMode();
+      }
+    });
+
+    exitCropBtn.addEventListener('click', exitCropMode);
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isCropMode) {
+        exitCropMode();
+      }
+    });
+
+    // Mousedown on overlay: start selection box
+    cropOverlay.addEventListener('mousedown', (e) => {
+      if (e.button !== 0) return;
+      if (e.target.closest('#cropActionsBar') || e.target.closest('#cropBanner')) return;
+      
+      const stageRect = viewerStage.getBoundingClientRect();
+      isSelectingCrop = true;
+      cropStartX = e.clientX - stageRect.left;
+      cropStartY = e.clientY - stageRect.top;
+
+      cropBox.style.left = cropStartX + 'px';
+      cropBox.style.top = cropStartY + 'px';
+      cropBox.style.width = '0px';
+      cropBox.style.height = '0px';
+      cropBox.style.display = 'block';
+      cropActionsBar.style.display = 'none';
+    });
+
+    // Mousemove: expand selection box
+    window.addEventListener('mousemove', (e) => {
+      if (!isSelectingCrop) return;
+      const stageRect = viewerStage.getBoundingClientRect();
+      const currentX = Math.max(0, Math.min(e.clientX - stageRect.left, stageRect.width));
+      const currentY = Math.max(0, Math.min(e.clientY - stageRect.top, stageRect.height));
+
+      const left = Math.min(cropStartX, currentX);
+      const top = Math.min(cropStartY, currentY);
+      const width = Math.abs(currentX - cropStartX);
+      const height = Math.abs(currentY - cropStartY);
+
+      cropBox.style.left = left + 'px';
+      cropBox.style.top = top + 'px';
+      cropBox.style.width = width + 'px';
+      cropBox.style.height = height + 'px';
+
+      cropBoxBadge.textContent = Math.round(width) + ' × ' + Math.round(height) + ' px';
+    });
+
+    // Mouseup: finalize selection box
+    window.addEventListener('mouseup', (e) => {
+      if (!isSelectingCrop) return;
+      isSelectingCrop = false;
+
+      const boxW = parseFloat(cropBox.style.width) || 0;
+      const boxH = parseFloat(cropBox.style.height) || 0;
+
+      if (boxW < 20 || boxH < 20) {
+        cropBox.style.display = 'none';
+        cropActionsBar.style.display = 'none';
+        return;
+      }
+
+      // Position action bar right under the selection box
+      const boxLeft = parseFloat(cropBox.style.left) || 0;
+      const boxTop = parseFloat(cropBox.style.top) || 0;
+      const stageRect = viewerStage.getBoundingClientRect();
+
+      let barTop = boxTop + boxH + 10;
+      if (barTop + 45 > stageRect.height) {
+        barTop = Math.max(10, boxTop - 46);
+      }
+      let barLeft = Math.max(10, Math.min(boxLeft, stageRect.width - 260));
+
+      cropActionsBar.style.left = barLeft + 'px';
+      cropActionsBar.style.top = barTop + 'px';
+      cropActionsBar.style.display = 'flex';
+    });
+
+    clearCropSelectionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      cropBox.style.display = 'none';
+      cropActionsBar.style.display = 'none';
+    });
+
+    // Function to slice image from selection box
+    function getCroppedBlob() {
+      return new Promise((resolve) => {
+        if (!mainImage || !naturalWidth || !naturalHeight) return resolve(null);
+
+        const boxRect = cropBox.getBoundingClientRect();
+        const stageRect = viewerStage.getBoundingClientRect();
+
+        // High quality native slice when no rotation and no flip
+        if ((rotation % 360 === 0) && flipH === 1 && flipV === 1) {
+          const imgRect = mainImage.getBoundingClientRect();
+          const scaleX = naturalWidth / imgRect.width;
+          const scaleY = naturalHeight / imgRect.height;
+
+          let sx = (boxRect.left - imgRect.left) * scaleX;
+          let sy = (boxRect.top - imgRect.top) * scaleY;
+          let sw = boxRect.width * scaleX;
+          let sh = boxRect.height * scaleY;
+
+          const x1 = Math.max(0, Math.min(sx, naturalWidth));
+          const y1 = Math.max(0, Math.min(sy, naturalHeight));
+          const x2 = Math.max(0, Math.min(sx + sw, naturalWidth));
+          const y2 = Math.max(0, Math.min(sy + sh, naturalHeight));
+
+          const cw = Math.round(x2 - x1);
+          const ch = Math.round(y2 - y1);
+
+          if (cw < 10 || ch < 10) return resolve(null);
+
+          const canvas = document.createElement('canvas');
+          canvas.width = cw;
+          canvas.height = ch;
+          const ctx = canvas.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(mainImage, x1, y1, cw, ch, 0, 0, cw, ch);
+          activeCropDims = { width: cw, height: ch };
+          canvas.toBlob((blob) => resolve(blob), 'image/png');
+          return;
+        }
+
+        // Rotated / flipped slice: render transformed view with high DPI
+        const dpr = Math.max(2, window.devicePixelRatio || 1);
+        const stageW = stageRect.width;
+        const stageH = stageRect.height;
+        const fullCanvas = document.createElement('canvas');
+        fullCanvas.width = Math.round(stageW * dpr);
+        fullCanvas.height = Math.round(stageH * dpr);
+        const ctx = fullCanvas.getContext('2d');
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.scale(dpr, dpr);
+
+        ctx.translate((stageW / 2) + posX, (stageH / 2) + posY);
+        ctx.scale(scale, scale);
+        ctx.rotate((rotation * Math.PI) / 180);
+        ctx.scale(flipH, flipV);
+
+        ctx.drawImage(mainImage, -naturalWidth / 2, -naturalHeight / 2, naturalWidth, naturalHeight);
+
+        const cropW = Math.round(boxRect.width * dpr);
+        const cropH = Math.round(boxRect.height * dpr);
+        const cropCanvas = document.createElement('canvas');
+        cropCanvas.width = cropW;
+        cropCanvas.height = cropH;
+        const cropCtx = cropCanvas.getContext('2d');
+
+        const cropX = Math.round((boxRect.left - stageRect.left) * dpr);
+        const cropY = Math.round((boxRect.top - stageRect.top) * dpr);
+
+        cropCtx.drawImage(fullCanvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+        activeCropDims = { width: Math.round(boxRect.width), height: Math.round(boxRect.height) };
+        cropCanvas.toBlob((blob) => resolve(blob), 'image/png');
+      });
+    }
+
+    doCropOcrBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const croppedBlob = await getCroppedBlob();
+      if (!croppedBlob) {
+        showToast('Vùng chọn nằm ngoài ảnh hoặc quá nhỏ!', 'error');
+        return;
+      }
+      activeOcrBlob = croppedBlob;
+      exitCropMode();
+      openOcrModal(true);
+    });
+
+    // --- OCR MODAL HANDLERS ---
+    function openOcrModal(isFromCrop = false) {
+      if (!currentBlob && !activeOcrBlob) {
         showToast('Vui lòng mở hình ảnh trước khi trích xuất chữ!', 'error');
         return;
       }
+
+      if (!isFromCrop) {
+        activeOcrBlob = currentBlob;
+        activeCropDims = null;
+        ocrTargetBadge.innerHTML = `<i class="fa-regular fa-image"></i> Toàn bộ ảnh (${naturalWidth || 0} × ${naturalHeight || 0} px)`;
+        ocrTargetBadge.style.color = 'var(--accent)';
+        ocrTargetBadge.style.background = 'rgba(99, 102, 241, 0.1)';
+        ocrTargetBadge.style.borderColor = 'rgba(99, 102, 241, 0.3)';
+      } else {
+        const w = activeCropDims ? activeCropDims.width : Math.round(parseFloat(cropBox.style.width) || 0);
+        const h = activeCropDims ? activeCropDims.height : Math.round(parseFloat(cropBox.style.height) || 0);
+        ocrTargetBadge.innerHTML = `<i class="fa-solid fa-crop-simple"></i> Vùng chọn (${w} × ${h} px)`;
+        ocrTargetBadge.style.color = '#10b981';
+        ocrTargetBadge.style.background = 'rgba(16, 185, 129, 0.12)';
+        ocrTargetBadge.style.borderColor = 'rgba(16, 185, 129, 0.35)';
+      }
+
       ocrModal.classList.add('active');
       ocrModalBackdrop.classList.add('active');
-      // Auto-start recognition if textarea is empty
-      if (!ocrResultText.value.trim()) {
-        runOcr();
-      }
+
+      // Always clear previous result and auto-run when a new scan is opened
+      ocrResultText.value = '';
+      updateOcrStats();
+      runOcr();
     }
 
     function closeOcrModal() {
@@ -1238,7 +1640,7 @@
       ocrModalBackdrop.classList.remove('active');
     }
 
-    ocrBtn.addEventListener('click', openOcrModal);
+    ocrBtn.addEventListener('click', () => openOcrModal(false));
     closeOcrBtn.addEventListener('click', closeOcrModal);
     closeOcrFooterBtn.addEventListener('click', closeOcrModal);
     ocrModalBackdrop.addEventListener('click', closeOcrModal);
@@ -1270,7 +1672,8 @@
     }
 
     async function runOcr() {
-      if (!currentBlob) return;
+      const targetBlob = activeOcrBlob || currentBlob;
+      if (!targetBlob) return;
 
       const selectedEngine = document.querySelector('input[name="ocrEngine"]:checked')?.value || 'google';
 
@@ -1294,7 +1697,7 @@
           ocrProgressBar.style.width = '50%';
           ocrStatusText.innerHTML = '<i class="fa-brands fa-google fa-spin"></i> AI của Google đang phân tích và nhận diện chữ tiếng Việt...';
 
-          const res = await DevLogAuth.ocrImageWithGoogleDrive(currentBlob, ocrLangSelect.value);
+          const res = await DevLogAuth.ocrImageWithGoogleDrive(targetBlob, ocrLangSelect.value);
           ocrProgressBar.style.width = '90%';
 
           if (res.success && res.text) {
@@ -1323,6 +1726,9 @@
     }
 
     async function runTesseractOcr() {
+      const targetBlob = activeOcrBlob || currentBlob;
+      if (!targetBlob) return;
+
       ocrProgressBar.style.width = '10%';
       ocrStatusText.textContent = 'Đang tải mô hình Tesseract AI...';
 
@@ -1332,7 +1738,7 @@
 
         ocrStatusText.textContent = 'Đang phân tích hình ảnh và nhận diện văn bản...';
 
-        const res = await Tesseract.recognize(currentBlob, lang, {
+        const res = await Tesseract.recognize(targetBlob, lang, {
           logger: m => {
             if (m.status === 'recognizing text') {
               const pct = Math.round((m.progress || 0) * 100);
@@ -1604,9 +2010,10 @@
 
     // 3. Mở Google Lens
     googleLensBtn.addEventListener('click', async () => {
-      if (!currentBlob) return;
+      const targetBlob = activeOcrBlob || currentBlob;
+      if (!targetBlob) return;
       try {
-        const item = new ClipboardItem({ [currentBlob.type]: currentBlob });
+        const item = new ClipboardItem({ [targetBlob.type]: targetBlob });
         await navigator.clipboard.write([item]);
         window.open('https://lens.google.com/', '_blank');
         showToast('Đã copy ảnh vào Clipboard! Hãy bấm Ctrl + V trên Google Lens.');
