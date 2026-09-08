@@ -46,8 +46,8 @@
 
   <main class="form-section">
     <div class="container">
-      <!-- Owner Settings Trigger -->
-      <div class="owner-config-bar">
+      <!-- Owner Settings Trigger (Ẩn đối với người dùng) -->
+      <div class="owner-config-bar" style="display: none;">
         <button id="openConfigBtn" class="btn-config-api" title="Dành cho Quản trị viên kết nối link Google Sheet">
           <i class="fa-solid fa-gear"></i> <span id="configStatusLabel">Cấu hình Google Sheet</span>
         </button>
@@ -245,28 +245,12 @@
       localStorage.setItem("devlog-theme", nextTheme);
     });
 
-    // Configuration storage key
-    const API_STORAGE_KEY = "declaration_form_api_url";
+    // ĐƯỜNG LINK GOOGLE APPS SCRIPT CỦA BẠN (CỐ ĐỊNH CHO TẤT CẢ MỌI NGƯỜI):
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyjbkHSziMEcQzB4kPT1885-BDE4fLRT3VinZTQ1yJQr-eHxETcnIYQ283_XFf7vL5/exec";
 
     function getApiUrl() {
-      return localStorage.getItem(API_STORAGE_KEY) || "";
+      return GOOGLE_SCRIPT_URL;
     }
-
-    function setApiUrl(url) {
-      localStorage.setItem(API_STORAGE_KEY, url.trim());
-      updateConfigStatus();
-    }
-
-    function updateConfigStatus() {
-      const url = getApiUrl();
-      const statusLabel = document.getElementById("configStatusLabel");
-      if (url) {
-        statusLabel.innerHTML = '<span style="color:var(--success);"><i class="fa-solid fa-circle-check"></i> Đã kết nối Sheet</span>';
-      } else {
-        statusLabel.innerHTML = '<span><i class="fa-solid fa-gear"></i> Cấu hình Google Sheet</span>';
-      }
-    }
-    updateConfigStatus();
 
     // Elements
     const declarationForm = document.getElementById("declarationForm");
