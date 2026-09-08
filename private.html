@@ -12,6 +12,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+  <!-- SheetJS for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/auth.css" />
@@ -235,6 +238,9 @@
           <button id="refreshDeclBtn" class="btn btn-primary">
             <i class="fa-solid fa-arrows-rotate" id="refreshDeclIcon"></i> Tải Lại Danh Sách
           </button>
+          <button type="button" id="exportDeclExcelBtnTop" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;">
+            <i class="fa-solid fa-file-excel"></i> Xuất Excel
+          </button>
           <a href="https://docs.google.com/spreadsheets" target="_blank" rel="noopener" class="btn btn-secondary">
             <i class="fa-solid fa-table"></i> Mở Google Sheet
           </a>
@@ -245,12 +251,30 @@
       </div>
 
       <!-- Declarations Toolbar -->
-      <div class="dashboard-toolbar">
-        <div class="search-private-box" style="max-width: 420px;">
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" id="searchDeclInput" placeholder="Tìm kiếm theo họ tên, mã số, số điện thoại..." />
+      <div class="dashboard-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1;">
+          <div class="search-private-box" style="max-width: 320px; min-width: 240px;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchDeclInput" placeholder="Tìm kiếm họ tên, mã số, SĐT..." />
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-arrow-down-a-z" style="color: var(--primary); font-size: 0.95rem;"></i>
+            <label for="sortDeclSelect" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; white-space: nowrap; margin: 0;">Sắp xếp:</label>
+            <select id="sortDeclSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="name-asc" selected>Tên A → Z (Tiếng Việt)</option>
+              <option value="name-desc">Tên Z → A</option>
+              <option value="fullname-asc">Họ tên A → Z</option>
+              <option value="time-desc">Thời gian: Mới nhất</option>
+              <option value="time-asc">Thời gian: Cũ nhất</option>
+            </select>
+          </div>
+
+          <button type="button" id="exportDeclExcelBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px;">
+            <i class="fa-solid fa-file-excel" style="font-size: 1.05rem;"></i> Xuất Excel
+          </button>
         </div>
-        <div style="font-size: 0.95rem; color: var(--text-muted);">
+        <div style="font-size: 0.95rem; color: var(--text-muted); white-space: nowrap;">
           Tổng số hồ sơ: <strong id="totalDeclCount" style="color: var(--primary);">0</strong> người đã khai báo
         </div>
       </div>
@@ -262,10 +286,14 @@
             <tr>
               <th style="width: 50px;">STT</th>
               <th style="width: 80px;">Ảnh chân dung</th>
-              <th>Họ và tên</th>
+              <th id="thSortFullName" style="cursor: pointer; user-select: none;" title="Bấm để đổi sắp xếp A → Z hoặc Z → A">
+                Họ và tên <i class="fa-solid fa-arrow-down-a-z" id="iconSortFullName" style="color: var(--primary); font-size: 0.8rem; margin-left: 4px;"></i>
+              </th>
               <th>Mã số</th>
               <th>Số điện thoại</th>
-              <th>Thời gian gửi</th>
+              <th id="thSortTime" style="cursor: pointer; user-select: none;" title="Bấm để đổi sắp xếp Thời gian mới/cũ">
+                Thời gian gửi <i class="fa-solid fa-sort" id="iconSortTime" style="color: var(--text-muted); font-size: 0.8rem; margin-left: 4px;"></i>
+              </th>
               <th>Ghi chú</th>
               <th style="text-align: right;">Hành động</th>
             </tr>
@@ -1131,18 +1159,26 @@
     const DECLARATION_API_URL = "https://script.google.com/macros/s/AKfycbwyjbkHSziMEcQzB4kPT1885-BDE4fLRT3VinZTQ1yJQr-eHxETcnIYQ283_XFf7vL5/exec";
     let declarationsList = [];
     let declSearchQuery = "";
+    let declSortMode = "name-asc"; // Mặc định sắp xếp Tên A -> Z chuẩn tiếng Việt
 
     const declarationsTableBody = document.getElementById("declarationsTableBody");
     const declCountBadge = document.getElementById("declCountBadge");
     const totalDeclCount = document.getElementById("totalDeclCount");
     const searchDeclInput = document.getElementById("searchDeclInput");
+    const sortDeclSelect = document.getElementById("sortDeclSelect");
+    const exportDeclExcelBtn = document.getElementById("exportDeclExcelBtn");
+    const exportDeclExcelBtnTop = document.getElementById("exportDeclExcelBtnTop");
     const refreshDeclBtn = document.getElementById("refreshDeclBtn");
     const refreshDeclIcon = document.getElementById("refreshDeclIcon");
+    const thSortFullName = document.getElementById("thSortFullName");
+    const thSortTime = document.getElementById("thSortTime");
+    const iconSortFullName = document.getElementById("iconSortFullName");
+    const iconSortTime = document.getElementById("iconSortTime");
 
     async function loadDeclarations() {
-      refreshDeclIcon.classList.add("sync-spinner");
+      if (refreshDeclIcon) refreshDeclIcon.classList.add("sync-spinner");
       try {
-        const res = await fetch(DECLARATION_API_URL);
+        const res = await fetch(DECLARATION_API_URL, { cache: "no-store" });
         const json = await res.json();
         if (json.status === "online" && Array.isArray(json.data)) {
           declarationsList = json.data;
@@ -1154,28 +1190,97 @@
       } catch (err) {
         console.warn("Lỗi tải danh sách hồ sơ:", err);
       } finally {
-        refreshDeclIcon.classList.remove("sync-spinner");
+        if (refreshDeclIcon) refreshDeclIcon.classList.remove("sync-spinner");
       }
     }
 
-    function renderDeclarations() {
-      declCountBadge.textContent = declarationsList.length;
-      totalDeclCount.textContent = declarationsList.length;
+    // Tách tên gọi chính và họ tên đệm để sắp xếp chuẩn danh bạ tiếng Việt (A, Ă, Â, B, C, D, Đ...)
+    function getVietnameseSortKey(fullName) {
+      const parts = (fullName || "").trim().split(/\s+/);
+      if (parts.length === 0 || !parts[0]) return "";
+      const firstName = parts[parts.length - 1]; // Tên chính (An, Bình, Cường...)
+      const rest = parts.slice(0, -1).join(" "); // Họ và tên đệm
+      return `${firstName} ${rest}`;
+    }
 
-      const filtered = declarationsList.filter(d => {
-        const query = declSearchQuery.toLowerCase();
+    function parseDeclarationTime(item) {
+      if (item && item.time) {
+        const cleaned = String(item.time).replace(/\s*\([^)]*\)$/, "");
+        const t = new Date(cleaned).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+      return Number(item && item.id) || 0;
+    }
+
+    function getFilteredAndSortedDeclarations() {
+      const query = declSearchQuery.toLowerCase();
+      let list = declarationsList.filter(d => {
         return (d.fullName || "").toLowerCase().includes(query) ||
                (d.codeId || "").toLowerCase().includes(query) ||
                (d.phone || "").toLowerCase().includes(query) ||
                (d.note && d.note.toLowerCase().includes(query));
       });
 
+      list.sort((a, b) => {
+        if (declSortMode === "name-asc") {
+          return getVietnameseSortKey(a.fullName).localeCompare(getVietnameseSortKey(b.fullName), "vi", { sensitivity: "base" });
+        } else if (declSortMode === "name-desc") {
+          return getVietnameseSortKey(b.fullName).localeCompare(getVietnameseSortKey(a.fullName), "vi", { sensitivity: "base" });
+        } else if (declSortMode === "fullname-asc") {
+          return (a.fullName || "").localeCompare(b.fullName || "", "vi", { sensitivity: "base" });
+        } else if (declSortMode === "time-asc") {
+          return parseDeclarationTime(a) - parseDeclarationTime(b);
+        } else {
+          // time-desc (mới nhất trước)
+          return parseDeclarationTime(b) - parseDeclarationTime(a);
+        }
+      });
+
+      return list;
+    }
+
+    function updateSortHeaderIcons() {
+      if (iconSortFullName) {
+        if (declSortMode === "name-asc" || declSortMode === "fullname-asc") {
+          iconSortFullName.className = "fa-solid fa-arrow-down-a-z";
+          iconSortFullName.style.color = "var(--primary)";
+        } else if (declSortMode === "name-desc") {
+          iconSortFullName.className = "fa-solid fa-arrow-down-z-a";
+          iconSortFullName.style.color = "var(--primary)";
+        } else {
+          iconSortFullName.className = "fa-solid fa-sort";
+          iconSortFullName.style.color = "var(--text-muted)";
+        }
+      }
+
+      if (iconSortTime) {
+        if (declSortMode === "time-desc") {
+          iconSortTime.className = "fa-solid fa-arrow-down-wide-short";
+          iconSortTime.style.color = "var(--primary)";
+        } else if (declSortMode === "time-asc") {
+          iconSortTime.className = "fa-solid fa-arrow-up-short-wide";
+          iconSortTime.style.color = "var(--primary)";
+        } else {
+          iconSortTime.className = "fa-solid fa-sort";
+          iconSortTime.style.color = "var(--text-muted)";
+        }
+      }
+    }
+
+    function renderDeclarations() {
+      if (declCountBadge) declCountBadge.textContent = declarationsList.length;
+      if (totalDeclCount) totalDeclCount.textContent = declarationsList.length;
+
+      updateSortHeaderIcons();
+
+      const filtered = getFilteredAndSortedDeclarations();
+
       if (filtered.length === 0) {
         declarationsTableBody.innerHTML = `
           <tr>
             <td colspan="8" style="text-align: center; padding: 40px; color: var(--text-muted);">
               <i class="fa-regular fa-folder-open" style="font-size: 2.2rem; margin-bottom: 10px; display: block;"></i>
-              Chưa có hồ sơ khai báo nào được ghi nhận trên Google Sheet.
+              ${declarationsList.length === 0 ? "Chưa có hồ sơ khai báo nào được ghi nhận trên Google Sheet." : "Không tìm thấy hồ sơ nào phù hợp với từ khóa tìm kiếm."}
             </td>
           </tr>
         `;
@@ -1224,12 +1329,134 @@
       }).join("");
     }
 
-    searchDeclInput.addEventListener("input", (e) => {
-      declSearchQuery = e.target.value.trim();
-      renderDeclarations();
-    });
+    // Xuất file Excel (.xlsx) danh sách hồ sơ hiện tại
+    function exportDeclarationsToExcel() {
+      const dataToExport = getFilteredAndSortedDeclarations();
+      if (dataToExport.length === 0) {
+        alert("Không có hồ sơ nào để xuất Excel.");
+        return;
+      }
 
-    refreshDeclBtn.addEventListener("click", loadDeclarations);
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      const filename = `Danh_Sach_Khai_Bao_${dateStr}.xlsx`;
+
+      try {
+        if (typeof XLSX !== "undefined") {
+          const wsData = [
+            ["STT", "Họ và tên", "Mã số", "Số điện thoại", "Thời gian gửi", "Link ảnh chân dung", "Ghi chú"]
+          ];
+
+          dataToExport.forEach((item, idx) => {
+            wsData.push([
+              idx + 1,
+              item.fullName || "",
+              item.codeId || "",
+              item.phone || "",
+              item.time || "",
+              item.photoUrl || "",
+              item.note || ""
+            ]);
+          });
+
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+          // Căn chỉnh độ rộng cột tối ưu
+          ws["!cols"] = [
+            { wch: 6 },
+            { wch: 25 },
+            { wch: 15 },
+            { wch: 16 },
+            { wch: 30 },
+            { wch: 55 },
+            { wch: 30 }
+          ];
+
+          XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Khai Báo");
+          XLSX.writeFile(wb, filename);
+        } else {
+          // Fallback: CSV UTF-8 kèm BOM hiển thị tiếng Việt hoàn hảo trên Excel
+          let csv = "\uFEFFSTT,Họ và tên,Mã số,Số điện thoại,Thời gian gửi,Link ảnh chân dung,Ghi chú\n";
+          dataToExport.forEach((item, idx) => {
+            const row = [
+              idx + 1,
+              `"${(item.fullName || "").replace(/"/g, '""')}"`,
+              `"${(item.codeId || "").replace(/"/g, '""')}"`,
+              `"${(item.phone || "").replace(/"/g, '""')}"`,
+              `"${(item.time || "").replace(/"/g, '""')}"`,
+              `"${(item.photoUrl || "").replace(/"/g, '""')}"`,
+              `"${(item.note || "").replace(/"/g, '""')}"`
+            ];
+            csv += row.join(",") + "\n";
+          });
+
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Danh_Sach_Khai_Bao_${dateStr}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        // Phản hồi trực quan trên nút
+        [exportDeclExcelBtn, exportDeclExcelBtnTop].forEach(btn => {
+          if (btn) {
+            const orig = btn.innerHTML;
+            btn.innerHTML = `<i class="fa-solid fa-check" style="color: #107c41;"></i> Đã xuất (${dataToExport.length})`;
+            setTimeout(() => { btn.innerHTML = orig; }, 2500);
+          }
+        });
+      } catch (err) {
+        console.error("Lỗi xuất Excel:", err);
+        alert("Có lỗi xảy ra khi xuất file Excel: " + err.message);
+      }
+    }
+
+    if (searchDeclInput) {
+      searchDeclInput.addEventListener("input", (e) => {
+        declSearchQuery = e.target.value.trim();
+        renderDeclarations();
+      });
+    }
+
+    if (sortDeclSelect) {
+      sortDeclSelect.addEventListener("change", (e) => {
+        declSortMode = e.target.value;
+        renderDeclarations();
+      });
+    }
+
+    if (thSortFullName) {
+      thSortFullName.addEventListener("click", () => {
+        if (declSortMode === "name-asc") {
+          declSortMode = "name-desc";
+        } else {
+          declSortMode = "name-asc";
+        }
+        if (sortDeclSelect) sortDeclSelect.value = declSortMode;
+        renderDeclarations();
+      });
+    }
+
+    if (thSortTime) {
+      thSortTime.addEventListener("click", () => {
+        if (declSortMode === "time-desc") {
+          declSortMode = "time-asc";
+        } else {
+          declSortMode = "time-desc";
+        }
+        if (sortDeclSelect) sortDeclSelect.value = declSortMode;
+        renderDeclarations();
+      });
+    }
+
+    if (exportDeclExcelBtn) exportDeclExcelBtn.addEventListener("click", exportDeclarationsToExcel);
+    if (exportDeclExcelBtnTop) exportDeclExcelBtnTop.addEventListener("click", exportDeclarationsToExcel);
+    if (refreshDeclBtn) refreshDeclBtn.addEventListener("click", loadDeclarations);
 
     // ==========================================
     // GOOGLE CALENDAR & AGENDA MANAGEMENT
