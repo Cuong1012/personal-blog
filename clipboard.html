@@ -493,10 +493,10 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) scale(0.95);
-      width: 95%;
-      max-width: 1100px;
-      height: 90vh;
-      max-height: 92vh;
+      width: 96%;
+      max-width: 1240px;
+      height: 94vh;
+      max-height: 94vh;
       background: var(--bg-surface);
       border: 1px solid var(--border-color);
       border-radius: var(--radius-lg);
@@ -520,19 +520,20 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 16px 20px;
+      padding: 10px 18px;
       border-bottom: 1px solid var(--border-color);
       background: var(--bg-card);
+      flex-shrink: 0;
     }
 
     .ocr-modal-title {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
 
     .ocr-modal-title h3 {
-      font-size: 1.15rem;
+      font-size: 1.05rem;
       font-weight: 700;
       margin: 0;
     }
@@ -540,11 +541,11 @@
     .ocr-close-btn {
       background: none;
       border: none;
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       color: var(--text-muted);
       cursor: pointer;
       line-height: 1;
-      padding: 4px;
+      padding: 2px 6px;
       transition: var(--transition);
     }
 
@@ -553,62 +554,57 @@
     }
 
     .ocr-modal-body {
-      padding: 16px 22px;
-      overflow-y: auto;
+      padding: 10px 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
       flex: 1;
+      overflow: hidden;
+      min-height: 0;
     }
 
-    .ocr-controls-bar {
+    .ocr-slim-toolbar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 8px 12px;
       background: var(--bg-card);
-      padding: 12px 16px;
+      padding: 6px 12px;
       border-radius: var(--radius-md);
       border: 1px solid var(--border-color);
+      flex-shrink: 0;
     }
 
-    .ocr-select-group {
+    .ocr-slim-group {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
-      font-weight: 600;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .ocr-select {
-      padding: 7px 12px;
+      padding: 4px 8px;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
       background: var(--bg-surface);
       color: var(--text-main);
-      font-size: 0.88rem;
+      font-size: 0.82rem;
       outline: none;
       cursor: pointer;
     }
 
     .ocr-progress-container {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 14px 16px;
-    }
-
-    .ocr-progress-status {
-      font-size: 0.88rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--text-main);
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin: -2px 0 2px;
+      flex-shrink: 0;
     }
 
     .ocr-progress-bar-bg {
-      height: 8px;
-      background: var(--bg-hover);
+      height: 3px;
+      background: rgba(99, 102, 241, 0.15);
       border-radius: 99px;
       overflow: hidden;
     }
@@ -624,24 +620,26 @@
     .ocr-result-section {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       flex: 1;
-      min-height: 320px;
+      min-height: 0;
+      overflow: hidden;
     }
 
     .ocr-result-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
+      flex-shrink: 0;
     }
 
     .ocr-stats-badge {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
       background: var(--bg-card);
-      padding: 2px 8px;
+      padding: 1px 7px;
       border-radius: var(--radius-sm);
       border: 1px solid var(--border-color);
     }
@@ -649,34 +647,66 @@
     #ocrResultText {
       width: 100%;
       flex: 1;
-      min-height: 320px;
-      padding: 14px 16px;
+      height: 100%;
+      min-height: 0;
+      padding: 14px 18px;
       font-family: var(--font-main);
-      font-size: 1rem;
-      line-height: 1.6;
+      font-size: 1.02rem;
+      line-height: 1.65;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       background: var(--bg-surface);
       color: var(--text-main);
-      resize: vertical;
+      resize: none;
       outline: none;
       transition: var(--transition);
+      box-sizing: border-box;
     }
 
     #ocrResultText:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-glow);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    #ocrWordPreview {
+      flex: 1;
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      padding: 18px 24px;
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 11.5pt;
+      line-height: 1.6;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: #ffffff;
+      color: #1e293b;
+      box-sizing: border-box;
     }
 
     .ocr-modal-footer {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      flex-wrap: wrap;
-      gap: 10px;
-      padding: 14px 20px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 8px;
+      padding: 8px 16px;
       border-top: 1px solid var(--border-color);
       background: var(--bg-card);
+      flex-shrink: 0;
+      scrollbar-width: none;
+    }
+
+    .ocr-modal-footer::-webkit-scrollbar {
+      display: none;
+    }
+
+    .ocr-modal-footer .btn {
+      padding: 6px 12px;
+      font-size: 0.84rem;
+      height: 34px;
+      white-space: nowrap;
     }
 
   </style>
@@ -831,56 +861,59 @@
     </div>
     
     <div class="ocr-modal-body">
-      <!-- Engine Selector -->
-      <div class="ocr-engine-row" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; background: var(--bg-card); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 12px;">
-        <span style="font-size: 0.88rem; font-weight: 700;"><i class="fa-solid fa-microchip"></i> Bộ máy OCR:</span>
-        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; color: var(--primary); font-weight: 700;">
-          <input type="radio" name="ocrEngine" id="engineGoogle" value="google" checked />
-          <span><i class="fa-brands fa-google"></i> Google Drive OCR (Chuẩn 100% tiếng Việt)</span>
-        </label>
-        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; color: var(--text-muted);">
-          <input type="radio" name="ocrEngine" id="engineTesseract" value="tesseract" />
-          <span><i class="fa-solid fa-laptop"></i> Tesseract AI (Offline)</span>
-        </label>
-      </div>
+      <!-- 1. SLIM COMBINED TOOLBAR (1 Single Row) -->
+      <div class="ocr-slim-toolbar">
+        <div class="ocr-slim-group">
+          <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted);"><i class="fa-solid fa-microchip"></i> Bộ máy:</span>
+          <label style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; cursor: pointer; color: var(--primary); font-weight: 700;">
+            <input type="radio" name="ocrEngine" id="engineGoogle" value="google" checked />
+            <span><i class="fa-brands fa-google"></i> Google Drive OCR (100%)</span>
+          </label>
+          <label style="display: inline-flex; align-items: center; gap: 5px; font-size: 0.82rem; cursor: pointer; color: var(--text-muted); font-weight: 600;">
+            <input type="radio" name="ocrEngine" id="engineTesseract" value="tesseract" />
+            <span><i class="fa-solid fa-laptop"></i> Offline AI</span>
+          </label>
 
-      <!-- Controls -->
-      <div class="ocr-controls-bar">
-        <div class="ocr-select-group">
-          <label for="ocrLangSelect"><i class="fa-solid fa-language"></i> Ngôn ngữ:</label>
-          <select id="ocrLangSelect" class="ocr-select">
-            <option value="vie+eng" selected>Tiếng Việt + Tiếng Anh (Khuyên dùng)</option>
-            <option value="vie">Chỉ Tiếng Việt</option>
-            <option value="eng">Chỉ Tiếng Anh</option>
-          </select>
+          <div style="width: 1px; height: 16px; background: var(--border-color); margin: 0 4px;"></div>
+
+          <div style="display: inline-flex; align-items: center; gap: 5px;">
+            <label for="ocrLangSelect" style="color: var(--text-muted); font-size: 0.82rem;"><i class="fa-solid fa-language"></i></label>
+            <select id="ocrLangSelect" class="ocr-select" style="height: 28px; font-size: 0.8rem;">
+              <option value="vie+eng" selected>Tiếng Việt + Anh</option>
+              <option value="vie">Chỉ Tiếng Việt</option>
+              <option value="eng">Chỉ Tiếng Anh</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-primary" id="startOcrBtn" style="padding: 4px 10px; font-size: 0.8rem; height: 28px; gap: 4px;">
+            <i class="fa-solid fa-rotate-right"></i> Quét lại
+          </button>
         </div>
-        <button type="button" class="btn btn-primary" id="startOcrBtn">
-          <i class="fa-solid fa-play"></i> Bắt đầu quét chữ
-        </button>
+
+        <div class="ocr-progress-status" id="ocrStatusText" style="margin: 0; font-size: 0.82rem; font-weight: 600; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Sẵn sàng</div>
       </div>
 
-      <!-- Progress -->
+      <!-- 2. SLIM PROGRESS LINE -->
       <div class="ocr-progress-container" id="ocrProgressContainer" style="display: none;">
-        <div class="ocr-progress-status" id="ocrStatusText">Đang khởi tạo mô hình AI OCR...</div>
         <div class="ocr-progress-bar-bg">
           <div class="ocr-progress-bar-fill" id="ocrProgressBar"></div>
         </div>
       </div>
 
-      <!-- Result Section with Word Preview Toggle -->
+      <!-- 3. MAXIMIZED TEXT AREA -->
       <div class="ocr-result-section">
         <div class="ocr-result-header">
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span><strong>Văn bản nhận diện:</strong></span>
+            <span style="font-size: 0.84rem;"><strong>Văn bản nhận diện:</strong></span>
             <div class="ocr-view-tabs" style="display: flex; background: var(--bg-hover); padding: 2px; border-radius: var(--radius-sm);">
-              <button type="button" id="btnViewEditor" class="ocr-tab-btn active" style="padding: 3px 10px; font-size: 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: var(--bg-surface); color: var(--text-main); font-weight: 600;">Văn bản sửa</button>
-              <button type="button" id="btnViewWordPreview" class="ocr-tab-btn" style="padding: 3px 10px; font-size: 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600;">Xem định dạng Word</button>
+              <button type="button" id="btnViewEditor" class="ocr-tab-btn active" style="padding: 2px 10px; font-size: 0.78rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: var(--bg-surface); color: var(--text-main); font-weight: 600;">Văn bản sửa</button>
+              <button type="button" id="btnViewWordPreview" class="ocr-tab-btn" style="padding: 2px 10px; font-size: 0.78rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600;">Xem định dạng Word</button>
             </div>
           </div>
           <span class="ocr-stats-badge" id="ocrStatsBadge">0 ký tự | 0 từ</span>
         </div>
-        <textarea id="ocrResultText" placeholder="Kết quả chữ trích xuất từ ảnh sẽ xuất hiện tại đây... Bạn có thể chỉnh sửa văn bản trực tiếp." rows="10"></textarea>
-        <div id="ocrWordPreview" style="display: none; width: 100%; flex: 1; min-height: 320px; max-height: 520px; overflow-y: auto; padding: 18px 24px; font-family: 'Calibri', 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.5; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff; color: #1e293b;"></div>
+        <textarea id="ocrResultText" placeholder="Kết quả chữ trích xuất từ ảnh sẽ xuất hiện tại đây... Bạn có thể chỉnh sửa văn bản trực tiếp."></textarea>
+        <div id="ocrWordPreview" style="display: none;"></div>
       </div>
     </div>
 
@@ -889,7 +922,7 @@
         <i class="fa-solid fa-file-word"></i> Sao Chép Cho Word
       </button>
       <button type="button" class="btn btn-secondary" id="downloadWordBtn" title="Tải văn bản về dạng file Word (.doc)">
-        <i class="fa-solid fa-download"></i> Tải file Word (.doc)
+        <i class="fa-solid fa-download"></i> Tải Word (.doc)
       </button>
       <button type="button" class="btn btn-secondary" id="copyOcrTextBtn" title="Sao chép dạng văn bản thuần">
         <i class="fa-regular fa-copy"></i> Sao chép Text
