@@ -301,6 +301,210 @@
 
     .toast-popup.success { border-left-color: var(--success); }
     .toast-popup.error { border-left-color: var(--danger); }
+
+    /* OCR Modal Styles */
+    .ocr-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      z-index: 10000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .ocr-modal-backdrop.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .ocr-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      width: 92%;
+      max-width: 720px;
+      max-height: 90vh;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xl);
+      z-index: 10001;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+    }
+
+    .ocr-modal.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .ocr-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+
+    .ocr-modal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ocr-modal-title h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .ocr-close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      transition: var(--transition);
+    }
+
+    .ocr-close-btn:hover {
+      color: var(--danger);
+    }
+
+    .ocr-modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .ocr-controls-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--bg-card);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+    }
+
+    .ocr-select-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .ocr-select {
+      padding: 7px 12px;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.88rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .ocr-progress-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+
+    .ocr-progress-status {
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text-main);
+    }
+
+    .ocr-progress-bar-bg {
+      height: 8px;
+      background: var(--bg-hover);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .ocr-progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 99px;
+      transition: width 0.3s ease;
+    }
+
+    .ocr-result-section {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .ocr-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.88rem;
+    }
+
+    .ocr-stats-badge {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    #ocrResultText {
+      width: 100%;
+      min-height: 200px;
+      padding: 12px 14px;
+      font-family: var(--font-main);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      resize: vertical;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    #ocrResultText:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .ocr-modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 14px 20px;
+      border-top: 1px solid var(--border-color);
+      background: var(--bg-card);
+    }
+
   </style>
 </head>
 <body class="clipboard-page-wrapper">
@@ -387,6 +591,7 @@
 
         <!-- ACTION TOOLS -->
         <div class="toolbar-group">
+          <button class="tool-btn" id="ocrBtn" style="background: rgba(99, 102, 241, 0.12); color: var(--accent); border-color: rgba(99, 102, 241, 0.35); font-weight: 700;" title="Chuyển chữ trong ảnh thành văn bản (AI OCR)"><i class="fa-solid fa-wand-magic-sparkles"></i> Lấy chữ (OCR)</button>
           <button class="tool-btn" id="copyImgBtn" title="Sao chép lại vào bộ nhớ tạm"><i class="fa-regular fa-copy"></i> Sao chép</button>
           <button class="tool-btn" id="openNewTabBtn" title="Mở ảnh trong tab mới"><i class="fa-solid fa-arrow-up-right-from-square"></i> Mở tab mới</button>
           <button class="tool-btn" id="downloadBtn" title="Tải ảnh về máy"><i class="fa-solid fa-download"></i> Tải về</button>
@@ -415,6 +620,65 @@
       </div>
     </div>
   </main>
+
+  <!-- OCR MODAL -->
+  <div class="ocr-modal-backdrop" id="ocrModalBackdrop"></div>
+  <div class="ocr-modal" id="ocrModal">
+    <div class="ocr-modal-header">
+      <div class="ocr-modal-title">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i>
+        <h3>Chuyển Chữ Trong Ảnh Thành Text (AI OCR)</h3>
+      </div>
+      <button class="ocr-close-btn" id="closeOcrBtn" aria-label="Đóng">&times;</button>
+    </div>
+    
+    <div class="ocr-modal-body">
+      <!-- Controls -->
+      <div class="ocr-controls-bar">
+        <div class="ocr-select-group">
+          <label for="ocrLangSelect"><i class="fa-solid fa-language"></i> Ngôn ngữ:</label>
+          <select id="ocrLangSelect" class="ocr-select">
+            <option value="vie+eng" selected>Tiếng Việt + Tiếng Anh (Khuyên dùng)</option>
+            <option value="vie">Chỉ Tiếng Việt</option>
+            <option value="eng">Chỉ Tiếng Anh</option>
+          </select>
+        </div>
+        <button type="button" class="btn btn-primary" id="startOcrBtn">
+          <i class="fa-solid fa-play"></i> Bắt đầu quét chữ
+        </button>
+      </div>
+
+      <!-- Progress -->
+      <div class="ocr-progress-container" id="ocrProgressContainer" style="display: none;">
+        <div class="ocr-progress-status" id="ocrStatusText">Đang khởi tạo mô hình AI OCR...</div>
+        <div class="ocr-progress-bar-bg">
+          <div class="ocr-progress-bar-fill" id="ocrProgressBar"></div>
+        </div>
+      </div>
+
+      <!-- Result Textarea -->
+      <div class="ocr-result-section">
+        <div class="ocr-result-header">
+          <span><strong>Văn bản nhận diện:</strong></span>
+          <span class="ocr-stats-badge" id="ocrStatsBadge">0 ký tự | 0 từ</span>
+        </div>
+        <textarea id="ocrResultText" placeholder="Kết quả chữ trích xuất từ ảnh sẽ xuất hiện tại đây... Bạn có thể chỉnh sửa văn bản trực tiếp." rows="10"></textarea>
+      </div>
+    </div>
+
+    <div class="ocr-modal-footer">
+      <button type="button" class="btn btn-secondary" id="copyOcrTextBtn">
+        <i class="fa-regular fa-copy"></i> Sao chép Text
+      </button>
+      <button type="button" class="btn btn-secondary" id="downloadOcrTxtBtn">
+        <i class="fa-solid fa-download"></i> Tải file .TXT
+      </button>
+      <button type="button" class="btn btn-secondary" id="saveOcrToNotesBtn" title="Lưu vào Sổ tay riêng tư">
+        <i class="fa-solid fa-book-bookmark"></i> Lưu vào Ghi Chú
+      </button>
+      <button type="button" class="btn btn-secondary" id="closeOcrFooterBtn">Đóng</button>
+    </div>
+  </div>
 
   <!-- TOAST NOTIFICATION -->
   <div class="toast-popup" id="toastPopup">
@@ -905,6 +1169,182 @@
       pasteZoneCard.style.display = 'block';
       showToast('Đã dọn khung xem. Bạn có thể bấm Ctrl + V để dán ảnh mới!');
     });
+
+    // ==========================================
+    // 6. OCR (TEXT RECOGNITION FROM IMAGE)
+    // ==========================================
+    const ocrBtn = document.getElementById('ocrBtn');
+    const ocrModal = document.getElementById('ocrModal');
+    const ocrModalBackdrop = document.getElementById('ocrModalBackdrop');
+    const closeOcrBtn = document.getElementById('closeOcrBtn');
+    const closeOcrFooterBtn = document.getElementById('closeOcrFooterBtn');
+    const ocrLangSelect = document.getElementById('ocrLangSelect');
+    const startOcrBtn = document.getElementById('startOcrBtn');
+    const ocrProgressContainer = document.getElementById('ocrProgressContainer');
+    const ocrStatusText = document.getElementById('ocrStatusText');
+    const ocrProgressBar = document.getElementById('ocrProgressBar');
+    const ocrResultText = document.getElementById('ocrResultText');
+    const ocrStatsBadge = document.getElementById('ocrStatsBadge');
+    const copyOcrTextBtn = document.getElementById('copyOcrTextBtn');
+    const downloadOcrTxtBtn = document.getElementById('downloadOcrTxtBtn');
+    const saveOcrToNotesBtn = document.getElementById('saveOcrToNotesBtn');
+
+    let isTesseractLoaded = false;
+
+    function openOcrModal() {
+      if (!currentBlob) {
+        showToast('Vui lòng mở hình ảnh trước khi trích xuất chữ!', 'error');
+        return;
+      }
+      ocrModal.classList.add('active');
+      ocrModalBackdrop.classList.add('active');
+      // Auto-start recognition if textarea is empty
+      if (!ocrResultText.value.trim()) {
+        runOcr();
+      }
+    }
+
+    function closeOcrModal() {
+      ocrModal.classList.remove('active');
+      ocrModalBackdrop.classList.remove('active');
+    }
+
+    ocrBtn.addEventListener('click', openOcrModal);
+    closeOcrBtn.addEventListener('click', closeOcrModal);
+    closeOcrFooterBtn.addEventListener('click', closeOcrModal);
+    ocrModalBackdrop.addEventListener('click', closeOcrModal);
+
+    function updateOcrStats() {
+      const txt = ocrResultText.value.trim();
+      const chars = txt.length;
+      const words = txt ? txt.split(/\s+/).length : 0;
+      ocrStatsBadge.textContent = `${chars} ký tự | ${words} từ`;
+    }
+
+    ocrResultText.addEventListener('input', updateOcrStats);
+
+    function loadTesseract() {
+      return new Promise((resolve, reject) => {
+        if (window.Tesseract) {
+          resolve(window.Tesseract);
+          return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        script.onload = () => {
+          isTesseractLoaded = true;
+          resolve(window.Tesseract);
+        };
+        script.onerror = () => reject(new Error('Không thể tải thư viện nhận diện Tesseract.js. Vui lòng kiểm tra kết nối mạng!'));
+        document.head.appendChild(script);
+      });
+    }
+
+    async function runOcr() {
+      if (!currentBlob) return;
+
+      ocrProgressContainer.style.display = 'block';
+      startOcrBtn.disabled = true;
+      ocrProgressBar.style.width = '10%';
+      ocrStatusText.textContent = 'Đang tải mô hình trí tuệ nhân tạo OCR...';
+
+      try {
+        const Tesseract = await loadTesseract();
+        const lang = ocrLangSelect.value;
+
+        ocrStatusText.textContent = 'Đang phân tích hình ảnh và nhận diện văn bản...';
+
+        const res = await Tesseract.recognize(currentBlob, lang, {
+          logger: m => {
+            if (m.status === 'recognizing text') {
+              const pct = Math.round((m.progress || 0) * 100);
+              ocrProgressBar.style.width = `${pct}%`;
+              ocrStatusText.textContent = `Đang quét và đọc văn bản: ${pct}%...`;
+            } else if (m.status === 'loading tesseract core') {
+              ocrStatusText.textContent = 'Đang nạp bộ xử lý WebAssembly...';
+            } else if (m.status && m.status.includes('traineddata')) {
+              ocrStatusText.textContent = 'Đang tải gói dữ liệu ngôn ngữ...';
+            }
+          }
+        });
+
+        const extractedText = (res.data && res.data.text) ? res.data.text.trim() : '';
+        ocrResultText.value = extractedText || '(Không phát hiện chữ nào rõ ràng trong hình ảnh này)';
+        updateOcrStats();
+
+        ocrProgressBar.style.width = '100%';
+        ocrStatusText.innerHTML = '<span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Hoàn tất trích xuất văn bản!</span>';
+        showToast('Đã trích xuất chữ trong ảnh thành công!');
+      } catch (err) {
+        ocrStatusText.innerHTML = `<span style="color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i> Lỗi: ${err.message}</span>`;
+        showToast('Lỗi nhận diện chữ: ' + err.message, 'error');
+      } finally {
+        startOcrBtn.disabled = false;
+      }
+    }
+
+    startOcrBtn.addEventListener('click', runOcr);
+
+    // Sao chép kết quả text
+    copyOcrTextBtn.addEventListener('click', async () => {
+      const text = ocrResultText.value.trim();
+      if (!text) {
+        showToast('Chưa có nội dung văn bản để sao chép!', 'error');
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Đã sao chép văn bản vào bộ nhớ tạm!');
+      } catch (e) {
+        ocrResultText.select();
+        document.execCommand('copy');
+        showToast('Đã sao chép văn bản!');
+      }
+    });
+
+    // Tải file .txt
+    downloadOcrTxtBtn.addEventListener('click', () => {
+      const text = ocrResultText.value.trim();
+      if (!text) {
+        showToast('Chưa có nội dung văn bản để tải về!', 'error');
+        return;
+      }
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `ocr_extracted_${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Đang tải file văn bản .txt về máy...');
+    });
+
+    // Lưu thẳng vào Ghi chú riêng tư
+    saveOcrToNotesBtn.addEventListener('click', () => {
+      const text = ocrResultText.value.trim();
+      if (!text) {
+        showToast('Chưa có nội dung văn bản để lưu!', 'error');
+        return;
+      }
+      const notes = DevLogAuth.getPrivateNotes();
+      const timeStr = new Date().toLocaleString('vi-VN');
+      const newNote = {
+        id: Date.now(),
+        title: `Trích xuất chữ từ ảnh (${timeStr})`,
+        category: 'snippet',
+        categoryName: 'Mã & Ghi chú',
+        date: new Date().toISOString().slice(0, 10),
+        content: text
+      };
+      notes.unshift(newNote);
+      DevLogAuth.savePrivateNotes(notes);
+
+      if (DevLogAuth.isCloudConnected()) {
+        DevLogAuth.addNoteToCloud(newNote);
+      }
+      showToast('Đã lưu văn bản vào Sổ tay Ghi chú riêng tư của bạn!');
+    });
+
   </script>
 </body>
 </html>
