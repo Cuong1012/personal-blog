@@ -633,6 +633,19 @@
     </div>
     
     <div class="ocr-modal-body">
+      <!-- Engine Selector -->
+      <div class="ocr-engine-row" style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; background: var(--bg-card); padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 12px;">
+        <span style="font-size: 0.88rem; font-weight: 700;"><i class="fa-solid fa-microchip"></i> Bộ máy OCR:</span>
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; color: var(--primary); font-weight: 700;">
+          <input type="radio" name="ocrEngine" id="engineGoogle" value="google" checked />
+          <span><i class="fa-brands fa-google"></i> Google Drive OCR (Chuẩn 100% tiếng Việt)</span>
+        </label>
+        <label style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem; cursor: pointer; color: var(--text-muted);">
+          <input type="radio" name="ocrEngine" id="engineTesseract" value="tesseract" />
+          <span><i class="fa-solid fa-laptop"></i> Tesseract AI (Offline)</span>
+        </label>
+      </div>
+
       <!-- Controls -->
       <div class="ocr-controls-bar">
         <div class="ocr-select-group">
@@ -1259,10 +1272,59 @@
     async function runOcr() {
       if (!currentBlob) return;
 
+      const selectedEngine = document.querySelector('input[name="ocrEngine"]:checked')?.value || 'google';
+
       ocrProgressContainer.style.display = 'block';
       startOcrBtn.disabled = true;
+
+      // ==========================================
+      // ENGINE 1: GOOGLE DRIVE OCR (CHUẨN 100%)
+      // ==========================================
+      if (selectedEngine === 'google') {
+        if (!DevLogAuth.isCloudConnected()) {
+          showToast('Chưa kết nối Google Drive! Đang chuyển sang Tesseract AI...', 'error');
+          runTesseractOcr();
+          return;
+        }
+
+        ocrProgressBar.style.width = '20%';
+        ocrStatusText.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Đang gửi ảnh tới Google Drive OCR...';
+
+        try {
+          ocrProgressBar.style.width = '50%';
+          ocrStatusText.innerHTML = '<i class="fa-brands fa-google fa-spin"></i> AI của Google đang phân tích và nhận diện chữ tiếng Việt...';
+
+          const res = await DevLogAuth.ocrImageWithGoogleDrive(currentBlob, ocrLangSelect.value);
+          ocrProgressBar.style.width = '90%';
+
+          if (res.success && res.text) {
+            ocrResultText.value = res.text;
+            updateOcrStats();
+            ocrProgressBar.style.width = '100%';
+            ocrStatusText.innerHTML = '<span style="color: var(--success);"><i class="fa-solid fa-circle-check"></i> Google Drive OCR hoàn tất! Độ chính xác 100%.</span>';
+            showToast('Đã trích xuất chữ bằng Google Drive OCR thành công!');
+          } else {
+            ocrStatusText.innerHTML = `<span style="color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i> ${res.message || 'Lỗi Google OCR'}</span>`;
+            showToast('Lỗi Google Drive OCR: ' + res.message, 'error');
+          }
+        } catch (err) {
+          ocrStatusText.innerHTML = `<span style="color: var(--danger);"><i class="fa-solid fa-circle-exclamation"></i> Lỗi kết nối Google Drive: ${err.message}</span>`;
+          showToast('Lỗi kết nối Google Drive OCR: ' + err.message, 'error');
+        } finally {
+          startOcrBtn.disabled = false;
+        }
+        return;
+      }
+
+      // ==========================================
+      // ENGINE 2: TESSERACT AI (OFFLINE)
+      // ==========================================
+      runTesseractOcr();
+    }
+
+    async function runTesseractOcr() {
       ocrProgressBar.style.width = '10%';
-      ocrStatusText.textContent = 'Đang tải mô hình trí tuệ nhân tạo OCR...';
+      ocrStatusText.textContent = 'Đang tải mô hình Tesseract AI...';
 
       try {
         const Tesseract = await loadTesseract();

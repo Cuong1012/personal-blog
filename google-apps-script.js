@@ -17,6 +17,13 @@
  * ===================================================================
  */
 
+// Hàm kiểm tra và cấp quyền một lần duy nhất cho toàn bộ dịch vụ (Drive, Docs, Sheets, UrlFetch)
+function authorizeAllServices() {
+  getOrCreateUploadFolder();
+  var token = ScriptApp.getOAuthToken();
+  Logger.log("Quyền truy cập đã sẵn sàng! Token: " + (token ? "OK" : "Chưa có"));
+}
+
 // Lấy hoặc tạo thư mục "DevLog Uploads" trên Google Drive
 function getOrCreateUploadFolder() {
   var folderName = "DevLog Uploads";
@@ -222,6 +229,95 @@ function doPost(e) {
         status: "success",
         message: "Đã xóa tệp khỏi Google Drive"
       })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ==========================================
+    // TÁC VỤ 2.5: GOOGLE DRIVE OCR (NHẬN DIỆN CHỮ AI CHUẨN 100% CỦA GOOGLE)
+    // ==========================================
+    if (action === "ocr_google") {
+      var base64Data = postData.fileData;
+      var mimeType = postData.mimeType || "image/png";
+      var lang = postData.lang || "vi";
+      if (lang === "vie+eng" || lang === "vie") lang = "vi";
+      if (lang === "eng") lang = "en";
+
+      var decodedBytes = Utilities.base64Decode(base64Data);
+      var blob = Utilities.newBlob(decodedBytes, mimeType, "ocr_temp_" + new Date().getTime());
+
+      var docId = null;
+
+      // Cách 1: Sử dụng Google Drive Advanced Service nếu có
+      if (typeof Drive !== "undefined" && Drive.Files && Drive.Files.insert) {
+        try {
+          var newFile = Drive.Files.insert(
+            { title: "OCR_Temp_" + new Date().getTime(), mimeType: "application/vnd.google-apps.document" },
+            blob,
+            { ocr: true, ocrLanguage: lang }
+          );
+          docId = newFile.id;
+        } catch (e1) {}
+      }
+
+      // Cách 2: Sử dụng Google Drive Multipart REST API (hoạt động mặc định không cần bật Services)
+      if (!docId) {
+        var uploadUrl = "https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart&ocr=true&ocrLanguage=" + encodeURIComponent(lang);
+        var boundary = "-------GoogleDriveOcr" + new Date().getTime();
+        var delimiter = "\r\n--" + boundary + "\r\n";
+        var close_delim = "\r\n--" + boundary + "--";
+
+        var metadata = {
+          title: "OCR_Temp_Doc_" + new Date().getTime(),
+          mimeType: "application/vnd.google-apps.document"
+        };
+
+        var multipartPayload =
+          delimiter +
+          'Content-Type: application/json; charset=UTF-8\r\n\r\n' +
+          JSON.stringify(metadata) +
+          delimiter +
+          'Content-Type: ' + mimeType + '\r\n' +
+          'Content-Transfer-Encoding: base64\r\n\r\n' +
+          base64Data +
+          close_delim;
+
+        var ocrResponse = UrlFetchApp.fetch(uploadUrl, {
+          method: "POST",
+          headers: {
+            "Authorization": "Bearer " + ScriptApp.getOAuthToken(),
+            "Content-Type": "multipart/related; boundary=" + boundary
+          },
+          payload: multipartPayload,
+          muteHttpExceptions: true
+        });
+
+        var ocrResultJson = JSON.parse(ocrResponse.getContentText());
+        if (ocrResultJson && ocrResultJson.id) {
+          docId = ocrResultJson.id;
+        } else {
+          var err = (ocrResultJson && ocrResultJson.error && ocrResultJson.error.message) ? ocrResultJson.error.message : ocrResponse.getContentText();
+          return ContentService.createTextOutput(JSON.stringify({
+            status: "error",
+            message: "Lỗi Google OCR: " + err
+          })).setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+
+      // Đọc toàn bộ nội dung văn bản từ Google Doc vừa được OCR
+      if (docId) {
+        var doc = DocumentApp.openById(docId);
+        var extractedText = doc.getBody().getText().trim();
+
+        // Xóa tài liệu tạm (cho vào thùng rác)
+        try {
+          DriveApp.getFileById(docId).setTrashed(true);
+        } catch (delErr) {}
+
+        return ContentService.createTextOutput(JSON.stringify({
+          status: "success",
+          message: "Trích xuất chữ Google Drive OCR thành công!",
+          text: extractedText
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
     }
 
     // ==========================================

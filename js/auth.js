@@ -301,6 +301,40 @@ async function deleteFileFromDrive(fileId) {
   }
 }
 
+/**
+ * Perform Google Drive OCR directly via Apps Script
+ */
+async function ocrImageWithGoogleDrive(fileOrBlob, lang = "vi") {
+  const url = getCloudApiUrl();
+  if (!url) {
+    return { success: false, message: "Chưa kết nối URL Google Apps Script!" };
+  }
+
+  try {
+    const base64Data = await fileToBase64(fileOrBlob);
+    const payload = {
+      action: "ocr_google",
+      fileData: base64Data,
+      mimeType: fileOrBlob.type || "image/png",
+      lang: lang
+    };
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+    if (result.status === "success") {
+      return { success: true, text: result.text, message: result.message };
+    }
+    return { success: false, message: result.message || "Lỗi khi nhận diện qua Google Drive OCR" };
+  } catch (err) {
+    return { success: false, message: "Lỗi kết nối tới Google Drive OCR: " + err.message };
+  }
+}
+
 // Export for application use
 window.DevLogAuth = {
   isAuthenticated,
@@ -321,5 +355,6 @@ window.DevLogAuth = {
   addNoteToCloud,
   deleteNoteFromCloud,
   uploadFileToDrive,
-  deleteFileFromDrive
+  deleteFileFromDrive,
+  ocrImageWithGoogleDrive
 };
