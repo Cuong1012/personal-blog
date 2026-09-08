@@ -12,7 +12,8 @@ const AUTH_CONFIG = {
   CUSTOM_PASS_KEY: "devlog_custom_pass",
   NOTES_KEY: "devlog_private_notes",
   FILES_KEY: "devlog_uploaded_files",
-  GDRIVE_API_KEY: "devlog_gdrive_api_url"
+  GDRIVE_API_KEY: "devlog_gdrive_api_url",
+  DEFAULT_GDRIVE_API_URL: "https://script.google.com/macros/s/AKfycbwsBhW4jfLviC7HilMl_0l3SL_VsVa_pGGfvLUhprt-33l_xaPf7uLbdI3IKbfT3Dk/exec"
 };
 
 // ==========================================
@@ -125,7 +126,12 @@ function saveUploadedFiles(files) {
 // 4. GOOGLE DRIVE / SHEETS CLOUD API
 // ==========================================
 function getCloudApiUrl() {
-  return localStorage.getItem(AUTH_CONFIG.GDRIVE_API_KEY) || "";
+  const saved = localStorage.getItem(AUTH_CONFIG.GDRIVE_API_KEY);
+  if (!saved || saved.indexOf("AKfycbwsBhW4jfLviC7HilMl_0l3SL_VsVa_pGGfvLUhprt-33l_xaPf7uLbdI3IKbfT3Dk") === -1) {
+    localStorage.setItem(AUTH_CONFIG.GDRIVE_API_KEY, AUTH_CONFIG.DEFAULT_GDRIVE_API_URL);
+    return AUTH_CONFIG.DEFAULT_GDRIVE_API_URL;
+  }
+  return saved;
 }
 
 function setCloudApiUrl(url) {
