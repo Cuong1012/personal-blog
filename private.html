@@ -74,6 +74,9 @@
       <button class="portal-tab-btn" id="tabFilesBtn">
         <i class="fa-brands fa-google-drive"></i> Tệp &amp; Tài Liệu Drive (<span id="fileCountBadge">0</span>)
       </button>
+      <button class="portal-tab-btn" id="tabCalendarBtn">
+        <i class="fa-regular fa-calendar-days"></i> Google Lịch
+      </button>
     </div>
 
     <!-- =========================================================
@@ -265,6 +268,66 @@
         </table>
       </div>
     </section>
+
+    <!-- =========================================================
+         VIEW 4: GOOGLE LỊCH (CALENDAR VIEW)
+         ========================================================= -->
+    <section class="dashboard-hero" id="calendarView" style="display: none;">
+      <div class="dashboard-welcome">
+        <div class="welcome-text">
+          <h1>Google Lịch &amp; Công Việc 📅</h1>
+          <p>Theo dõi lịch biểu, các cuộc họp và danh sách việc cần làm được đồng bộ từ Google Calendar.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="openAddEventBtn" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Thêm Sự Kiện / Việc Cần Làm
+          </button>
+          <a href="https://calendar.google.com" target="_blank" rel="noopener" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở Google Calendar
+          </a>
+          <button id="openCalendarConfigBtn" class="btn btn-secondary" title="Đổi email hoặc Calendar ID nhúng">
+            <i class="fa-solid fa-gear"></i> Cài Đặt Lịch
+          </button>
+        </div>
+      </div>
+
+      <!-- Calendar Layout Grid -->
+      <div class="calendar-layout-grid">
+        <!-- Left: Agenda Cards List -->
+        <div class="calendar-agenda-pane">
+          <div class="agenda-pane-header">
+            <h3 class="agenda-pane-title">
+              <i class="fa-solid fa-list-check" style="color: var(--primary);"></i> Việc Cần Làm Sắp Tới
+            </h3>
+            <span style="font-size: 0.82rem; color: var(--text-muted);" id="agendaCountText">Đang tải...</span>
+          </div>
+
+          <div class="agenda-cards-list" id="agendaCardsList">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- Right: Interactive Google Calendar Embed -->
+        <div class="calendar-embed-pane">
+          <div class="calendar-embed-header">
+            <div>
+              <strong style="color: var(--text-main); font-size: 1rem;">
+                <i class="fa-brands fa-google" style="color: #4285f4;"></i> Lịch Google Trực Quan
+              </strong>
+              <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">
+                Múi giờ: GMT+7 (Hà Nội, TP.HCM)
+              </div>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <a href="https://calendar.google.com" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.82rem;">
+                <i class="fa-regular fa-calendar-plus"></i> Tạo trên Google
+              </a>
+            </div>
+          </div>
+          <iframe id="googleCalendarIframe" class="calendar-embed-iframe" src="" frameborder="0" scrolling="no"></iframe>
+        </div>
+      </div>
+    </section>
   </main>
 
   <!-- MODAL THÊM GHI CHÚ MỚI -->
@@ -380,6 +443,94 @@
     </div>
   </div>
 
+  <!-- MODAL THÊM SỰ KIỆN LÊN GOOGLE LỊCH -->
+  <div class="article-modal" id="addEventModal" aria-hidden="true">
+    <div class="modal-backdrop" id="addEventBackdrop"></div>
+    <div class="modal-container" style="max-width: 540px;">
+      <button class="modal-close-btn" id="closeAddEventBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 18px;">
+          <i class="fa-regular fa-calendar-plus" style="color: var(--primary);"></i> Thêm Việc Cần Làm Lên Lịch
+        </h2>
+        <form id="addEventForm">
+          <div class="modal-form-group">
+            <label for="eventTitleInput">Tiêu đề sự kiện / Tên công việc</label>
+            <input type="text" id="eventTitleInput" placeholder="Ví dụ: Họp kỹ thuật IT Petrolimex..." required />
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="modal-form-group">
+              <label for="eventStartInput">Bắt đầu lúc</label>
+              <input type="datetime-local" id="eventStartInput" required />
+            </div>
+            <div class="modal-form-group">
+              <label for="eventEndInput">Kết thúc lúc</label>
+              <input type="datetime-local" id="eventEndInput" required />
+            </div>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="eventCategorySelect">Phân loại tính chất</label>
+            <select id="eventCategorySelect">
+              <option value="work">Công việc IT Petrolimex</option>
+              <option value="meeting">Họp trực tuyến / Google Meet</option>
+              <option value="urgent">Việc quan trọng / Khẩn cấp</option>
+              <option value="personal">Cá nhân / Đời sống</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="eventLocationInput">Địa điểm hoặc Link Google Meet</label>
+            <input type="text" id="eventLocationInput" placeholder="Ví dụ: Phòng họp tầng 3 hoặc meet.google.com/..." />
+          </div>
+
+          <div class="modal-form-group">
+            <label for="eventDescInput">Mô tả / Nội dung công việc</label>
+            <textarea id="eventDescInput" placeholder="Chi tiết nội dung cần xử lý..." style="min-height: 80px;"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelAddEventBtn">Hủy</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fa-brands fa-google"></i> Lưu &amp; Mở Lịch Google
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CẤU HÌNH GOOGLE CALENDAR -->
+  <div class="article-modal" id="calendarConfigModal" aria-hidden="true">
+    <div class="modal-backdrop" id="calendarConfigBackdrop"></div>
+    <div class="modal-container" style="max-width: 520px;">
+      <button class="modal-close-btn" id="closeCalendarConfigBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px;">
+          <i class="fa-regular fa-calendar-days" style="color: #4285f4;"></i> Cài Đặt Google Lịch Nhúng
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+          Nhập địa chỉ Email Google của bạn để khung lịch tự động hiển thị lịch trình cá nhân.
+        </p>
+
+        <form id="calendarConfigForm">
+          <div class="modal-form-group">
+            <label for="calendarEmailInput">Địa chỉ Email Google / Calendar ID:</label>
+            <input type="text" id="calendarEmailInput" placeholder="Ví dụ: cuongtrinh1012@gmail.com" required />
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted);">
+            Lưu ý: Bạn cần đăng nhập đúng tài khoản Google trên trình duyệt này để xem được các lịch riêng tư.
+          </p>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelCalendarConfigBtn">Đóng</button>
+            <button type="submit" class="btn btn-primary">Lưu &amp; Tải Lịch</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- PRIVATE APP SCRIPT -->
   <script>
     // Theme sync
@@ -402,18 +553,20 @@
     });
 
     // ==========================================
-    // TAB SWITCHING (NOTES VS DECLARATIONS VS FILES)
+    // TAB SWITCHING (NOTES VS DECLARATIONS VS FILES VS CALENDAR)
     // ==========================================
     const tabNotesBtn = document.getElementById("tabNotesBtn");
     const tabDeclarationsBtn = document.getElementById("tabDeclarationsBtn");
     const tabFilesBtn = document.getElementById("tabFilesBtn");
+    const tabCalendarBtn = document.getElementById("tabCalendarBtn");
     const notesView = document.getElementById("notesView");
     const declarationsView = document.getElementById("declarationsView");
     const filesView = document.getElementById("filesView");
+    const calendarView = document.getElementById("calendarView");
 
     function switchTab(activeBtn, activeView) {
-      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn].forEach(b => b.classList.remove("active"));
-      [notesView, declarationsView, filesView].forEach(v => v.style.display = "none");
+      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn, tabCalendarBtn].forEach(b => b.classList.remove("active"));
+      [notesView, declarationsView, filesView, calendarView].forEach(v => v.style.display = "none");
       activeBtn.classList.add("active");
       activeView.style.display = "block";
     }
@@ -424,6 +577,10 @@
       loadDeclarations();
     });
     tabFilesBtn.addEventListener("click", () => switchTab(tabFilesBtn, filesView));
+    tabCalendarBtn.addEventListener("click", () => {
+      switchTab(tabCalendarBtn, calendarView);
+      initCalendarView();
+    });
 
     // ==========================================
     // NOTES STATE & RENDERING
@@ -1037,6 +1194,205 @@
     });
 
     refreshDeclBtn.addEventListener("click", loadDeclarations);
+
+    // ==========================================
+    // GOOGLE CALENDAR & AGENDA MANAGEMENT
+    // ==========================================
+    const CALENDAR_STORAGE_KEY = "devlog_calendar_id";
+    const AGENDA_STORAGE_KEY = "devlog_calendar_agenda";
+
+    const DEFAULT_AGENDA = [
+      {
+        id: 1,
+        title: "Họp giao ban định kỳ IT Petrolimex",
+        time: "08:30 - 09:30, Thứ Hai hàng tuần",
+        category: "meeting",
+        location: "Phòng họp tầng 3 & Google Meet",
+        desc: "Báo cáo tiến độ vận hành hạ tầng và bảo mật thông tin."
+      },
+      {
+        id: 2,
+        title: "Kiểm tra sao lưu hệ thống & máy chủ",
+        time: "14:00 - 15:30, Thứ Sáu",
+        category: "work",
+        location: "Trung tâm dữ liệu Petrolimex",
+        desc: "Xác thực bản sao lưu định kỳ và kiểm tra an ninh mạng."
+      },
+      {
+        id: 3,
+        title: "Duyệt hồ sơ khai báo & hình ảnh mới",
+        time: "Hàng ngày sau giờ làm việc",
+        category: "urgent",
+        location: "Hệ thống Google Sheet & Drive",
+        desc: "Đối chiếu mã số nhân viên và ảnh chân dung mọi người nộp."
+      }
+    ];
+
+    function getStoredAgenda() {
+      const data = localStorage.getItem(AGENDA_STORAGE_KEY);
+      if (!data) {
+        localStorage.setItem(AGENDA_STORAGE_KEY, JSON.stringify(DEFAULT_AGENDA));
+        return DEFAULT_AGENDA;
+      }
+      try { return JSON.parse(data); } catch(e) { return DEFAULT_AGENDA; }
+    }
+
+    function saveStoredAgenda(agenda) {
+      localStorage.setItem(AGENDA_STORAGE_KEY, JSON.stringify(agenda));
+    }
+
+    function getCalendarId() {
+      return localStorage.getItem(CALENDAR_STORAGE_KEY) || "vi.vietnamese#holiday@group.v.calendar.google.com";
+    }
+
+    function setCalendarId(id) {
+      localStorage.setItem(CALENDAR_STORAGE_KEY, id.trim());
+      updateCalendarIframe();
+    }
+
+    const googleCalendarIframe = document.getElementById("googleCalendarIframe");
+    const agendaCardsList = document.getElementById("agendaCardsList");
+    const agendaCountText = document.getElementById("agendaCountText");
+
+    function updateCalendarIframe() {
+      const calId = encodeURIComponent(getCalendarId());
+      const embedUrl = `https://calendar.google.com/calendar/embed?src=${calId}&ctz=Asia%2FHo_Chi_Minh&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=1&showCalendars=0&showTz=1&mode=AGENDA`;
+      googleCalendarIframe.src = embedUrl;
+    }
+
+    function renderAgenda() {
+      const agenda = getStoredAgenda();
+      agendaCountText.textContent = `${agenda.length} việc cần làm`;
+
+      if (agenda.length === 0) {
+        agendaCardsList.innerHTML = `
+          <div style="text-align: center; padding: 30px 10px; color: var(--text-muted);">
+            <i class="fa-regular fa-calendar-check" style="font-size: 2rem; margin-bottom: 8px; display: block;"></i>
+            Chưa có công việc nào trong danh sách.
+          </div>
+        `;
+        return;
+      }
+
+      agendaCardsList.innerHTML = agenda.map(item => `
+        <div class="event-card status-${item.category}">
+          <div class="event-time-pill">
+            <i class="fa-regular fa-clock"></i> ${escapeHtml(item.time)}
+          </div>
+          <div class="event-card-title">${escapeHtml(item.title)}</div>
+          <div class="event-card-meta">
+            ${item.location ? `<span><i class="fa-solid fa-location-dot" style="color:var(--primary);"></i> ${escapeHtml(item.location)}</span>` : ''}
+            ${item.desc ? `<span><i class="fa-solid fa-align-left"></i> ${escapeHtml(item.desc)}</span>` : ''}
+          </div>
+          <div style="margin-top: 10px; display: flex; justify-content: flex-end;">
+            <button class="btn-icon-sm" onclick="deleteAgendaItem(${item.id})" title="Xóa việc này">
+              <i class="fa-regular fa-trash-can"></i>
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    window.deleteAgendaItem = function(id) {
+      let agenda = getStoredAgenda();
+      agenda = agenda.filter(a => a.id !== id);
+      saveStoredAgenda(agenda);
+      renderAgenda();
+    };
+
+    function initCalendarView() {
+      renderAgenda();
+      if (!googleCalendarIframe.src || googleCalendarIframe.src === "about:blank") {
+        updateCalendarIframe();
+      }
+    }
+
+    // Modal Add Event
+    const addEventModal = document.getElementById("addEventModal");
+    const openAddEventBtn = document.getElementById("openAddEventBtn");
+    const closeAddEventBtn = document.getElementById("closeAddEventBtn");
+    const cancelAddEventBtn = document.getElementById("cancelAddEventBtn");
+    const addEventBackdrop = document.getElementById("addEventBackdrop");
+    const addEventForm = document.getElementById("addEventForm");
+
+    openAddEventBtn.addEventListener("click", () => {
+      const now = new Date();
+      const inOneHour = new Date(now.getTime() + 60 * 60 * 1000);
+      document.getElementById("eventStartInput").value = now.toISOString().slice(0, 16);
+      document.getElementById("eventEndInput").value = inOneHour.toISOString().slice(0, 16);
+      addEventModal.classList.add("active");
+    });
+
+    function closeEventModal() {
+      addEventModal.classList.remove("active");
+      addEventForm.reset();
+    }
+
+    closeAddEventBtn.addEventListener("click", closeEventModal);
+    cancelAddEventBtn.addEventListener("click", closeEventModal);
+    addEventBackdrop.addEventListener("click", closeEventModal);
+
+    addEventForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const title = document.getElementById("eventTitleInput").value.trim();
+      const start = document.getElementById("eventStartInput").value;
+      const end = document.getElementById("eventEndInput").value;
+      const category = document.getElementById("eventCategorySelect").value;
+      const location = document.getElementById("eventLocationInput").value.trim();
+      const desc = document.getElementById("eventDescInput").value.trim();
+
+      const formatTimeText = `${start.replace('T', ' ')} đến ${end.replace('T', ' ')}`;
+
+      const newEvent = {
+        id: Date.now(),
+        title,
+        time: formatTimeText,
+        category,
+        location,
+        desc
+      };
+
+      const agenda = getStoredAgenda();
+      agenda.unshift(newEvent);
+      saveStoredAgenda(agenda);
+      renderAgenda();
+      closeEventModal();
+
+      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&details=${encodeURIComponent(desc)}&location=${encodeURIComponent(location)}`;
+      window.open(gcalUrl, '_blank');
+    });
+
+    // Modal Calendar Config
+    const calendarConfigModal = document.getElementById("calendarConfigModal");
+    const openCalendarConfigBtn = document.getElementById("openCalendarConfigBtn");
+    const closeCalendarConfigBtn = document.getElementById("closeCalendarConfigBtn");
+    const cancelCalendarConfigBtn = document.getElementById("cancelCalendarConfigBtn");
+    const calendarConfigBackdrop = document.getElementById("calendarConfigBackdrop");
+    const calendarConfigForm = document.getElementById("calendarConfigForm");
+    const calendarEmailInput = document.getElementById("calendarEmailInput");
+
+    openCalendarConfigBtn.addEventListener("click", () => {
+      calendarEmailInput.value = getCalendarId();
+      calendarConfigModal.classList.add("active");
+    });
+
+    function closeCalendarModal() {
+      calendarConfigModal.classList.remove("active");
+    }
+
+    closeCalendarConfigBtn.addEventListener("click", closeCalendarModal);
+    cancelCalendarConfigBtn.addEventListener("click", closeCalendarModal);
+    calendarConfigBackdrop.addEventListener("click", closeCalendarModal);
+
+    calendarConfigForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = calendarEmailInput.value.trim();
+      if (id) {
+        setCalendarId(id);
+        closeCalendarModal();
+        alert("Đã cập nhật cấu hình Google Calendar!");
+      }
+    });
 
     // Initial render & Cloud auto-pull if connected
     updateCloudBadge();
