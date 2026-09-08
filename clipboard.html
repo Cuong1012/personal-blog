@@ -767,14 +767,14 @@
       height: 100%;
       min-height: 0;
       overflow-y: auto;
-      padding: 18px 24px;
-      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
-      font-size: 11.5pt;
-      line-height: 1.6;
+      padding: 24px 32px;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 13pt;
+      line-height: 1.5;
       border: 1px solid var(--border-color);
       border-radius: var(--radius-md);
       background: #ffffff;
-      color: #1e293b;
+      color: #000000;
       box-sizing: border-box;
     }
 
@@ -2105,12 +2105,14 @@
 
     // Convert raw OCR lines into structured Word HTML (Paragraphs, Headings, Lists, Tables)
     function convertTextToWordHtml(rawText) {
-      if (!rawText || !rawText.trim()) return '<p style="color: #94a3b8; font-style: italic;">Chưa có văn bản.</p>';
+      if (!rawText || !rawText.trim()) return "<p style=\"color: #64748b; font-style: italic; font-family: 'Times New Roman', Times, serif;\">Chưa có văn bản.</p>";
       const lines = rawText.split(/\r?\n/);
       let html = '';
       let inList = false;
       let inNumberedList = false;
       let inTable = false;
+
+      const fontStyle = "font-family: 'Times New Roman', Times, serif; color: #000000;";
 
       for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
@@ -2126,11 +2128,11 @@
           if (!inTable) {
             if (inList) { html += '</ul>'; inList = false; }
             if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
-            html += '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 10pt 0; border: 1px solid #cbd5e1; font-family: Calibri, Arial, sans-serif;">';
+            html += `<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 10pt 0; border: 1px solid #000000; ${fontStyle} font-size: 13pt;">`;
             inTable = true;
           }
           const cells = line.split(line.includes('\t') ? '\t' : '|').map(c => c.trim()).filter(c => c.length > 0);
-          html += '<tr>' + cells.map(c => `<td style="padding: 6pt; border: 1px solid #cbd5e1;">${formatInline(c)}</td>`).join('') + '</tr>';
+          html += '<tr>' + cells.map(c => `<td style="padding: 6pt; border: 1px solid #000000; color: #000000; font-family: 'Times New Roman', Times, serif;">${formatInline(c)}</td>`).join('') + '</tr>';
           continue;
         } else if (inTable) {
           html += '</table>';
@@ -2141,8 +2143,8 @@
         const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
         if (bulletMatch) {
           if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
-          if (!inList) { html += '<ul style="margin: 4pt 0 8pt; padding-left: 24pt;">'; inList = true; }
-          html += `<li style="margin-bottom: 3pt;">${formatInline(bulletMatch[1])}</li>`;
+          if (!inList) { html += `<ul style="margin: 4pt 0 8pt; padding-left: 24pt; ${fontStyle} font-size: 13pt;">`; inList = true; }
+          html += `<li style="margin-bottom: 3pt; ${fontStyle} font-size: 13pt;">${formatInline(bulletMatch[1])}</li>`;
           continue;
         }
 
@@ -2150,22 +2152,22 @@
         const numMatch = line.match(/^(\d+|[a-zA-Z])[\.\)]\s+(.*)$/);
         if (numMatch) {
           if (inList) { html += '</ul>'; inList = false; }
-          if (!inNumberedList) { html += '<ol style="margin: 4pt 0 8pt; padding-left: 24pt;">'; inNumberedList = true; }
-          html += `<li style="margin-bottom: 3pt;">${formatInline(numMatch[2])}</li>`;
+          if (!inNumberedList) { html += `<ol style="margin: 4pt 0 8pt; padding-left: 24pt; ${fontStyle} font-size: 13pt;">`; inNumberedList = true; }
+          html += `<li style="margin-bottom: 3pt; ${fontStyle} font-size: 13pt;">${formatInline(numMatch[2])}</li>`;
           continue;
         }
 
-        if (inList) { html += '</ul>'; inList = false; }
-        if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
+        if (inList) html += '</ul>';
+        if (inNumberedList) html += '</ol>';
 
-        // 4. Headings & Title detection
+        // 4. Headings & Title detection (Chữ đen, Đậm, Times New Roman, 13-14pt)
         if (line.length < 80 && (line === line.toUpperCase() && /[A-ZÀ-Ỹ]/.test(line) && line.length > 4 || /^(CHƯƠNG|BÀI|ĐIỀU|MỤC|PHẦN|LƯU Ý|THÔNG BÁO|CỘNG HÒA)/i.test(line))) {
-          html += `<h3 style="margin: 12pt 0 4pt; color: #1e3a8a; font-family: Calibri, Arial, sans-serif; font-size: 13pt; font-weight: bold;">${formatInline(line)}</h3>`;
+          html += `<h3 style="margin: 12pt 0 4pt; color: #000000; font-family: 'Times New Roman', Times, serif; font-size: 14pt; font-weight: bold;">${formatInline(line)}</h3>`;
         } else if (line.endsWith(':') && line.length < 60) {
-          html += `<p style="margin: 8pt 0 3pt; font-weight: bold; color: #0f172a;">${formatInline(line)}</p>`;
+          html += `<p style="margin: 8pt 0 3pt; font-weight: bold; color: #000000; font-family: 'Times New Roman', Times, serif; font-size: 13pt;">${formatInline(line)}</p>`;
         } else {
           // Standard Paragraph
-          html += `<p style="margin: 0 0 6pt; font-size: 11pt; line-height: 1.4;">${formatInline(line)}</p>`;
+          html += `<p style="margin: 0 0 6pt; font-size: 13pt; line-height: 1.4; color: #000000; font-family: 'Times New Roman', Times, serif;">${formatInline(line)}</p>`;
         }
       }
 
@@ -2185,7 +2187,7 @@
       }
 
       const formattedHtml = convertTextToWordHtml(text);
-      const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; color: #000000;">${formattedHtml}</body></html>`;
+      const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.4; color: #000000;">${formattedHtml}</body></html>`;
 
       try {
         const item = new ClipboardItem({
@@ -2216,12 +2218,12 @@
           <title>Tài liệu Word OCR</title>
           <style>
             @page { size: A4; margin: 2cm; }
-            body { font-family: 'Calibri', 'Times New Roman', Arial, sans-serif; font-size: 11pt; line-height: 1.35; color: #000000; }
-            h1, h2, h3 { font-family: 'Calibri', 'Arial', sans-serif; color: #1e3a8a; }
-            p { margin: 0 0 6pt; }
-            table { border-collapse: collapse; width: 100%; margin: 10pt 0; }
-            td, th { border: 1px solid #cbd5e1; padding: 6pt; }
-            ul, ol { margin: 4pt 0 8pt; padding-left: 24pt; }
+            body { font-family: 'Times New Roman', Times, serif; font-size: 13pt; line-height: 1.4; color: #000000; }
+            h1, h2, h3 { font-family: 'Times New Roman', Times, serif; color: #000000; font-size: 14pt; }
+            p { margin: 0 0 6pt; color: #000000; font-family: 'Times New Roman', Times, serif; font-size: 13pt; }
+            table { border-collapse: collapse; width: 100%; margin: 10pt 0; border: 1px solid #000000; font-family: 'Times New Roman', Times, serif; color: #000000; }
+            td, th { border: 1px solid #000000; padding: 6pt; color: #000000; font-family: 'Times New Roman', Times, serif; }
+            ul, ol, li { color: #000000; font-family: 'Times New Roman', Times, serif; font-size: 13pt; margin: 4pt 0 8pt; }
           </style>
         </head>
         <body>
