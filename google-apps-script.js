@@ -250,9 +250,9 @@ function doPost(e) {
       if (typeof Drive !== "undefined" && Drive.Files && Drive.Files.insert) {
         try {
           var newFile = Drive.Files.insert(
-            { title: "OCR_Temp_" + new Date().getTime(), mimeType: "application/vnd.google-apps.document" },
+            { title: "OCR_Temp_" + new Date().getTime() },
             blob,
-            { ocr: true, ocrLanguage: lang }
+            { convert: true, ocr: true, ocrLanguage: lang }
           );
           docId = newFile.id;
         } catch (e1) {}
@@ -260,14 +260,13 @@ function doPost(e) {
 
       // Cách 2: Sử dụng Google Drive Multipart REST API (hoạt động mặc định không cần bật Services)
       if (!docId) {
-        var uploadUrl = "https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart&ocr=true&ocrLanguage=" + encodeURIComponent(lang);
+        var uploadUrl = "https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart&convert=true&ocr=true&ocrLanguage=" + encodeURIComponent(lang);
         var boundary = "-------GoogleDriveOcr" + new Date().getTime();
         var delimiter = "\r\n--" + boundary + "\r\n";
         var close_delim = "\r\n--" + boundary + "--";
 
         var metadata = {
-          title: "OCR_Temp_Doc_" + new Date().getTime(),
-          mimeType: "application/vnd.google-apps.document"
+          title: "OCR_Temp_" + new Date().getTime()
         };
 
         var multipartPayload =
