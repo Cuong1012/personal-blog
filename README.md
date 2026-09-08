@@ -21,17 +21,21 @@ Dự án tương thích 100% với **GitHub Pages** (Hosting miễn phí trọn 
 
 ```text
 personal-blog/
-├── index.html        # Trang giao diện chính của Blog
-├── login.html        # Trang Đăng nhập vào Khu vực riêng tư
-├── private.html      # Trang Bảng điều khiển & Quản lý dữ liệu bí mật
+├── index.html              # Trang giao diện chính của Blog
+├── form.html               # Trang Biểu mẫu Khai báo thông tin & Tải ảnh chân dung
+├── login.html              # Trang Đăng nhập vào Khu vực riêng tư
+├── private.html            # Trang Bảng điều khiển & Quản lý dữ liệu bí mật
+├── google-form-script.js   # Script Google Sheets dành riêng cho Biểu mẫu khai báo
+├── google-apps-script.js   # Script Google Sheets dành cho Khu vực riêng tư & Upload tệp
 ├── css/
-│   ├── style.css     # Định dạng CSS, biến màu sắc, Dark Mode & Animation
-│   └── auth.css      # CSS cho trang Đăng nhập và Dashboard bảo mật
+│   ├── style.css           # Định dạng CSS chung, Dark Mode & Animation
+│   ├── auth.css            # CSS cho trang Đăng nhập và Dashboard bảo mật
+│   └── form.css            # CSS cho Biểu mẫu khai báo & Khung xem trước ảnh
 ├── js/
-│   ├── app.js        # Dữ liệu bài viết công khai và logic blog
-│   └── auth.js       # Xử lý xác thực, bảo mật phiên và lưu trữ ghi chú riêng tư
-├── .gitignore        # Các file bỏ qua khi dùng Git
-└── README.md         # Hướng dẫn chi tiết
+│   ├── app.js              # Dữ liệu bài viết công khai và logic blog
+│   └── auth.js             # Xử lý xác thực, bảo mật phiên và lưu trữ
+├── .gitignore              # Các file bỏ qua khi dùng Git
+└── README.md               # Hướng dẫn chi tiết
 ```
 
 ---
@@ -128,5 +132,22 @@ git push -u origin main
 2. Kéo thả file bất kỳ (ảnh, PDF, Word, Excel, ZIP) hoặc bấm để chọn tệp từ máy tính.
 3. Tệp sẽ tự động được tải lên và lưu vào thư mục **`DevLog Uploads`** trên Google Drive của bạn.
 4. Bạn có thể mở xem trực tiếp trên Google Drive hoặc sao chép link tệp để chia sẻ bất cứ lúc nào.
+
+---
+
+## 📋 Hướng Dẫn Kích Hoạt Form Khai Báo Thông Tin & Ảnh Chân Dung (`form.html`)
+
+1. Mở [sheets.new](https://sheets.new) để tạo 1 file Google Sheets mới (Đặt tên ví dụ: `Danh Sách Khai Báo`).
+2. Vào menu: **Tiện ích mở rộng (Extensions) > Apps Script**.
+3. Mở tệp `google-form-script.js` trong thư mục dự án, copy toàn bộ code và dán vào Apps Script.
+4. Bấm nút **Triển khai (Deploy) > Quản lý bản triển khai mới (New deployment)**:
+   - Chọn loại: **Ứng dụng web (Web app)**.
+   - **Thực thi dưới dạng**: `Tôi (Me)`.
+   - **Ai có quyền truy cập**: `Bất kỳ ai (Anyone)` *(Để người lạ có thể gửi dữ liệu)*.
+   - Nhấn **Triển khai** và cấp quyền.
+5. Sao chép link Web App (có đuôi `/exec`).
+6. Mở trang `form.html`, bấm nút **"⚙️ Cấu hình Google Sheet"** ở góc trên, dán link vào và bấm **"Lưu Cấu Hình"**.
+   > 🎉 Giờ đây bất kỳ ai vào `form.html` điền thông tin và tải ảnh chân dung, dữ liệu sẽ tự động xuất hiện trong Google Sheet và ảnh sẽ nằm gọn trong thư mục `Anh_Chan_Dung` trên Google Drive của bạn!
+
 
 

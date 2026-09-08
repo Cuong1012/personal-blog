@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Khai Báo Thông Tin & Tải Ảnh Chân Dung | Hệ Thống Tiếp Nhận</title>
+  <meta name="description" content="Trang khai báo thông tin cá nhân, mã số và tải ảnh chân dung tự động lưu vào Google Sheets và Google Drive." />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/form.css" />
+</head>
+<body class="form-page-wrapper">
+  <!-- HEADER -->
+  <header class="header" id="header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+        <span class="logo-text">DevLog<span class="accent-dot">.</span></span>
+      </a>
+
+      <nav class="nav-menu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+          <li><a href="form.html" class="nav-link active"><i class="fa-solid fa-id-card"></i> Khai báo thông tin</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Chuyển giao diện" title="Chuyển chế độ Sáng / Tối">
+          <i class="fa-regular fa-moon dark-icon"></i>
+          <i class="fa-regular fa-sun light-icon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="form-section">
+    <div class="container">
+      <!-- Owner Settings Trigger -->
+      <div class="owner-config-bar">
+        <button id="openConfigBtn" class="btn-config-api" title="Dành cho Quản trị viên kết nối link Google Sheet">
+          <i class="fa-solid fa-gear"></i> <span id="configStatusLabel">Cấu hình Google Sheet</span>
+        </button>
+      </div>
+
+      <!-- MAIN FORM CARD -->
+      <div class="form-card" id="formCard">
+        <div class="form-header">
+          <div class="form-header-badge">
+            <i class="fa-solid fa-shield-halved"></i> Biểu Mẫu Trực Tuyến
+          </div>
+          <h1 class="form-main-title">Khai Báo Thông Tin Cá Nhân</h1>
+          <p class="form-subtitle">Vui lòng điền đúng thông tin và tải lên ảnh chân dung rõ mặt để hệ thống lưu hồ sơ.</p>
+        </div>
+
+        <form id="declarationForm" novalidate>
+          <!-- PORTRAIT UPLOAD AREA -->
+          <div class="portrait-box-wrapper" id="portraitDropzone" title="Nhấp hoặc kéo thả ảnh chân dung vào đây">
+            <input type="file" id="photoFileInput" accept="image/*" hidden />
+            
+            <div class="portrait-preview-area">
+              <i class="fa-regular fa-user portrait-placeholder-icon" id="portraitPlaceholder"></i>
+              <img src="" alt="Ảnh chân dung xem trước" id="portraitImgPreview" class="portrait-img-preview" />
+            </div>
+
+            <div class="portrait-upload-text" id="uploadPromptText">
+              <h4><i class="fa-solid fa-camera"></i> Chọn hoặc Chụp ảnh chân dung</h4>
+              <p>Hỗ trợ ảnh JPG, PNG, WebP (Ảnh sẽ tự lưu vào Google Drive)</p>
+            </div>
+
+            <div class="portrait-action-btns" id="portraitActionBtns">
+              <button type="button" class="btn btn-secondary" id="changePhotoBtn" style="padding: 6px 14px; font-size: 0.85rem;">
+                <i class="fa-solid fa-rotate"></i> Đổi ảnh khác
+              </button>
+            </div>
+          </div>
+
+          <!-- INPUT FIELDS -->
+          <div class="form-grid-row">
+            <!-- Full Name -->
+            <div class="form-field full-width">
+              <label class="field-label" for="fullNameInput">
+                Họ và tên đầy đủ <span class="req">*</span>
+              </label>
+              <div class="field-input-wrapper">
+                <i class="fa-regular fa-user field-icon"></i>
+                <input type="text" id="fullNameInput" placeholder="Ví dụ: Nguyễn Văn A" required autocomplete="name" />
+              </div>
+            </div>
+
+            <!-- Code / ID -->
+            <div class="form-field">
+              <label class="field-label" for="codeIdInput">
+                Mã số (Mã NV / SV / CCCD) <span class="req">*</span>
+              </label>
+              <div class="field-input-wrapper">
+                <i class="fa-regular fa-id-badge field-icon"></i>
+                <input type="text" id="codeIdInput" placeholder="Ví dụ: IT-1012 hoặc 00120..." required />
+              </div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-field">
+              <label class="field-label" for="phoneInput">
+                Số điện thoại liên hệ <span class="req">*</span>
+              </label>
+              <div class="field-input-wrapper">
+                <i class="fa-solid fa-phone field-icon"></i>
+                <input type="tel" id="phoneInput" placeholder="Ví dụ: 0912345678" required autocomplete="tel" />
+              </div>
+            </div>
+
+            <!-- Extra Note -->
+            <div class="form-field full-width">
+              <label class="field-label" for="noteInput">Ghi chú thêm (Tùy chọn)</label>
+              <div class="field-input-wrapper">
+                <textarea id="noteInput" placeholder="Nhập thêm thông tin bổ sung, phòng ban hoặc lời nhắn (nếu có)..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- SUBMIT BUTTON -->
+          <button type="submit" class="btn btn-primary btn-submit-form" id="submitBtn">
+            <span id="submitBtnText"><i class="fa-solid fa-paper-plane"></i> Xác Nhận &amp; Gửi Thông Tin</span>
+          </button>
+        </form>
+      </div>
+
+      <!-- SUCCESS CONFIRMATION CARD -->
+      <div class="form-card form-success-card" id="successCard">
+        <div class="success-icon-badge">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <h2 class="success-title">Gửi Thông Tin Thành Công!</h2>
+        <p class="success-desc">
+          Thông tin của bạn kèm ảnh chân dung đã được chuyển tiếp và ghi nhận an toàn vào hệ thống Google Sheet &amp; Google Drive.
+        </p>
+
+        <div class="receipt-info-box">
+          <div class="receipt-row">
+            <span class="receipt-label">Họ và tên:</span>
+            <span class="receipt-val" id="receiptName">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Mã số:</span>
+            <span class="receipt-val" id="receiptCode">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Thời gian tiếp nhận:</span>
+            <span class="receipt-val" id="receiptTime">-</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Ảnh chân dung:</span>
+            <span class="receipt-val" style="color: var(--success);"><i class="fa-solid fa-cloud-check"></i> Đã lưu vào Drive</span>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" id="fillAnotherBtn">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Khai báo người khác
+          </button>
+          <a href="index.html" class="btn btn-primary">
+            <i class="fa-solid fa-house"></i> Về trang chủ Blog
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL CẤU HÌNH GOOGLE SHEET API (CHO QUẢN TRỊ VIÊN) -->
+  <div class="article-modal" id="configModal" aria-hidden="true">
+    <div class="modal-backdrop" id="configBackdrop"></div>
+    <div class="modal-container" style="max-width: 580px;">
+      <button class="modal-close-btn" id="closeConfigBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 12px;">
+          <i class="fa-brands fa-google-drive" style="color: #34a853;"></i> Cấu Hình Google Sheet Nhận Tin
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 16px;">
+          Dán đường link Web App Google Apps Script để nhận thông tin khai báo và ảnh chân dung của người lạ.
+        </p>
+
+        <form id="configForm">
+          <div class="modal-form-group">
+            <label for="apiUrlInput">Link Google Apps Script Web App (URL đuôi /exec):</label>
+            <input type="url" id="apiUrlInput" placeholder="https://script.google.com/macros/s/.../exec" required />
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-top: 6px;">
+            Mã nguồn script đã có sẵn trong file <code>google-form-script.js</code> trong thư mục dự án.
+          </p>
+
+          <div id="configFeedback" style="font-size: 0.88rem; margin: 12px 0;"></div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelConfigBtn">Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu Cấu Hình</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <a href="index.html" class="brand-logo footer-logo">
+          <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+          <span class="logo-text">DevLog<span class="accent-dot">.</span></span>
+        </a>
+        <p class="footer-copy">
+          Hệ thống thu thập và khai báo thông tin tự động kết nối Google Sheets.
+        </p>
+      </div>
+      <div class="footer-right">
+        <div class="footer-socials">
+          <a href="https://github.com/Cuong1012" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
+          <a href="index.html" class="back-to-top" title="Về trang chủ"><i class="fa-solid fa-arrow-up"></i></a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FORM SCRIPT -->
+  <script>
+    // Theme sync
+    const savedTheme = localStorage.getItem("devlog-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const themeToggle = document.getElementById("themeToggle");
+    themeToggle.addEventListener("click", () => {
+      const current = document.documentElement.getAttribute("data-theme");
+      const nextTheme = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", nextTheme);
+      localStorage.setItem("devlog-theme", nextTheme);
+    });
+
+    // Configuration storage key
+    const API_STORAGE_KEY = "declaration_form_api_url";
+
+    function getApiUrl() {
+      return localStorage.getItem(API_STORAGE_KEY) || "";
+    }
+
+    function setApiUrl(url) {
+      localStorage.setItem(API_STORAGE_KEY, url.trim());
+      updateConfigStatus();
+    }
+
+    function updateConfigStatus() {
+      const url = getApiUrl();
+      const statusLabel = document.getElementById("configStatusLabel");
+      if (url) {
+        statusLabel.innerHTML = '<span style="color:var(--success);"><i class="fa-solid fa-circle-check"></i> Đã kết nối Sheet</span>';
+      } else {
+        statusLabel.innerHTML = '<span><i class="fa-solid fa-gear"></i> Cấu hình Google Sheet</span>';
+      }
+    }
+    updateConfigStatus();
+
+    // Elements
+    const declarationForm = document.getElementById("declarationForm");
+    const photoFileInput = document.getElementById("photoFileInput");
+    const portraitDropzone = document.getElementById("portraitDropzone");
+    const portraitPlaceholder = document.getElementById("portraitPlaceholder");
+    const portraitImgPreview = document.getElementById("portraitImgPreview");
+    const uploadPromptText = document.getElementById("uploadPromptText");
+    const portraitActionBtns = document.getElementById("portraitActionBtns");
+    const changePhotoBtn = document.getElementById("changePhotoBtn");
+
+    const fullNameInput = document.getElementById("fullNameInput");
+    const codeIdInput = document.getElementById("codeIdInput");
+    const phoneInput = document.getElementById("phoneInput");
+    const noteInput = document.getElementById("noteInput");
+    const submitBtn = document.getElementById("submitBtn");
+    const submitBtnText = document.getElementById("submitBtnText");
+
+    const formCard = document.getElementById("formCard");
+    const successCard = document.getElementById("successCard");
+    const receiptName = document.getElementById("receiptName");
+    const receiptCode = document.getElementById("receiptCode");
+    const receiptTime = document.getElementById("receiptTime");
+    const fillAnotherBtn = document.getElementById("fillAnotherBtn");
+
+    // Image file state
+    let selectedPhoto = {
+      name: "",
+      type: "",
+      base64: ""
+    };
+
+    // Trigger photo selection
+    portraitDropzone.addEventListener("click", (e) => {
+      if (e.target !== changePhotoBtn && !changePhotoBtn.contains(e.target)) {
+        photoFileInput.click();
+      }
+    });
+
+    changePhotoBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      photoFileInput.click();
+    });
+
+    // Drag & Drop
+    portraitDropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      portraitDropzone.classList.add("dragover");
+    });
+
+    portraitDropzone.addEventListener("dragleave", (e) => {
+      e.preventDefault();
+      portraitDropzone.classList.remove("dragover");
+    });
+
+    portraitDropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      portraitDropzone.classList.remove("dragover");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processPhoto(e.dataTransfer.files[0]);
+      }
+    });
+
+    photoFileInput.addEventListener("change", (e) => {
+      if (e.target.files && e.target.files.length > 0) {
+        processPhoto(e.target.files[0]);
+      }
+    });
+
+    function processPhoto(file) {
+      if (!file.type.startsWith("image/")) {
+        alert("Vui lòng chỉ chọn tệp hình ảnh (JPG, PNG, WebP)!");
+        return;
+      }
+      if (file.size > 15 * 1024 * 1024) {
+        alert("Ảnh quá lớn (vượt quá 15MB). Vui lòng chọn ảnh nhỏ hơn.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const fullDataUrl = evt.target.result;
+        portraitImgPreview.src = fullDataUrl;
+        portraitImgPreview.style.display = "block";
+        portraitPlaceholder.style.display = "none";
+        uploadPromptText.style.display = "none";
+        portraitActionBtns.style.display = "flex";
+
+        // Store base64 data without data:image/...;base64, prefix
+        selectedPhoto.name = file.name;
+        selectedPhoto.type = file.type;
+        selectedPhoto.base64 = fullDataUrl.split(',')[1];
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetPhoto() {
+      selectedPhoto = { name: "", type: "", base64: "" };
+      portraitImgPreview.src = "";
+      portraitImgPreview.style.display = "none";
+      portraitPlaceholder.style.display = "block";
+      uploadPromptText.style.display = "block";
+      portraitActionBtns.style.display = "none";
+      photoFileInput.value = "";
+    }
+
+    // Submit Form Handler
+    declarationForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const fullName = fullNameInput.value.trim();
+      const codeId = codeIdInput.value.trim();
+      const phone = phoneInput.value.trim();
+      const note = noteInput.value.trim();
+
+      // Validation
+      if (!fullName) {
+        alert("Vui lòng nhập Họ và tên!");
+        fullNameInput.focus();
+        return;
+      }
+      if (!codeId) {
+        alert("Vui lòng nhập Mã số!");
+        codeIdInput.focus();
+        return;
+      }
+      if (!phone) {
+        alert("Vui lòng nhập Số điện thoại!");
+        phoneInput.focus();
+        return;
+      }
+      if (!selectedPhoto.base64) {
+        alert("Vui lòng tải lên hoặc chụp ảnh chân dung!");
+        photoFileInput.click();
+        return;
+      }
+
+      // Check API URL
+      const apiUrl = getApiUrl();
+      if (!apiUrl) {
+        alert("Chưa thiết lập URL Google Apps Script nhận dữ liệu! Vui lòng bấm 'Cấu hình Google Sheet' ở góc trên để dán link.");
+        openConfig();
+        return;
+      }
+
+      // Set Loading State
+      submitBtn.disabled = true;
+      submitBtnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải ảnh & ghi vào Google Sheet...';
+
+      const payload = {
+        fullName: fullName,
+        codeId: codeId,
+        phone: phone,
+        note: note,
+        photoName: selectedPhoto.name,
+        photoType: selectedPhoto.type,
+        photoData: selectedPhoto.base64
+      };
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          // Display Receipt
+          receiptName.textContent = fullName;
+          receiptCode.textContent = codeId;
+          receiptTime.textContent = (result.data && result.data.time) ? result.data.time : new Date().toLocaleString("vi-VN");
+
+          formCard.style.display = "none";
+          successCard.style.display = "block";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+          alert("Lỗi tiếp nhận: " + (result.message || "Vui lòng thử lại"));
+        }
+      } catch (err) {
+        alert("Không thể kết nối đến Google Sheet. Vui lòng kiểm tra lại link Web App hoặc quyền chia sẻ: " + err.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtnText.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Xác Nhận & Gửi Thông Tin';
+      }
+    });
+
+    // Fill Another
+    fillAnotherBtn.addEventListener("click", () => {
+      declarationForm.reset();
+      resetPhoto();
+      successCard.style.display = "none";
+      formCard.style.display = "block";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    // Configuration Modal
+    const configModal = document.getElementById("configModal");
+    const openConfigBtn = document.getElementById("openConfigBtn");
+    const closeConfigBtn = document.getElementById("closeConfigBtn");
+    const cancelConfigBtn = document.getElementById("cancelConfigBtn");
+    const configBackdrop = document.getElementById("configBackdrop");
+    const configForm = document.getElementById("configForm");
+    const apiUrlInput = document.getElementById("apiUrlInput");
+    const configFeedback = document.getElementById("configFeedback");
+
+    function openConfig() {
+      apiUrlInput.value = getApiUrl();
+      configFeedback.textContent = "";
+      configModal.classList.add("active");
+    }
+
+    function closeConfig() {
+      configModal.classList.remove("active");
+    }
+
+    openConfigBtn.addEventListener("click", openConfig);
+    closeConfigBtn.addEventListener("click", closeConfig);
+    cancelConfigBtn.addEventListener("click", closeConfig);
+    configBackdrop.addEventListener("click", closeConfig);
+
+    configForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = apiUrlInput.value.trim();
+      if (!url.startsWith("https://script.google.com")) {
+        configFeedback.style.color = "var(--danger)";
+        configFeedback.textContent = "URL phải bắt đầu bằng https://script.google.com/...";
+        return;
+      }
+
+      configFeedback.style.color = "var(--primary)";
+      configFeedback.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang kiểm tra link Google Sheet...';
+
+      try {
+        const resp = await fetch(url);
+        const data = await resp.json();
+        if (data.status === "online") {
+          setApiUrl(url);
+          configFeedback.style.color = "var(--success)";
+          configFeedback.textContent = "Kết nối thành công! Đã sẵn sàng tiếp nhận thông tin.";
+          setTimeout(closeConfig, 1200);
+        } else {
+          setApiUrl(url);
+          configFeedback.style.color = "var(--success)";
+          configFeedback.textContent = "Đã lưu URL!";
+          setTimeout(closeConfig, 1200);
+        }
+      } catch (err) {
+        setApiUrl(url);
+        configFeedback.style.color = "var(--success)";
+        configFeedback.textContent = "Đã lưu URL thành công!";
+        setTimeout(closeConfig, 1200);
+      }
+    });
+  </script>
+</body>
+</html>
