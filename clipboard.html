@@ -656,25 +656,41 @@
         </div>
       </div>
 
-      <!-- Result Textarea -->
+      <!-- Result Section with Word Preview Toggle -->
       <div class="ocr-result-section">
         <div class="ocr-result-header">
-          <span><strong>Văn bản nhận diện:</strong></span>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span><strong>Văn bản nhận diện:</strong></span>
+            <div class="ocr-view-tabs" style="display: flex; background: var(--bg-hover); padding: 2px; border-radius: var(--radius-sm);">
+              <button type="button" id="btnViewEditor" class="ocr-tab-btn active" style="padding: 3px 10px; font-size: 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: var(--bg-surface); color: var(--text-main); font-weight: 600;">Văn bản sửa</button>
+              <button type="button" id="btnViewWordPreview" class="ocr-tab-btn" style="padding: 3px 10px; font-size: 0.8rem; border: none; border-radius: var(--radius-sm); cursor: pointer; background: transparent; color: var(--text-muted); font-weight: 600;">Xem định dạng Word</button>
+            </div>
+          </div>
           <span class="ocr-stats-badge" id="ocrStatsBadge">0 ký tự | 0 từ</span>
         </div>
         <textarea id="ocrResultText" placeholder="Kết quả chữ trích xuất từ ảnh sẽ xuất hiện tại đây... Bạn có thể chỉnh sửa văn bản trực tiếp." rows="10"></textarea>
+        <div id="ocrWordPreview" style="display: none; width: 100%; min-height: 200px; max-height: 350px; overflow-y: auto; padding: 16px 20px; font-family: 'Calibri', 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.5; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: #ffffff; color: #1e293b;"></div>
       </div>
     </div>
 
     <div class="ocr-modal-footer">
-      <button type="button" class="btn btn-secondary" id="copyOcrTextBtn">
+      <button type="button" class="btn btn-primary" id="copyForWordBtn" title="Sao chép chuẩn định dạng để dán sang Microsoft Word (giữ nguyên đoạn văn, bảng biểu, gạch đầu dòng)" style="background: #2b579a; border-color: #2b579a; color: #fff;">
+        <i class="fa-solid fa-file-word"></i> Sao Chép Cho Word
+      </button>
+      <button type="button" class="btn btn-secondary" id="downloadWordBtn" title="Tải văn bản về dạng file Word (.doc)">
+        <i class="fa-solid fa-download"></i> Tải file Word (.doc)
+      </button>
+      <button type="button" class="btn btn-secondary" id="copyOcrTextBtn" title="Sao chép dạng văn bản thuần">
         <i class="fa-regular fa-copy"></i> Sao chép Text
       </button>
-      <button type="button" class="btn btn-secondary" id="downloadOcrTxtBtn">
-        <i class="fa-solid fa-download"></i> Tải file .TXT
+      <button type="button" class="btn btn-secondary" id="downloadOcrTxtBtn" title="Tải file .TXT">
+        <i class="fa-regular fa-file-lines"></i> File .TXT
       </button>
       <button type="button" class="btn btn-secondary" id="saveOcrToNotesBtn" title="Lưu vào Sổ tay riêng tư">
-        <i class="fa-solid fa-book-bookmark"></i> Lưu vào Ghi Chú
+        <i class="fa-solid fa-book-bookmark"></i> Lưu Ghi Chú
+      </button>
+      <button type="button" class="btn btn-secondary" id="googleLensBtn" style="color: #ea4335;" title="Mở trang Google Lens để quét chữ bằng AI của Google">
+        <i class="fa-brands fa-google"></i> Google Lens ↗
       </button>
       <button type="button" class="btn btn-secondary" id="closeOcrFooterBtn">Đóng</button>
     </div>
@@ -1343,6 +1359,198 @@
         DevLogAuth.addNoteToCloud(newNote);
       }
       showToast('Đã lưu văn bản vào Sổ tay Ghi chú riêng tư của bạn!');
+    });
+
+
+    // ==========================================
+    // WORD FORMATTING & RICH EXPORT
+    // ==========================================
+    const copyForWordBtn = document.getElementById('copyForWordBtn');
+    const downloadWordBtn = document.getElementById('downloadWordBtn');
+    const googleLensBtn = document.getElementById('googleLensBtn');
+    const btnViewEditor = document.getElementById('btnViewEditor');
+    const btnViewWordPreview = document.getElementById('btnViewWordPreview');
+    const ocrWordPreview = document.getElementById('ocrWordPreview');
+
+    // Toggle view between raw text editor and Word rich preview
+    btnViewEditor.addEventListener('click', () => {
+      btnViewEditor.style.background = 'var(--bg-surface)';
+      btnViewEditor.style.color = 'var(--text-main)';
+      btnViewWordPreview.style.background = 'transparent';
+      btnViewWordPreview.style.color = 'var(--text-muted)';
+      ocrResultText.style.display = 'block';
+      ocrWordPreview.style.display = 'none';
+    });
+
+    btnViewWordPreview.addEventListener('click', () => {
+      btnViewWordPreview.style.background = 'var(--bg-surface)';
+      btnViewWordPreview.style.color = 'var(--text-main)';
+      btnViewEditor.style.background = 'transparent';
+      btnViewEditor.style.color = 'var(--text-muted)';
+      ocrResultText.style.display = 'none';
+      ocrWordPreview.style.display = 'block';
+      ocrWordPreview.innerHTML = convertTextToWordHtml(ocrResultText.value);
+    });
+
+    function escapeHtmlString(str) {
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    function formatInline(text) {
+      let escaped = escapeHtmlString(text);
+      escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
+      return escaped;
+    }
+
+    // Convert raw OCR lines into structured Word HTML (Paragraphs, Headings, Lists, Tables)
+    function convertTextToWordHtml(rawText) {
+      if (!rawText || !rawText.trim()) return '<p style="color: #94a3b8; font-style: italic;">Chưa có văn bản.</p>';
+      const lines = rawText.split(/\r?\n/);
+      let html = '';
+      let inList = false;
+      let inNumberedList = false;
+      let inTable = false;
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (!line) {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
+          if (inTable) { html += '</table>'; inTable = false; }
+          continue;
+        }
+
+        // 1. Table Detection (tab-separated or pipe | separated)
+        if (line.includes('\t') || (line.includes('|') && line.split('|').length >= 3)) {
+          if (!inTable) {
+            if (inList) { html += '</ul>'; inList = false; }
+            if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
+            html += '<table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse; width: 100%; margin: 10pt 0; border: 1px solid #cbd5e1; font-family: Calibri, Arial, sans-serif;">';
+            inTable = true;
+          }
+          const cells = line.split(line.includes('\t') ? '\t' : '|').map(c => c.trim()).filter(c => c.length > 0);
+          html += '<tr>' + cells.map(c => `<td style="padding: 6pt; border: 1px solid #cbd5e1;">${formatInline(c)}</td>`).join('') + '</tr>';
+          continue;
+        } else if (inTable) {
+          html += '</table>';
+          inTable = false;
+        }
+
+        // 2. Bullet Lists (-, *, •)
+        const bulletMatch = line.match(/^[-*•]\s+(.*)$/);
+        if (bulletMatch) {
+          if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
+          if (!inList) { html += '<ul style="margin: 4pt 0 8pt; padding-left: 24pt;">'; inList = true; }
+          html += `<li style="margin-bottom: 3pt;">${formatInline(bulletMatch[1])}</li>`;
+          continue;
+        }
+
+        // 3. Numbered Lists (1., 2., a), b))
+        const numMatch = line.match(/^(\d+|[a-zA-Z])[\.\)]\s+(.*)$/);
+        if (numMatch) {
+          if (inList) { html += '</ul>'; inList = false; }
+          if (!inNumberedList) { html += '<ol style="margin: 4pt 0 8pt; padding-left: 24pt;">'; inNumberedList = true; }
+          html += `<li style="margin-bottom: 3pt;">${formatInline(numMatch[2])}</li>`;
+          continue;
+        }
+
+        if (inList) { html += '</ul>'; inList = false; }
+        if (inNumberedList) { html += '</ol>'; inNumberedList = false; }
+
+        // 4. Headings & Title detection
+        if (line.length < 80 && (line === line.toUpperCase() && /[A-ZÀ-Ỹ]/.test(line) && line.length > 4 || /^(CHƯƠNG|BÀI|ĐIỀU|MỤC|PHẦN|LƯU Ý|THÔNG BÁO|CỘNG HÒA)/i.test(line))) {
+          html += `<h3 style="margin: 12pt 0 4pt; color: #1e3a8a; font-family: Calibri, Arial, sans-serif; font-size: 13pt; font-weight: bold;">${formatInline(line)}</h3>`;
+        } else if (line.endsWith(':') && line.length < 60) {
+          html += `<p style="margin: 8pt 0 3pt; font-weight: bold; color: #0f172a;">${formatInline(line)}</p>`;
+        } else {
+          // Standard Paragraph
+          html += `<p style="margin: 0 0 6pt; font-size: 11pt; line-height: 1.4;">${formatInline(line)}</p>`;
+        }
+      }
+
+      if (inList) html += '</ul>';
+      if (inNumberedList) html += '</ol>';
+      if (inTable) html += '</table>';
+
+      return html;
+    }
+
+    // 1. Sao chép chuẩn cho Word (Rich Text Clipboard)
+    copyForWordBtn.addEventListener('click', async () => {
+      const text = ocrResultText.value.trim();
+      if (!text) {
+        showToast('Chưa có nội dung để sao chép!', 'error');
+        return;
+      }
+
+      const formattedHtml = convertTextToWordHtml(text);
+      const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.4; color: #000000;">${formattedHtml}</body></html>`;
+
+      try {
+        const item = new ClipboardItem({
+          'text/html': new Blob([fullHtml], { type: 'text/html' }),
+          'text/plain': new Blob([text], { type: 'text/plain' })
+        });
+        await navigator.clipboard.write([item]);
+        showToast('Đã sao chép chuẩn Word! Hãy mở Word và bấm Ctrl + V.');
+      } catch (err) {
+        // Fallback
+        showToast('Trình duyệt chưa hỗ trợ sao chép Rich Text: ' + err.message, 'error');
+      }
+    });
+
+    // 2. Tải file Word (.doc)
+    downloadWordBtn.addEventListener('click', () => {
+      const text = ocrResultText.value.trim();
+      if (!text) {
+        showToast('Chưa có nội dung để tải file Word!', 'error');
+        return;
+      }
+
+      const formattedHtml = convertTextToWordHtml(text);
+      const wordDocument = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <meta charset='utf-8'>
+          <title>Tài liệu Word OCR</title>
+          <style>
+            @page { size: A4; margin: 2cm; }
+            body { font-family: 'Calibri', 'Times New Roman', Arial, sans-serif; font-size: 11pt; line-height: 1.35; color: #000000; }
+            h1, h2, h3 { font-family: 'Calibri', 'Arial', sans-serif; color: #1e3a8a; }
+            p { margin: 0 0 6pt; }
+            table { border-collapse: collapse; width: 100%; margin: 10pt 0; }
+            td, th { border: 1px solid #cbd5e1; padding: 6pt; }
+            ul, ol { margin: 4pt 0 8pt; padding-left: 24pt; }
+          </style>
+        </head>
+        <body>
+          ${formattedHtml}
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob(['\ufeff' + wordDocument], { type: 'application/msword;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `tai_lieu_ocr_${Date.now()}.doc`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Đang tải file Word (.doc) về máy tính...');
+    });
+
+    // 3. Mở Google Lens
+    googleLensBtn.addEventListener('click', async () => {
+      if (!currentBlob) return;
+      try {
+        const item = new ClipboardItem({ [currentBlob.type]: currentBlob });
+        await navigator.clipboard.write([item]);
+        window.open('https://lens.google.com/', '_blank');
+        showToast('Đã copy ảnh vào Clipboard! Hãy bấm Ctrl + V trên Google Lens.');
+      } catch (err) {
+        window.open('https://lens.google.com/', '_blank');
+      }
     });
 
   </script>
