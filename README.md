@@ -44,7 +44,7 @@ personal-blog/
 
 - Đường dẫn trang đăng nhập: `login.html` (hoặc bấm biểu tượng Ổ Khóa ở thanh Menu / Footer).
 - **Tên đăng nhập**: `admin`
-- **Mật khẩu**: `cuong1012`
+- **Mật khẩu**: `admin`
 *(Bạn có thể đổi mật khẩu bất kỳ lúc nào trực tiếp trong trang quản lý riêng tư).*
 
 ---

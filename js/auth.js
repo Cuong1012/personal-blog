@@ -5,7 +5,7 @@
 
 const AUTH_CONFIG = {
   DEFAULT_USER: "admin",
-  DEFAULT_PASS: "cuong1012",
+  DEFAULT_PASS: "admin",
   SESSION_KEY: "devlog_auth_session",
   REMEMBER_KEY: "devlog_auth_remember",
   CUSTOM_USER_KEY: "devlog_custom_user",
@@ -21,7 +21,10 @@ const AUTH_CONFIG = {
 // ==========================================
 function getStoredCredentials() {
   const user = localStorage.getItem(AUTH_CONFIG.CUSTOM_USER_KEY) || AUTH_CONFIG.DEFAULT_USER;
-  const pass = localStorage.getItem(AUTH_CONFIG.CUSTOM_PASS_KEY) || AUTH_CONFIG.DEFAULT_PASS;
+  let pass = localStorage.getItem(AUTH_CONFIG.CUSTOM_PASS_KEY);
+  if (!pass || pass === "cuong1012") {
+    pass = AUTH_CONFIG.DEFAULT_PASS;
+  }
   return { user, pass };
 }
 
