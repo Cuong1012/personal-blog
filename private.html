@@ -17,14 +17,61 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/auth.css" />
+  <link rel="stylesheet" href="css/auth.css?v=20260914b" />
 </head>
 <body>
   <!-- AUTH GUARD SCRIPT -->
-  <script src="js/auth.js"></script>
+  <script src="js/auth.js?v=20260914b"></script>
   <script>
     if (!DevLogAuth.isAuthenticated()) {
       window.location.href = "login.html";
+    }
+
+    // Safety fallback: Đảm bảo các hàm đồng bộ mật khẩu luôn tồn tại kể cả khi trình duyệt điện thoại cache file js/auth.js cũ
+    if (typeof DevLogAuth !== "undefined") {
+      if (!DevLogAuth.syncPasswordsToCloud) {
+        DevLogAuth.syncPasswordsToCloud = async function(passwords, categories) {
+          const url = DevLogAuth.getCloudApiUrl();
+          if (!url) return { success: false, message: "Chưa cấu hình URL Google Apps Script!" };
+          try {
+            const response = await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify({
+                action: "sync_passwords",
+                passwords: passwords || [],
+                categories: categories || []
+              })
+            });
+            const result = await response.json();
+            if (result.status === "success") return { success: true, message: result.message };
+            return { success: false, message: result.message || "Lỗi khi đồng bộ mật khẩu lên Google Sheets" };
+          } catch (err) {
+            return { success: false, message: "Lỗi kết nối khi đồng bộ: " + err.message };
+          }
+        };
+      }
+
+      if (!DevLogAuth.fetchPasswordsFromCloud) {
+        DevLogAuth.fetchPasswordsFromCloud = async function() {
+          const url = DevLogAuth.getCloudApiUrl();
+          if (!url) return { success: false, message: "Chưa cấu hình URL Google Apps Script!" };
+          try {
+            const response = await fetch(url + (url.includes("?") ? "&" : "?") + "type=passwords");
+            const result = await response.json();
+            if (result.status === "success") {
+              return {
+                success: true,
+                passwords: result.passwords || [],
+                categories: result.passwordCategories || []
+              };
+            }
+            return { success: false, message: result.message || "Lỗi khi lấy mật khẩu từ Google Sheets" };
+          } catch (err) {
+            return { success: false, message: "Lỗi kết nối khi tải mật khẩu: " + err.message };
+          }
+        };
+      }
     }
   </script>
 
