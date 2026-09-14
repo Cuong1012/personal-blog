@@ -86,7 +86,7 @@
         <i class="fa-regular fa-calendar-days"></i> Google Lịch
       </button>
       <button class="portal-tab-btn" id="tabPasswordsBtn">
-        <i class="fa-solid fa-vault"></i> Mật Khẩu Người Thân (<span id="pwdCountBadge">0</span>)
+        <i class="fa-solid fa-vault"></i> Mật Khẩu (<span id="pwdCountBadge">0</span>)
       </button>
     </div>
 
@@ -369,17 +369,20 @@
     </section>
 
     <!-- =========================================================
-         VIEW 5: MẬT KHẨU & TÀI KHOẢN NGƯỜI THÂN (PASSWORD VAULT)
+         VIEW 5: MẬT KHẨU & TÀI KHOẢN (PASSWORD VAULT)
          ========================================================= -->
     <section class="dashboard-hero" id="passwordsView" style="display: none;">
       <div class="dashboard-welcome">
         <div class="welcome-text">
-          <h1>Két Mật Khẩu &amp; Tài Khoản Người Thân 🔐</h1>
-          <p>Quản lý an toàn tài khoản ngân hàng, mã PIN/OTP, Zalo, Facebook, VNeID... của ông bà, cha mẹ. Tự động cảnh báo chu kỳ đổi mật khẩu 6 tháng &amp; lưu vết toàn bộ lịch sử.</p>
+          <h1>Két Mật Khẩu &amp; Tài Khoản 🔐</h1>
+          <p>Lưu trữ và quản lý an toàn tài khoản ngân hàng, mã PIN/OTP, Zalo, Facebook, VNeID, công việc... cho bản thân và gia đình. Tự động cảnh báo chu kỳ đổi mật khẩu 6 tháng &amp; lưu vết toàn bộ lịch sử.</p>
         </div>
         <div class="toolbar-actions">
           <button id="openAddPwdBtn" class="btn btn-primary">
-            <i class="fa-solid fa-plus"></i> Thêm Tài Khoản Mới
+            <i class="fa-solid fa-plus"></i> Thêm Tài Khoản
+          </button>
+          <button type="button" id="openManageCatBtn" class="btn btn-secondary" title="Thêm mới, sửa hoặc xóa danh mục mật khẩu">
+            <i class="fa-solid fa-tags"></i> Quản Lý Danh Mục
           </button>
           <button id="exportPwdExcelBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;">
             <i class="fa-solid fa-file-excel"></i> Xuất Excel
@@ -431,15 +434,15 @@
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1;">
           <div class="search-private-box" style="max-width: 320px; min-width: 240px;">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchPwdInput" placeholder="Tìm theo tên người thân, dịch vụ, SĐT..." />
+            <input type="text" id="searchPwdInput" placeholder="Tìm theo chủ tài khoản, dịch vụ, SĐT..." />
           </div>
 
           <!-- Filter by Owner -->
           <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-user-tag" style="color: var(--primary); font-size: 0.9rem;"></i>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Người thân:</span>
+            <i class="fa-solid fa-user" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Chủ TK:</span>
             <select id="filterPwdOwnerSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
-              <option value="all">Tất cả người thân</option>
+              <option value="all">Tất cả chủ tài khoản</option>
             </select>
           </div>
 
@@ -449,11 +452,7 @@
             <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Danh mục:</span>
             <select id="filterPwdCatSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
               <option value="all">Tất cả danh mục</option>
-              <option value="bank">Ngân hàng &amp; Ví tiền</option>
-              <option value="social">Mạng xã hội (Zalo, FB...)</option>
-              <option value="gov">Dịch vụ công (VNeID, BHYT...)</option>
-              <option value="email">Email &amp; Google / Apple</option>
-              <option value="other">Khác</option>
+              <!-- Rendered dynamically by JS -->
             </select>
           </div>
 
@@ -475,7 +474,7 @@
             <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Sắp xếp:</span>
             <select id="sortPwdSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
               <option value="updated-desc">Mới cập nhật</option>
-              <option value="owner-asc">Người thân: A → Z</option>
+              <option value="owner-asc">Chủ TK: A → Z</option>
               <option value="service-asc">Dịch vụ: A → Z</option>
               <option value="expiry-asc">Hạn đổi: Cần đổi trước</option>
             </select>
@@ -702,10 +701,10 @@
       <button class="modal-close-btn" id="closePwdModalBtn">&times;</button>
       <div class="modal-body" style="padding: 32px;">
         <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;" id="pwdModalTitle">
-          <i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Người Thân
+          <i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Mật Khẩu
         </h2>
         <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">
-          Lưu trữ thông tin đăng nhập, mã PIN/OTP ngân hàng cho ông bà, bố mẹ để tra cứu nhanh chóng khi cần.
+          Lưu trữ thông tin đăng nhập, mật khẩu, mã PIN/OTP cho bản thân hoặc người thân để tra cứu nhanh chóng khi cần.
         </p>
 
         <form id="pwdForm">
@@ -713,28 +712,31 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
             <div class="modal-form-group">
-              <label for="pwdOwnerInput">Người thân (Chủ tài khoản) <span style="color: var(--danger);">*</span></label>
-              <input type="text" id="pwdOwnerInput" list="pwdOwnerSuggestions" placeholder="Ví dụ: Bố, Mẹ, Bà nội, Ông ngoại..." required />
+              <label for="pwdOwnerInput">Chủ tài khoản / Người sở hữu <span style="color: var(--danger);">*</span></label>
+              <input type="text" id="pwdOwnerInput" list="pwdOwnerSuggestions" placeholder="Ví dụ: Bản thân, Bố, Mẹ, Bà nội..." required />
               <datalist id="pwdOwnerSuggestions">
+                <option value="Bản thân (Tôi)"></option>
                 <option value="Bố"></option>
                 <option value="Mẹ"></option>
-                <option value="Ông nội"></option>
-                <option value="Bà nội"></option>
-                <option value="Ông ngoại"></option>
-                <option value="Bà ngoại"></option>
                 <option value="Vợ"></option>
                 <option value="Chồng"></option>
+                <option value="Con"></option>
+                <option value="Bà nội"></option>
+                <option value="Ông nội"></option>
+                <option value="Bà ngoại"></option>
+                <option value="Ông ngoại"></option>
               </datalist>
             </div>
 
             <div class="modal-form-group">
-              <label for="pwdCategorySelect">Phân loại danh mục</label>
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                <label for="pwdCategorySelect" style="margin-bottom: 0;">Phân loại danh mục</label>
+                <button type="button" id="btnOpenCatFromModal" class="btn btn-secondary" style="padding: 2px 8px; font-size: 0.76rem; border-color: var(--primary); color: var(--primary);" title="Thêm hoặc xóa danh mục">
+                  <i class="fa-solid fa-tags"></i> Thêm / Bớt
+                </button>
+              </div>
               <select id="pwdCategorySelect">
-                <option value="bank">Ngân hàng &amp; Ví tiền</option>
-                <option value="social">Mạng xã hội (Zalo, FB)</option>
-                <option value="gov">Dịch vụ công (VNeID, BHYT)</option>
-                <option value="email">Email &amp; Google / Apple</option>
-                <option value="other">Khác (WiFi, Mua sắm...)</option>
+                <!-- Rendered dynamically by JS -->
               </select>
             </div>
           </div>
@@ -867,6 +869,65 @@
 
         <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
           <button type="button" class="btn btn-secondary" id="closePwdHistoryBtn2">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL QUẢN LÝ DANH MỤC MẬT KHẨU -->
+  <div class="article-modal" id="pwdCategoriesModal" aria-hidden="true">
+    <div class="modal-backdrop" id="pwdCategoriesBackdrop"></div>
+    <div class="modal-container" style="max-width: 540px;">
+      <button class="modal-close-btn" id="closePwdCategoriesBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;">
+          <i class="fa-solid fa-tags" style="color: var(--primary);"></i> Quản Lý Danh Mục Mật Khẩu
+        </h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">
+          Thêm danh mục mới hoặc xóa bớt danh mục để dễ dàng phân loại và lọc tài khoản theo nhu cầu của bạn.
+        </p>
+
+        <!-- Form thêm danh mục mới -->
+        <form id="addCategoryForm" style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px;">
+          <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">
+            <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Thêm danh mục mới:
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 140px; gap: 10px; margin-bottom: 10px;">
+            <input type="text" id="newCatNameInput" placeholder="Tên danh mục (vd: Game Steam, Công việc...)" required style="font-size: 0.88rem;" />
+            <select id="newCatIconSelect" style="font-size: 0.88rem; cursor: pointer;">
+              <option value="fa-solid fa-tag">🏷️ Mặc định</option>
+              <option value="fa-solid fa-building-columns">🏛️ Ngân hàng</option>
+              <option value="fa-solid fa-wallet">👛 Ví tiền</option>
+              <option value="fa-solid fa-comments">💬 Mạng XH</option>
+              <option value="fa-solid fa-shield-halved">🛡️ Dịch vụ công</option>
+              <option value="fa-solid fa-envelope">✉️ Email</option>
+              <option value="fa-solid fa-briefcase">💼 Công việc</option>
+              <option value="fa-solid fa-cart-shopping">🛒 Mua sắm</option>
+              <option value="fa-solid fa-gamepad">🎮 Game</option>
+              <option value="fa-solid fa-wifi">📶 WiFi</option>
+              <option value="fa-solid fa-server">🖥️ Server</option>
+              <option value="fa-solid fa-heart">❤️ Y tế / Sức khỏe</option>
+              <option value="fa-solid fa-film">🎬 Giải trí / Phim</option>
+              <option value="fa-solid fa-key">🔑 Khác</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; justify-content: center;">
+            <i class="fa-solid fa-plus"></i> Thêm Vào Danh Mục
+          </button>
+        </form>
+
+        <!-- Danh sách danh mục hiện có -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <h4 style="font-size: 0.92rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            Danh mục hiện tại (<span id="catCountText">0</span>):
+          </h4>
+        </div>
+        <div id="categoriesListContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 4px;">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" id="closePwdCategoriesBtn2">Xong</button>
         </div>
       </div>
     </div>
@@ -1972,9 +2033,43 @@
     });
 
     // ==========================================
-    // 6. KÉT MẬT KHẨU & TÀI KHOẢN NGƯỜI THÂN
+    // 6. KÉT MẬT KHẨU & TÀI KHOẢN (PASSWORD VAULT)
     // ==========================================
     const FAMILY_PASSWORDS_KEY = "devlog_family_passwords";
+    const PWD_CATEGORIES_KEY = "devlog_password_categories";
+
+    const DEFAULT_PWD_CATEGORIES = [
+      { id: "bank", name: "Ngân hàng & Ví tiền", icon: "fa-solid fa-building-columns" },
+      { id: "social", name: "Mạng xã hội & Chat", icon: "fa-solid fa-comments" },
+      { id: "gov", name: "Dịch vụ công & BHYT", icon: "fa-solid fa-shield-halved" },
+      { id: "email", name: "Email & Tài khoản số", icon: "fa-solid fa-envelope" },
+      { id: "work", name: "Công việc & Server", icon: "fa-solid fa-briefcase" },
+      { id: "shopping", name: "Mua sắm & E-Commerce", icon: "fa-solid fa-cart-shopping" },
+      { id: "other", name: "Khác", icon: "fa-solid fa-key" }
+    ];
+
+    function getPasswordCategories() {
+      const data = localStorage.getItem(PWD_CATEGORIES_KEY);
+      if (!data) {
+        localStorage.setItem(PWD_CATEGORIES_KEY, JSON.stringify(DEFAULT_PWD_CATEGORIES));
+        return DEFAULT_PWD_CATEGORIES;
+      }
+      try {
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) && parsed.length > 0 ? parsed : DEFAULT_PWD_CATEGORIES;
+      } catch (e) {
+        return DEFAULT_PWD_CATEGORIES;
+      }
+    }
+
+    let passwordCategories = getPasswordCategories();
+
+    function savePasswordCategories(cats) {
+      localStorage.setItem(PWD_CATEGORIES_KEY, JSON.stringify(cats));
+      passwordCategories = cats;
+      updateCategoryDropdowns();
+      renderPasswords();
+    }
 
     const DEFAULT_FAMILY_PASSWORDS = [
       {
@@ -2030,15 +2125,15 @@
       },
       {
         id: "pwd_sample_4",
-        owner: "Bố",
-        service: "BIDV SmartBanking",
-        category: "bank",
-        username: "0912345678",
-        password: "BidvBo#2026",
-        pin: "654321",
+        owner: "Bản thân",
+        service: "GitHub Pro",
+        category: "work",
+        username: "cuongtrinh1012",
+        password: "GitSecurePass#2026",
+        pin: "",
         rotationMonths: 6,
         lastChanged: "2026-08-20",
-        note: "Tài khoản nhận lương hưu hàng tháng của Bố.",
+        note: "Tài khoản lưu trữ source code các dự án cá nhân và công ty.",
         history: [],
         createdAt: "2026-08-20T11:00:00.000Z",
         updatedAt: "2026-08-20T11:00:00.000Z"
@@ -2092,6 +2187,7 @@
     const sortPwdSelect = document.getElementById("sortPwdSelect");
 
     const openAddPwdBtn = document.getElementById("openAddPwdBtn");
+    const openManageCatBtn = document.getElementById("openManageCatBtn");
     const exportPwdExcelBtn = document.getElementById("exportPwdExcelBtn");
     const exportPwdJsonBtn = document.getElementById("exportPwdJsonBtn");
     const importPwdJsonBtn = document.getElementById("importPwdJsonBtn");
@@ -2107,6 +2203,7 @@
     const pwdEditId = document.getElementById("pwdEditId");
     const pwdOwnerInput = document.getElementById("pwdOwnerInput");
     const pwdCategorySelect = document.getElementById("pwdCategorySelect");
+    const btnOpenCatFromModal = document.getElementById("btnOpenCatFromModal");
     const pwdServiceInput = document.getElementById("pwdServiceInput");
     const pwdUsernameInput = document.getElementById("pwdUsernameInput");
     const pwdPinInput = document.getElementById("pwdPinInput");
@@ -2130,6 +2227,17 @@
     const btnToggleHistoryCurrent = document.getElementById("btnToggleHistoryCurrent");
     const btnCopyHistoryCurrent = document.getElementById("btnCopyHistoryCurrent");
     const pwdHistoryList = document.getElementById("pwdHistoryList");
+
+    // Category Manager Modal elements
+    const pwdCategoriesModal = document.getElementById("pwdCategoriesModal");
+    const pwdCategoriesBackdrop = document.getElementById("pwdCategoriesBackdrop");
+    const closePwdCategoriesBtn = document.getElementById("closePwdCategoriesBtn");
+    const closePwdCategoriesBtn2 = document.getElementById("closePwdCategoriesBtn2");
+    const addCategoryForm = document.getElementById("addCategoryForm");
+    const newCatNameInput = document.getElementById("newCatNameInput");
+    const newCatIconSelect = document.getElementById("newCatIconSelect");
+    const categoriesListContainer = document.getElementById("categoriesListContainer");
+    const catCountText = document.getElementById("catCountText");
 
     let currentHistoryActiveItem = null;
     let isHistoryCurrentVisible = false;
@@ -2244,7 +2352,14 @@
       }
     }
 
+    function getCategoryInfo(catId) {
+      const cat = passwordCategories.find(c => c.id === catId);
+      if (cat) return cat;
+      return { id: catId || "other", name: catId || "Khác", icon: "fa-solid fa-tag" };
+    }
+
     function getServiceVisual(service, category) {
+      const catInfo = getCategoryInfo(category);
       const s = (service || "").toLowerCase();
       if (s.includes("vietcombank") || s.includes("vcb")) {
         return { icon: "fa-solid fa-building-columns", class: "bank", label: "Vietcombank" };
@@ -2261,26 +2376,148 @@
       if (s.includes("facebook") || s.includes("fb") || s.includes("messenger")) {
         return { icon: "fa-brands fa-facebook", class: "social", label: "Facebook" };
       }
-      if (s.includes("vneid") || s.includes("vssid") || s.includes("định danh") || s.includes("bảo hiểm") || category === "gov") {
+      if (s.includes("vneid") || s.includes("vssid") || s.includes("định danh") || s.includes("bảo hiểm")) {
         return { icon: "fa-solid fa-shield-halved", class: "gov", label: "Dịch vụ công" };
       }
-      if (s.includes("google") || s.includes("gmail") || s.includes("icloud") || s.includes("apple") || category === "email") {
+      if (s.includes("google") || s.includes("gmail") || s.includes("icloud") || s.includes("apple")) {
         return { icon: "fa-solid fa-envelope", class: "email", label: "Email & Cloud" };
       }
-      if (category === "bank") return { icon: "fa-solid fa-building-columns", class: "bank", label: "Ngân hàng" };
-      if (category === "social") return { icon: "fa-solid fa-comments", class: "social", label: "Mạng xã hội" };
-      return { icon: "fa-solid fa-key", class: "other", label: "Tài khoản" };
+      if (category === "bank") return { icon: "fa-solid fa-building-columns", class: "bank", label: catInfo.name };
+      if (category === "social") return { icon: "fa-solid fa-comments", class: "social", label: catInfo.name };
+      if (category === "gov") return { icon: "fa-solid fa-shield-halved", class: "gov", label: catInfo.name };
+      if (category === "email") return { icon: "fa-solid fa-envelope", class: "email", label: catInfo.name };
+      if (category === "work") return { icon: "fa-solid fa-briefcase", class: "email", label: catInfo.name };
+      if (category === "shopping") return { icon: "fa-solid fa-cart-shopping", class: "bank", label: catInfo.name };
+
+      return { icon: catInfo.icon || "fa-solid fa-key", class: "other", label: catInfo.name };
     }
 
-    function getCategoryName(cat) {
-      const map = {
-        bank: "Ngân hàng & Ví tiền",
-        social: "Mạng xã hội & Chat",
-        gov: "Dịch vụ công & BHYT",
-        email: "Email & Tài khoản số",
-        other: "Khác"
-      };
-      return map[cat] || "Tài khoản";
+    function updateCategoryDropdowns() {
+      // 1. Filter dropdown in toolbar
+      if (filterPwdCatSelect) {
+        const currentVal = filterPwdCatSelect.value;
+        let html = `<option value="all">Tất cả danh mục (${familyPasswords.length})</option>`;
+        passwordCategories.forEach(cat => {
+          const count = familyPasswords.filter(p => p.category === cat.id).length;
+          html += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)} (${count})</option>`;
+        });
+        filterPwdCatSelect.innerHTML = html;
+        if (passwordCategories.some(c => c.id === currentVal) || currentVal === "all") {
+          filterPwdCatSelect.value = currentVal;
+        } else {
+          filterPwdCatSelect.value = "all";
+        }
+      }
+
+      // 2. Select dropdown in Add/Edit form modal
+      if (pwdCategorySelect) {
+        const currentVal = pwdCategorySelect.value;
+        let html = "";
+        passwordCategories.forEach(cat => {
+          html += `<option value="${escapeHtml(cat.id)}">${escapeHtml(cat.name)}</option>`;
+        });
+        pwdCategorySelect.innerHTML = html;
+        if (passwordCategories.some(c => c.id === currentVal)) {
+          pwdCategorySelect.value = currentVal;
+        } else if (passwordCategories.length > 0) {
+          pwdCategorySelect.value = passwordCategories[0].id;
+        }
+      }
+
+      // 3. Category Manager Modal list
+      if (categoriesListContainer) {
+        if (catCountText) catCountText.textContent = passwordCategories.length;
+        categoriesListContainer.innerHTML = passwordCategories.map(cat => {
+          const count = familyPasswords.filter(p => p.category === cat.id).length;
+          const isDefaultOther = cat.id === "other";
+          return `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md);">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--bg-hover); display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                  <i class="${cat.icon || 'fa-solid fa-tag'}"></i>
+                </div>
+                <div>
+                  <strong style="color: var(--text-main); font-size: 0.9rem;">${escapeHtml(cat.name)}</strong>
+                  <div style="font-size: 0.76rem; color: var(--text-muted);">${count} tài khoản đang dùng</div>
+                </div>
+              </div>
+              <div>
+                ${!isDefaultOther ? `
+                  <button type="button" class="btn btn-sm" style="padding: 4px 10px; font-size: 0.78rem; color: #dc2626; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);" onclick="deleteCategory('${cat.id}')" title="Xóa danh mục này">
+                    <i class="fa-solid fa-trash"></i> Xóa
+                  </button>
+                ` : `
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Mặc định</span>
+                `}
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
+    }
+
+    window.deleteCategory = function(catId) {
+      if (catId === "other") {
+        alert("Danh mục 'Khác' là danh mục mặc định của hệ thống, không thể xóa.");
+        return;
+      }
+      const targetCat = passwordCategories.find(c => c.id === catId);
+      if (!targetCat) return;
+
+      const usedCount = familyPasswords.filter(p => p.category === catId).length;
+      if (usedCount > 0) {
+        if (!confirm(`Có ${usedCount} tài khoản đang thuộc danh mục "${targetCat.name}".\n\nBạn có muốn chuyển tất cả tài khoản này sang danh mục "Khác" và xóa danh mục "${targetCat.name}" không?`)) {
+          return;
+        }
+        familyPasswords.forEach(p => {
+          if (p.category === catId) p.category = "other";
+        });
+        saveFamilyPasswords(familyPasswords);
+      } else {
+        if (!confirm(`Bạn có chắc chắn muốn xóa danh mục "${targetCat.name}"?`)) {
+          return;
+        }
+      }
+
+      passwordCategories = passwordCategories.filter(c => c.id !== catId);
+      savePasswordCategories(passwordCategories);
+      showToast(`Đã xóa danh mục "${targetCat.name}".`);
+    };
+
+    function openCategoriesModal() {
+      updateCategoryDropdowns();
+      if (newCatNameInput) newCatNameInput.value = "";
+      if (pwdCategoriesModal) pwdCategoriesModal.classList.add("active");
+    }
+
+    function closeCategoriesModal() {
+      if (pwdCategoriesModal) pwdCategoriesModal.classList.remove("active");
+    }
+
+    if (openManageCatBtn) openManageCatBtn.addEventListener("click", openCategoriesModal);
+    if (btnOpenCatFromModal) btnOpenCatFromModal.addEventListener("click", openCategoriesModal);
+    if (closePwdCategoriesBtn) closePwdCategoriesBtn.addEventListener("click", closeCategoriesModal);
+    if (closePwdCategoriesBtn2) closePwdCategoriesBtn2.addEventListener("click", closeCategoriesModal);
+    if (pwdCategoriesBackdrop) pwdCategoriesBackdrop.addEventListener("click", closeCategoriesModal);
+
+    if (addCategoryForm) {
+      addCategoryForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = newCatNameInput.value.trim();
+        const icon = newCatIconSelect.value;
+        if (!name) return;
+
+        if (passwordCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+          alert(`Danh mục "${name}" đã tồn tại!`);
+          return;
+        }
+
+        const id = "cat_" + Date.now();
+        passwordCategories.push({ id, name, icon });
+        savePasswordCategories(passwordCategories);
+        newCatNameInput.value = "";
+        showToast(`Đã thêm danh mục "${name}"!`);
+      });
     }
 
     function updateOwnerFilterOptions() {
@@ -2292,7 +2529,7 @@
       });
       const owners = Array.from(ownersSet).sort((a, b) => a.localeCompare(b, "vi"));
 
-      let optionsHtml = `<option value="all">Tất cả người thân (${familyPasswords.length})</option>`;
+      let optionsHtml = `<option value="all">Tất cả chủ tài khoản (${familyPasswords.length})</option>`;
       owners.forEach(o => {
         const count = familyPasswords.filter(p => (p.owner || "").trim() === o).length;
         optionsHtml += `<option value="${escapeHtml(o)}">${escapeHtml(o)} (${count})</option>`;
@@ -2329,6 +2566,7 @@
       if (statExpiringPwds) statExpiringPwds.textContent = expiringCount;
 
       updateOwnerFilterOptions();
+      updateCategoryDropdowns();
 
       // Filtering
       const query = pwdSearchQuery.toLowerCase();
@@ -2377,7 +2615,7 @@
           <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
             <i class="fa-solid fa-key" style="font-size: 2.8rem; margin-bottom: 12px; color: var(--text-muted); opacity: 0.6; display: block;"></i>
             <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 6px;">Không tìm thấy tài khoản phù hợp</h3>
-            <p style="font-size: 0.88rem;">Hãy thử tìm kiếm từ khóa khác hoặc bấm nút "+ Thêm Tài Khoản Mới" để bắt đầu lưu trữ.</p>
+            <p style="font-size: 0.88rem;">Hãy thử tìm kiếm từ khóa khác hoặc bấm nút "+ Thêm Tài Khoản" để bắt đầu lưu trữ.</p>
           </div>
         `;
         return;
@@ -2385,6 +2623,7 @@
 
       pwdCardsGrid.innerHTML = list.map(item => {
         const visual = getServiceVisual(item.service, item.category);
+        const catInfo = getCategoryInfo(item.category);
         const rot = getPwdRotationStatus(item);
         const isPwdVisible = Boolean(visiblePasswordsMap[item.id]);
         const isPinVisible = Boolean(visiblePinsMap[item.id]);
@@ -2411,8 +2650,8 @@
                 <div>
                   <h3 class="pwd-service-name">${escapeHtml(item.service)}</h3>
                   <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <span class="pwd-owner-tag"><i class="fa-solid fa-user"></i> ${escapeHtml(item.owner || "Người thân")}</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${escapeHtml(getCategoryName(item.category))}</span>
+                    <span class="pwd-owner-tag"><i class="fa-solid fa-user"></i> ${escapeHtml(item.owner || "Cá nhân")}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${escapeHtml(catInfo.name)}</span>
                   </div>
                 </div>
               </div>
@@ -2513,10 +2752,11 @@
       pwdForm.reset();
       pwdEditId.value = "";
       originalPasswordForEdit = "";
-      pwdModalTitle.innerHTML = `<i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Người Thân`;
+      pwdModalTitle.innerHTML = `<i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Mật Khẩu`;
       pwdChangeNoticeBox.style.display = "none";
       pwdLastChangedInput.value = new Date().toISOString().split("T")[0];
       pwdRotationSelect.value = "6";
+      updateCategoryDropdowns();
       pwdModal.classList.add("active");
     }
 
@@ -2524,6 +2764,7 @@
       const item = familyPasswords.find(p => p.id === id);
       if (!item) return;
 
+      updateCategoryDropdowns();
       pwdEditId.value = item.id;
       originalPasswordForEdit = item.password || "";
       pwdOwnerInput.value = item.owner || "";
@@ -2538,7 +2779,7 @@
       pwdChangeReasonInput.value = "";
       pwdChangeNoticeBox.style.display = "none";
 
-      pwdModalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Sửa Tài Khoản: ${escapeHtml(item.service)} (${escapeHtml(item.owner || "Người thân")})`;
+      pwdModalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Sửa Tài Khoản: ${escapeHtml(item.service)} (${escapeHtml(item.owner || "Cá nhân")})`;
       pwdModal.classList.add("active");
     };
 
@@ -2596,7 +2837,7 @@
       const changeReason = pwdChangeReasonInput.value.trim();
 
       if (!owner || !service || !username || !password) {
-        alert("Vui lòng điền đầy đủ Người thân, Dịch vụ, Tên đăng nhập và Mật khẩu!");
+        alert("Vui lòng điền đầy đủ Chủ tài khoản, Dịch vụ, Tên đăng nhập và Mật khẩu!");
         return;
       }
 
@@ -2613,7 +2854,6 @@
               changedAt: new Date().toISOString(),
               reason: changeReason || "Đổi mật khẩu định kỳ"
             });
-            // Update lastChanged if user didn't manually pick a different date
             item.lastChanged = new Date().toISOString().split("T")[0];
           } else {
             item.lastChanged = lastChanged;
@@ -2658,7 +2898,7 @@
     window.deletePasswordAccount = function(id) {
       const item = familyPasswords.find(p => p.id === id);
       if (!item) return;
-      if (confirm(`Bạn có chắc chắn muốn xóa tài khoản "${item.service}" của ${item.owner}?`)) {
+      if (confirm(`Bạn có chắc chắn muốn xóa tài khoản "${item.service}" (${item.owner})?`)) {
         familyPasswords = familyPasswords.filter(p => p.id !== id);
         saveFamilyPasswords(familyPasswords);
         renderPasswords();
@@ -2839,14 +3079,14 @@
 
       const now = new Date();
       const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-      const filename = `Mat_Khau_Nguoi_Than_${dateStr}.xlsx`;
+      const filename = `Danh_Sach_Mat_Khau_${dateStr}.xlsx`;
 
       try {
         if (typeof XLSX !== "undefined") {
           const wsData = [
             [
               "STT",
-              "Người thân (Chủ TK)",
+              "Chủ tài khoản",
               "Dịch vụ / Ứng dụng",
               "Danh mục",
               "Tên đăng nhập / SĐT / STK",
@@ -2862,11 +3102,12 @@
 
           familyPasswords.forEach((item, idx) => {
             const rot = getPwdRotationStatus(item);
+            const catInfo = getCategoryInfo(item.category);
             wsData.push([
               idx + 1,
               item.owner || "",
               item.service || "",
-              getCategoryName(item.category),
+              catInfo.name,
               item.username || "",
               item.password || "",
               item.pin || "",
@@ -2896,18 +3137,19 @@
             { wch: 35 }
           ];
 
-          XLSX.utils.book_append_sheet(wb, ws, "Mật Khẩu Người Thân");
+          XLSX.utils.book_append_sheet(wb, ws, "Danh Sách Mật Khẩu");
           XLSX.writeFile(wb, filename);
         } else {
           // Fallback: CSV UTF-8 with BOM
-          let csv = "\uFEFFSTT,Người thân,Dịch vụ,Danh mục,Tên đăng nhập,Mật khẩu,Mã PIN,Ngày đổi,Chu kỳ,Tình trạng,Số lần đổi,Ghi chú\n";
+          let csv = "\uFEFFSTT,Chủ tài khoản,Dịch vụ,Danh mục,Tên đăng nhập,Mật khẩu,Mã PIN,Ngày đổi,Chu kỳ,Tình trạng,Số lần đổi,Ghi chú\n";
           familyPasswords.forEach((item, idx) => {
             const rot = getPwdRotationStatus(item);
+            const catInfo = getCategoryInfo(item.category);
             const row = [
               idx + 1,
               `"${(item.owner || "").replace(/"/g, '""')}"`,
               `"${(item.service || "").replace(/"/g, '""')}"`,
-              `"${getCategoryName(item.category)}"`,
+              `"${catInfo.name.replace(/"/g, '""')}"`,
               `"${(item.username || "").replace(/"/g, '""')}"`,
               `"${(item.password || "").replace(/"/g, '""')}"`,
               `"${(item.pin || "").replace(/"/g, '""')}"`,
@@ -2924,7 +3166,7 @@
           const url = URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `Mat_Khau_Nguoi_Than_${dateStr}.csv`;
+          a.download = `Danh_Sach_Mat_Khau_${dateStr}.csv`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -2942,12 +3184,16 @@
 
     // JSON Backup & Restore
     exportPwdJsonBtn.addEventListener("click", () => {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(familyPasswords, null, 2));
+      const backupData = {
+        categories: passwordCategories,
+        passwords: familyPasswords
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
       const now = new Date();
       const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
       const a = document.createElement("a");
       a.href = dataStr;
-      a.download = `Mat_Khau_Nguoi_Than_Backup_${dateStr}.json`;
+      a.download = `Ket_Mat_Khau_Backup_${dateStr}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -2965,11 +3211,26 @@
       reader.onload = (event) => {
         try {
           const parsed = JSON.parse(event.target.result);
-          if (!Array.isArray(parsed)) throw new Error("File không đúng định dạng danh sách mật khẩu.");
-          if (confirm(`Tìm thấy ${parsed.length} tài khoản trong file. Bạn có muốn thêm vào danh sách hiện tại không?`)) {
+          let passList = [];
+          if (Array.isArray(parsed)) {
+            passList = parsed;
+          } else if (parsed && Array.isArray(parsed.passwords)) {
+            passList = parsed.passwords;
+            if (Array.isArray(parsed.categories) && parsed.categories.length > 0) {
+              const existingCatIds = new Set(passwordCategories.map(c => c.id));
+              parsed.categories.forEach(c => {
+                if (!existingCatIds.has(c.id)) passwordCategories.push(c);
+              });
+              savePasswordCategories(passwordCategories);
+            }
+          } else {
+            throw new Error("File không đúng định dạng dữ liệu mật khẩu.");
+          }
+
+          if (confirm(`Tìm thấy ${passList.length} tài khoản trong file. Bạn có muốn thêm vào két mật khẩu hiện tại không?`)) {
             const existingIds = new Set(familyPasswords.map(p => p.id));
             let addedCount = 0;
-            parsed.forEach(p => {
+            passList.forEach(p => {
               if (p.service && p.username) {
                 if (existingIds.has(p.id)) {
                   p.id = "pwd_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
