@@ -17,11 +17,11 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/auth.css?v=20260914b" />
+  <link rel="stylesheet" href="css/auth.css?v=20260914c" />
 </head>
 <body>
   <!-- AUTH GUARD SCRIPT -->
-  <script src="js/auth.js?v=20260914b"></script>
+  <script src="js/auth.js?v=20260914c"></script>
   <script>
     if (!DevLogAuth.isAuthenticated()) {
       window.location.href = "login.html";
@@ -100,18 +100,18 @@
         </button>
 
         <!-- Open Clipboard Viewer Button -->
-        <a href="clipboard.html" target="_blank" class="btn btn-secondary" style="padding: 8px 14px; font-size: 0.88rem;" title="Mở Trình Xem & Dán Ảnh Clipboard">
-          <i class="fa-regular fa-image"></i> Xem Ảnh Clipboard
+        <a href="clipboard.html" target="_blank" class="btn btn-secondary private-header-btn" style="padding: 8px 14px; font-size: 0.88rem;" title="Mở Trình Xem & Dán Ảnh Clipboard">
+          <i class="fa-regular fa-image"></i> <span class="header-btn-text">Xem Ảnh Clipboard</span>
         </a>
 
         <!-- Change Password Button -->
-        <button id="openChangePassBtn" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.88rem;">
-          <i class="fa-solid fa-key"></i> Đổi Mật Khẩu
+        <button id="openChangePassBtn" class="btn btn-secondary private-header-btn" style="padding: 8px 16px; font-size: 0.88rem;" title="Đổi Mật Khẩu Đăng Nhập">
+          <i class="fa-solid fa-key"></i> <span class="header-btn-text">Đổi Mật Khẩu</span>
         </button>
 
         <!-- Logout Button -->
-        <button id="logoutBtn" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem; background: var(--danger);">
-          <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng Xuất
+        <button id="logoutBtn" class="btn btn-primary private-header-btn" style="padding: 8px 18px; font-size: 0.88rem; background: var(--danger);" title="Đăng Xuất">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="header-btn-text">Đăng Xuất</span>
         </button>
       </div>
     </div>
@@ -2792,24 +2792,25 @@
                 </div>
               </div>
 
-              <!-- Cột 4: Chu kỳ & Hạn đổi -->
-              <div class="pwd-row-status" title="Đổi ngày: ${formattedLastChanged} (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})">
-                <span class="pwd-status-pill ${rot.badgeClass}">
-                  <i class="${rot.icon}"></i> ${rot.text}
-                </span>
-              </div>
+              <!-- Cột 4 & 5: Chu kỳ, Hạn đổi & Thao tác -->
+              <div class="pwd-row-bottom">
+                <div class="pwd-row-status" title="Đổi ngày: ${formattedLastChanged} (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})">
+                  <span class="pwd-status-pill ${rot.badgeClass}">
+                    <i class="${rot.icon}"></i> ${rot.text}
+                  </span>
+                </div>
 
-              <!-- Cột 5: Thao tác -->
-              <div class="pwd-row-actions">
-                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
-                  <i class="fa-solid fa-clock-rotate-left"></i> ${historyCount}
-                </button>
-                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="editPasswordAccount('${item.id}')" title="Sửa thông tin / Đổi mật khẩu">
-                  <i class="fa-solid fa-pen-to-square"></i>
-                </button>
-                <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 4px 8px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
-                  <i class="fa-solid fa-trash"></i>
-                </button>
+                <div class="pwd-row-actions">
+                  <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
+                    <i class="fa-solid fa-clock-rotate-left"></i> ${historyCount}
+                  </button>
+                  <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="editPasswordAccount('${item.id}')" title="Sửa thông tin / Đổi mật khẩu">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 4px 8px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
               </div>
             </div>
           `;

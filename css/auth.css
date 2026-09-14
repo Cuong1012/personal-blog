@@ -1166,13 +1166,193 @@
   flex-shrink: 0;
 }
 
+.pwd-row-bottom {
+  display: contents;
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN (TỐI ƯU HÓA GIAO DIỆN DI ĐỘNG & MÀN HÌNH NHỎ)
+   ========================================================= */
 @media (max-width: 992px) {
-  .pwd-vault-list {
-    overflow-x: auto;
-    padding-bottom: 8px;
+  .dashboard-welcome {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
-  .pwd-list-header, .pwd-row-card {
-    min-width: 800px;
+}
+
+@media (max-width: 768px) {
+  /* 1. Header Tối Ưu Gọn Gàng */
+  .private-header {
+    padding: 8px 0;
+  }
+  .private-brand {
+    font-size: 1.05rem;
+    gap: 8px;
+  }
+  .private-brand .badge-secret {
+    display: none !important;
+  }
+  .private-actions {
+    gap: 5px;
+  }
+  .private-header-btn {
+    padding: 7px 10px !important;
+    font-size: 0.82rem !important;
+  }
+  .header-btn-text {
+    display: none !important;
+  }
+  .cloud-status-badge {
+    padding: 7px 10px;
+    font-size: 0.8rem;
+  }
+  .cloud-status-badge span {
+    display: none !important;
+  }
+
+  /* 2. Thanh Tabs Vuốt Ngang Mượt Mà (Không vỡ dòng) */
+  .portal-tabs {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 8px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid var(--border-color);
+    scrollbar-width: none;
+  }
+  .portal-tabs::-webkit-scrollbar {
+    display: none;
+  }
+  .portal-tab-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  /* 3. Khung Thống Kê (2 cột nhỏ gọn) */
+  .dash-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+  }
+  .dash-stat-item {
+    padding: 10px 12px !important;
+    gap: 10px !important;
+    border-radius: var(--radius-md) !important;
+  }
+  .dash-stat-icon {
+    width: 36px !important;
+    height: 36px !important;
+    font-size: 0.95rem !important;
+    border-radius: 8px !important;
+    flex-shrink: 0;
+  }
+  .dash-stat-info h4 {
+    font-size: 1.2rem !important;
+    margin-bottom: 2px !important;
+  }
+  .dash-stat-info span {
+    font-size: 0.72rem !important;
+    line-height: 1.2 !important;
+    display: block;
+  }
+
+  /* 4. Thanh Công Cụ Nút Bấm (Vuốt ngang dạng pill mượt mà) */
+  .toolbar-actions {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    gap: 8px;
+    padding-bottom: 6px;
+    width: 100%;
+    scrollbar-width: none;
+  }
+  .toolbar-actions::-webkit-scrollbar {
+    display: none;
+  }
+  .toolbar-actions .btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 7px 12px;
+    font-size: 0.82rem;
+  }
+
+  /* 5. Bộ Lọc Tìm Kiếm */
+  .dashboard-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .search-private-box {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .dashboard-toolbar > div:first-child {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    width: 100%;
+  }
+
+  /* 6. Danh Sách Mật Khẩu (Dạng thẻ mobile card thông minh, không cuộn ngang vụng về) */
+  .pwd-list-header {
+    display: none !important;
+  }
+  .pwd-vault-list {
+    gap: 10px;
+    overflow-x: visible;
+  }
+  .pwd-row-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 12px 14px;
+    gap: 10px;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-shadow: var(--shadow-sm);
+  }
+  .pwd-row-service {
+    min-width: 0;
+    width: 100%;
+    flex: none;
+    justify-content: space-between;
+  }
+  .pwd-row-field {
+    min-width: 0;
+    width: 100%;
+    flex: none;
+    padding: 6px 10px;
+  }
+  .pwd-row-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding-top: 8px;
+    border-top: 1px dashed var(--border-color);
+    gap: 8px;
+  }
+  .pwd-row-status {
+    min-width: 0;
+    flex: 1;
+  }
+  .pwd-row-actions {
+    flex-shrink: 0;
+  }
+
+  /* 7. Modal Form trên điện thoại */
+  .modal-container {
+    width: 95% !important;
+    max-height: 90vh !important;
+  }
+  .modal-body {
+    padding: 20px 16px !important;
   }
 }
 
