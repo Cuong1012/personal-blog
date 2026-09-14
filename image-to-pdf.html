@@ -606,6 +606,270 @@
       width: 0%;
       transition: width 0.2s ease;
     }
+
+    /* Highlight Stamp Preset Button */
+    .filter-preset-btn.highlight-stamp {
+      grid-column: 1 / -1;
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.06);
+      padding: 10px 14px;
+    }
+    .filter-preset-btn.highlight-stamp:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: #dc2626;
+    }
+    .filter-preset-btn.highlight-stamp.active {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.18);
+      color: #ef4444;
+    }
+
+    /* =========================================================
+       LIVE CAMERA SCANNER MODAL
+       ========================================================= */
+    .live-camera-modal {
+      position: fixed;
+      inset: 0;
+      background: #000000;
+      z-index: 10005;
+      display: none;
+      flex-direction: column;
+      user-select: none;
+    }
+
+    .live-camera-modal.active {
+      display: flex;
+    }
+
+    .live-camera-container {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .live-camera-header {
+      height: 56px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+      color: #fff;
+    }
+
+    .camera-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .camera-count-badge {
+      font-size: 0.75rem;
+      background: #10b981;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-weight: 700;
+      margin-left: 4px;
+      display: none;
+    }
+
+    .camera-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cam-icon-btn {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    .cam-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .live-camera-viewfinder {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    #liveCameraVideo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Document framing guide */
+    .doc-guide-box {
+      position: absolute;
+      top: 10%;
+      bottom: 10%;
+      left: 7%;
+      right: 7%;
+      pointer-events: none;
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+      border-radius: 8px;
+    }
+
+    .doc-guide-corner {
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      border-color: #10b981;
+      border-style: solid;
+      border-width: 0;
+    }
+
+    .corner-tl { top: -2px; left: -2px; border-top-width: 3.5px; border-left-width: 3.5px; border-top-left-radius: 6px; }
+    .corner-tr { top: -2px; right: -2px; border-top-width: 3.5px; border-right-width: 3.5px; border-top-right-radius: 6px; }
+    .corner-bl { bottom: -2px; left: -2px; border-bottom-width: 3.5px; border-left-width: 3.5px; border-bottom-left-radius: 6px; }
+    .corner-br { bottom: -2px; right: -2px; border-bottom-width: 3.5px; border-right-width: 3.5px; border-bottom-right-radius: 6px; }
+
+    .doc-guide-hint {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.85rem;
+      background: rgba(0, 0, 0, 0.65);
+      padding: 5px 14px;
+      border-radius: 20px;
+      pointer-events: none;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
+    }
+
+    .camera-flash-overlay {
+      position: absolute;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease-out;
+      z-index: 5;
+    }
+
+    .camera-flash-overlay.flash {
+      opacity: 0.85;
+      transition: none;
+    }
+
+    .live-camera-footer {
+      min-height: 90px;
+      background: rgba(15, 23, 42, 0.95);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .footer-left, .footer-right {
+      flex: 1;
+      display: flex;
+    }
+
+    .footer-right {
+      justify-content: flex-end;
+    }
+
+    .footer-center {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn-shutter {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      background: transparent;
+      border: 4px solid #ffffff;
+      padding: 3px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease;
+      touch-action: manipulation;
+    }
+
+    .btn-shutter:active {
+      transform: scale(0.92);
+    }
+
+    .shutter-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: background-color 0.1s ease;
+    }
+
+    .btn-shutter:active .shutter-inner {
+      background: #e2e8f0;
+    }
+
+    .btn-native-cam {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #94a3b8;
+      font-size: 0.82rem;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-native-cam:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-cam-done {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+      background: #10b981;
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: var(--radius-md);
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .btn-cam-done:hover {
+      background: #059669;
+    }
   </style>
 </head>
 <body>
@@ -667,9 +931,12 @@
             <button type="button" class="btn btn-primary" id="btnSelectFiles">
               <i class="fa-solid fa-plus"></i> Chọn Ảnh Từ Máy
             </button>
-            <button type="button" class="btn btn-secondary" id="btnCameraCapture" style="color: #059669; border-color: #059669; font-weight: 700;" title="Chụp ảnh tài liệu trực tiếp từ Camera điện thoại">
-              <i class="fa-solid fa-camera"></i> Chụp Bằng Camera
+            <button type="button" class="btn btn-secondary" id="btnCameraCapture" style="color: #059669; border-color: #059669; font-weight: 700;" title="Quét tài liệu trực tiếp bằng Camera trong trình duyệt (Có khung căn lề, chụp nhiều trang liên tục)">
+              <i class="fa-solid fa-camera"></i> Quét Bằng Camera
             </button>
+            <label for="cameraInput" class="btn btn-secondary" style="font-weight: 600; cursor: pointer;" title="Mở trực tiếp ứng dụng Camera mặc định của máy điện thoại">
+              <i class="fa-solid fa-camera-retro"></i> Camera Máy
+            </label>
             <button type="button" class="btn btn-secondary" id="btnPasteClipboard" title="Dán ảnh từ Clipboard (Ctrl+V)">
               <i class="fa-regular fa-paste"></i> Dán Clipboard
             </button>
@@ -715,6 +982,13 @@
 
           <!-- Presets -->
           <div class="filter-presets-grid">
+            <button type="button" class="filter-preset-btn highlight-stamp" data-preset="stamp" title="Làm trắng nền giấy, khử bóng tối, giữ nét chữ và giữ nguyên màu con dấu đỏ">
+              <i class="fa-solid fa-stamp" style="color: #ef4444; font-size: 1.15rem;"></i>
+              <div>
+                <span style="color: #ef4444; font-weight: 700;">Sáng Nền Trắng + Giữ Dấu Đỏ</span>
+                <div style="font-size: 0.71rem; color: var(--text-muted); font-weight: normal; margin-top: 1px;">Khử bóng râm, nền giấy trắng tinh, giữ nguyên chữ nét &amp; con dấu</div>
+              </div>
+            </button>
             <button type="button" class="filter-preset-btn active" data-preset="original">
               <i class="fa-regular fa-image" style="color: #3b82f6;"></i> Ảnh Gốc
             </button>
@@ -799,8 +1073,8 @@
           <div class="setting-item">
             <label for="pdfMargin"><i class="fa-solid fa-border-all"></i> Căn lề giấy:</label>
             <select id="pdfMargin" class="setting-select">
-              <option value="0">Không lề (0 mm) - Tràn viền</option>
-              <option value="5" selected>Lề hẹp (5 mm) - Cân đối</option>
+              <option value="0" selected>Không lề (0 mm) - Tràn viền (Mặc định)</option>
+              <option value="5">Lề hẹp (5 mm) - Cân đối</option>
               <option value="10">Lề chuẩn (10 mm) - Để đóng tập</option>
             </select>
           </div>
@@ -899,6 +1173,63 @@
           </button>
         </div>
       </div>
+  <!-- =========================================================
+       MODAL MÁY ẢNH QUÉT TRỰC TIẾP (LIVE CAMERA SCANNER)
+       ========================================================= -->
+  <div class="live-camera-modal" id="liveCameraModal" aria-hidden="true">
+    <div class="live-camera-container">
+      <!-- Camera Top Bar -->
+      <div class="live-camera-header">
+        <div class="camera-info">
+          <i class="fa-solid fa-camera" style="color: #10b981;"></i>
+          <span>Máy Ảnh Quét Tài Liệu</span>
+          <span class="camera-count-badge" id="cameraSnapCountBadge">Đã chụp: 0</span>
+        </div>
+        <div class="camera-top-actions">
+          <button type="button" class="cam-icon-btn" id="btnToggleTorch" title="Bật / Tắt Đèn Flash" style="display: none;">
+            <i class="fa-solid fa-bolt"></i>
+          </button>
+          <button type="button" class="cam-icon-btn" id="btnSwitchCamera" title="Đổi Camera (Trước / Sau)">
+            <i class="fa-solid fa-camera-rotate"></i>
+          </button>
+          <button type="button" class="cam-icon-btn" id="btnCloseLiveCamera" title="Đóng Camera">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Camera Viewfinder Stage -->
+      <div class="live-camera-viewfinder" id="cameraViewfinder">
+        <video id="liveCameraVideo" autoplay playsinline muted></video>
+        <div class="camera-flash-overlay" id="cameraFlashOverlay"></div>
+        <!-- Document frame guide overlay -->
+        <div class="doc-guide-box">
+          <div class="doc-guide-corner corner-tl"></div>
+          <div class="doc-guide-corner corner-tr"></div>
+          <div class="doc-guide-corner corner-bl"></div>
+          <div class="doc-guide-corner corner-br"></div>
+          <span class="doc-guide-hint"><i class="fa-solid fa-expand"></i> Căn tài liệu vừa khung viền</span>
+        </div>
+      </div>
+
+      <!-- Camera Bottom Controls -->
+      <div class="live-camera-footer">
+        <div class="footer-left">
+          <label for="cameraInput" class="btn-native-cam" title="Mở ứng dụng Camera gốc của máy điện thoại">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Camera máy
+          </label>
+        </div>
+        <div class="footer-center">
+          <button type="button" class="btn-shutter" id="btnSnapPhoto" title="Bấm chụp ảnh">
+            <div class="shutter-inner"></div>
+          </button>
+        </div>
+        <div class="footer-right">
+          <button type="button" class="btn-cam-done" id="btnFinishCamera">
+            <i class="fa-solid fa-check"></i> Xong
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -988,6 +1319,22 @@
       document.getElementById("handleBL")
     ];
 
+    // Live Camera Modal Elements
+    const liveCameraModal = document.getElementById("liveCameraModal");
+    const liveCameraVideo = document.getElementById("liveCameraVideo");
+    const cameraFlashOverlay = document.getElementById("cameraFlashOverlay");
+    const cameraSnapCountBadge = document.getElementById("cameraSnapCountBadge");
+    const btnToggleTorch = document.getElementById("btnToggleTorch");
+    const btnSwitchCamera = document.getElementById("btnSwitchCamera");
+    const btnCloseLiveCamera = document.getElementById("btnCloseLiveCamera");
+    const btnSnapPhoto = document.getElementById("btnSnapPhoto");
+    const btnFinishCamera = document.getElementById("btnFinishCamera");
+
+    let cameraStream = null;
+    let currentFacingMode = "environment";
+    let cameraSnappedCount = 0;
+    let isTorchOn = false;
+
     // Progress Modal
     const progressOverlay = document.getElementById("progressOverlay");
     const progressBarFill = document.getElementById("progressBarFill");
@@ -1003,6 +1350,139 @@
     // =========================================================
     // FILE UPLOADING & CAMERA CAPTURE
     // =========================================================
+    async function startCameraStream(facing) {
+      stopCameraStream();
+      const constraints = {
+        audio: false,
+        video: {
+          facingMode: { ideal: facing },
+          width: { ideal: 2560, min: 1280 },
+          height: { ideal: 1440, min: 720 }
+        }
+      };
+
+      try {
+        cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+        liveCameraVideo.srcObject = cameraStream;
+        await liveCameraVideo.play();
+        checkTorchSupport();
+      } catch (err) {
+        console.warn("Retrying with basic video constraint:", err);
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: { facingMode: facing }
+        });
+        liveCameraVideo.srcObject = cameraStream;
+        await liveCameraVideo.play();
+      }
+    }
+
+    function stopCameraStream() {
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+      }
+      if (liveCameraVideo) {
+        liveCameraVideo.srcObject = null;
+      }
+    }
+
+    function closeLiveCamera() {
+      stopCameraStream();
+      liveCameraModal.classList.remove("active");
+      cameraSnappedCount = 0;
+    }
+
+    function checkTorchSupport() {
+      if (!cameraStream) return;
+      const track = cameraStream.getVideoTracks()[0];
+      if (track && track.getCapabilities && track.getCapabilities().torch) {
+        btnToggleTorch.style.display = "flex";
+        isTorchOn = false;
+        btnToggleTorch.innerHTML = '<i class="fa-solid fa-bolt"></i>';
+      } else {
+        btnToggleTorch.style.display = "none";
+      }
+    }
+
+    async function toggleTorch() {
+      if (!cameraStream) return;
+      const track = cameraStream.getVideoTracks()[0];
+      if (track && track.getCapabilities && track.getCapabilities().torch) {
+        isTorchOn = !isTorchOn;
+        try {
+          await track.applyConstraints({
+            advanced: [{ torch: isTorchOn }]
+          });
+          btnToggleTorch.innerHTML = isTorchOn ? '<i class="fa-solid fa-bolt" style="color: #f59e0b;"></i>' : '<i class="fa-solid fa-bolt"></i>';
+        } catch (e) {
+          console.warn("Torch toggle error:", e);
+        }
+      }
+    }
+
+    function snapPhotoFromLiveCamera() {
+      if (!liveCameraVideo || liveCameraVideo.readyState < 2) return;
+
+      // Flash feedback
+      cameraFlashOverlay.classList.add("flash");
+      setTimeout(() => cameraFlashOverlay.classList.remove("flash"), 120);
+
+      const w = liveCameraVideo.videoWidth || 1920;
+      const h = liveCameraVideo.videoHeight || 1080;
+
+      const snapCanvas = document.createElement("canvas");
+      snapCanvas.width = w;
+      snapCanvas.height = h;
+      const sCtx = snapCanvas.getContext("2d");
+      sCtx.drawImage(liveCameraVideo, 0, 0, w, h);
+
+      const dataUrl = snapCanvas.toDataURL("image/jpeg", 0.95);
+      const img = new Image();
+      img.onload = () => {
+        cameraSnappedCount++;
+        cameraSnapCountBadge.textContent = `Đã chụp: ${cameraSnappedCount}`;
+        cameraSnapCountBadge.style.display = "inline-block";
+
+        const pageObj = {
+          id: "page_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
+          name: `Quet_Camera_${pages.length + 1}.jpg`,
+          originalImage: img,
+          activeImage: img,
+          filter: "original",
+          brightness: 0,
+          contrast: 0,
+          sharpen: false,
+          rotation: 0,
+          isCropped: false
+        };
+
+        pages.push(pageObj);
+        selectedPageIndex = pages.length - 1;
+        renderPagesList();
+        updateFilterControls();
+      };
+      img.src = dataUrl;
+    }
+
+    async function openLiveCamera() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        cameraInput.click();
+        return;
+      }
+      cameraSnappedCount = 0;
+      cameraSnapCountBadge.textContent = "Đã chụp: 0";
+      cameraSnapCountBadge.style.display = "none";
+      liveCameraModal.classList.add("active");
+      try {
+        await startCameraStream(currentFacingMode);
+      } catch (err) {
+        console.warn("Live camera failed to start, falling back to native file input:", err);
+        closeLiveCamera();
+        cameraInput.click();
+      }
+    }
+
     btnSelectFiles.addEventListener("click", (e) => {
       e.stopPropagation();
       fileInput.click();
@@ -1010,7 +1490,17 @@
 
     btnCameraCapture.addEventListener("click", (e) => {
       e.stopPropagation();
-      cameraInput.click();
+      openLiveCamera();
+    });
+
+    btnCloseLiveCamera.addEventListener("click", closeLiveCamera);
+    btnFinishCamera.addEventListener("click", closeLiveCamera);
+    btnSnapPhoto.addEventListener("click", snapPhotoFromLiveCamera);
+    if (btnToggleTorch) btnToggleTorch.addEventListener("click", toggleTorch);
+
+    btnSwitchCamera.addEventListener("click", async () => {
+      currentFacingMode = currentFacingMode === "environment" ? "user" : "environment";
+      await startCameraStream(currentFacingMode);
     });
 
     dropzoneArea.addEventListener("click", () => fileInput.click());
@@ -1537,7 +2027,46 @@
         let g = data[i + 1];
         let b = data[i + 2];
 
-        if (filter === "scan") {
+        if (filter === "stamp") {
+          // BỘ LỌC ĐẶC BIỆT: NỀN TRẮNG TINH + GIỮ NGUYÊN CHỮ & CON DẤU ĐỎ
+          const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          const maxC = Math.max(r, g, b);
+          const minC = Math.min(r, g, b);
+          const sat = (maxC - minC) / Math.max(maxC, 1);
+
+          // 1. Nhận diện pixel con dấu đỏ / mực đỏ
+          const isRedStamp = (r > 80) && (r > g + 20) && (r > b + 20) && (sat > 0.18);
+          // 2. Nhận diện pixel chữ ký bút bi xanh
+          const isBlueSign = (b > 85) && (b > r + 15) && (b > g + 5) && (sat > 0.18);
+
+          if (isRedStamp) {
+            // Tôn và bảo toàn màu con dấu đỏ
+            r = Math.min(255, Math.round(r * 1.25));
+            g = Math.max(0, Math.round(g * 0.8));
+            b = Math.max(0, Math.round(b * 0.8));
+          } else if (isBlueSign) {
+            // Giữ chữ ký bút bi xanh
+            r = Math.max(0, Math.round(r * 0.8));
+            g = Math.max(0, Math.round(g * 0.85));
+            b = Math.min(255, Math.round(b * 1.25));
+          } else {
+            // Tẩy trắng nền giấy, khử bóng râm & làm đậm nét chữ đen
+            const whiteThresh = Math.max(85, Math.min(195, 130 - bOffset));
+            const blackThresh = Math.max(35, Math.min(110, 75 - bOffset));
+
+            if (gray >= whiteThresh) {
+              r = g = b = 255;
+            } else if (gray <= blackThresh) {
+              let dark = Math.max(0, Math.round(gray * 0.5));
+              r = g = b = dark;
+            } else {
+              let t = (gray - blackThresh) / (whiteThresh - blackThresh);
+              let smoothT = t * t * (3 - 2 * t);
+              let val = Math.min(255, Math.max(0, Math.round(blackThresh * 0.5 + smoothT * (255 - blackThresh * 0.5))));
+              r = g = b = val;
+            }
+          }
+        } else if (filter === "scan") {
           let gray = 0.299 * r + 0.587 * g + 0.114 * b;
           let stretched = (gray - 128) * 1.6 + 128;
           if (stretched > 185) {
@@ -1576,7 +2105,7 @@
           }
         }
 
-        if (filter !== "threshold") {
+        if (filter !== "threshold" && filter !== "stamp") {
           if (bOffset !== 0) {
             r += bOffset;
             g += bOffset;
@@ -1976,6 +2505,17 @@
       } catch (err) {
         alert("Lỗi trong quá trình tạo PDF: " + err.message);
         progressOverlay.classList.remove("active");
+      }
+    });
+
+    // Close modals on Escape key
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (liveCameraModal && liveCameraModal.classList.contains("active")) {
+          closeLiveCamera();
+        } else if (cropModal && cropModal.classList.contains("active")) {
+          closeCropModal();
+        }
       }
     });
   </script>
