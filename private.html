@@ -85,6 +85,9 @@
       <button class="portal-tab-btn" id="tabCalendarBtn">
         <i class="fa-regular fa-calendar-days"></i> Google Lịch
       </button>
+      <button class="portal-tab-btn" id="tabPasswordsBtn">
+        <i class="fa-solid fa-vault"></i> Mật Khẩu Người Thân (<span id="pwdCountBadge">0</span>)
+      </button>
     </div>
 
     <!-- =========================================================
@@ -364,6 +367,131 @@
         </div>
       </div>
     </section>
+
+    <!-- =========================================================
+         VIEW 5: MẬT KHẨU & TÀI KHOẢN NGƯỜI THÂN (PASSWORD VAULT)
+         ========================================================= -->
+    <section class="dashboard-hero" id="passwordsView" style="display: none;">
+      <div class="dashboard-welcome">
+        <div class="welcome-text">
+          <h1>Két Mật Khẩu &amp; Tài Khoản Người Thân 🔐</h1>
+          <p>Quản lý an toàn tài khoản ngân hàng, mã PIN/OTP, Zalo, Facebook, VNeID... của ông bà, cha mẹ. Tự động cảnh báo chu kỳ đổi mật khẩu 6 tháng &amp; lưu vết toàn bộ lịch sử.</p>
+        </div>
+        <div class="toolbar-actions">
+          <button id="openAddPwdBtn" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Thêm Tài Khoản Mới
+          </button>
+          <button id="exportPwdExcelBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;">
+            <i class="fa-solid fa-file-excel"></i> Xuất Excel
+          </button>
+          <button id="exportPwdJsonBtn" class="btn btn-secondary" title="Sao lưu toàn bộ két mật khẩu dạng file JSON">
+            <i class="fa-solid fa-cloud-arrow-down"></i> Sao Lưu
+          </button>
+          <button id="importPwdJsonBtn" class="btn btn-secondary" title="Phục hồi dữ liệu từ file JSON">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Khôi Phục
+          </button>
+          <input type="file" id="importPwdJsonInput" accept=".json" style="display: none;" />
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="dash-stats-grid">
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: var(--primary); background: var(--primary-light);"><i class="fa-solid fa-vault"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statTotalPwds">0</h4>
+            <span>Tổng tài khoản lưu trữ</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #059669; background: rgba(16, 185, 129, 0.15);"><i class="fa-solid fa-building-columns"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statBankPwds">0</h4>
+            <span>Ngân hàng &amp; Ví tiền</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #3b82f6; background: rgba(59, 130, 246, 0.15);"><i class="fa-solid fa-comments"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statSocialPwds">0</h4>
+            <span>Mạng xã hội &amp; Chat</span>
+          </div>
+        </div>
+        <div class="dash-stat-item">
+          <div class="dash-stat-icon" style="color: #ef4444; background: rgba(239, 68, 68, 0.15);"><i class="fa-solid fa-triangle-exclamation"></i></div>
+          <div class="dash-stat-info">
+            <h4 id="statExpiringPwds">0</h4>
+            <span>Cần đổi MK (&gt;6 tháng)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="dashboard-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1;">
+          <div class="search-private-box" style="max-width: 320px; min-width: 240px;">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchPwdInput" placeholder="Tìm theo tên người thân, dịch vụ, SĐT..." />
+          </div>
+
+          <!-- Filter by Owner -->
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-user-tag" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Người thân:</span>
+            <select id="filterPwdOwnerSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="all">Tất cả người thân</option>
+            </select>
+          </div>
+
+          <!-- Filter by Category -->
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-layer-group" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Danh mục:</span>
+            <select id="filterPwdCatSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="all">Tất cả danh mục</option>
+              <option value="bank">Ngân hàng &amp; Ví tiền</option>
+              <option value="social">Mạng xã hội (Zalo, FB...)</option>
+              <option value="gov">Dịch vụ công (VNeID, BHYT...)</option>
+              <option value="email">Email &amp; Google / Apple</option>
+              <option value="other">Khác</option>
+            </select>
+          </div>
+
+          <!-- Filter by Rotation Status -->
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Chu kỳ:</span>
+            <select id="filterPwdStatusSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="all">Tất cả chu kỳ</option>
+              <option value="expired">⚠️ Đã quá 6 tháng (Cần đổi)</option>
+              <option value="expiring">⏳ Sắp đến hạn (&lt; 30 ngày)</option>
+              <option value="safe">✅ Mới đổi (An toàn)</option>
+            </select>
+          </div>
+
+          <!-- Sort -->
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-arrow-down-a-z" style="color: var(--primary); font-size: 0.9rem;"></i>
+            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Sắp xếp:</span>
+            <select id="sortPwdSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="updated-desc">Mới cập nhật</option>
+              <option value="owner-asc">Người thân: A → Z</option>
+              <option value="service-asc">Dịch vụ: A → Z</option>
+              <option value="expiry-asc">Hạn đổi: Cần đổi trước</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="font-size: 0.95rem; color: var(--text-muted); white-space: nowrap;">
+          Hiển thị: <strong id="pwdFilteredCount" style="color: var(--primary);">0</strong> tài khoản
+        </div>
+      </div>
+
+      <!-- Password Cards Grid -->
+      <div class="pwd-vault-grid" id="pwdCardsGrid">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
   </main>
 
   <!-- MODAL THÊM GHI CHÚ MỚI -->
@@ -567,6 +695,186 @@
     </div>
   </div>
 
+  <!-- MODAL THÊM / SỬA MẬT KHẨU TÀI KHOẢN NGƯỜI THÂN -->
+  <div class="article-modal" id="pwdModal" aria-hidden="true">
+    <div class="modal-backdrop" id="pwdModalBackdrop"></div>
+    <div class="modal-container" style="max-width: 620px;">
+      <button class="modal-close-btn" id="closePwdModalBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main); margin-bottom: 8px;" id="pwdModalTitle">
+          <i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Người Thân
+        </h2>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;">
+          Lưu trữ thông tin đăng nhập, mã PIN/OTP ngân hàng cho ông bà, bố mẹ để tra cứu nhanh chóng khi cần.
+        </p>
+
+        <form id="pwdForm">
+          <input type="hidden" id="pwdEditId" value="" />
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="modal-form-group">
+              <label for="pwdOwnerInput">Người thân (Chủ tài khoản) <span style="color: var(--danger);">*</span></label>
+              <input type="text" id="pwdOwnerInput" list="pwdOwnerSuggestions" placeholder="Ví dụ: Bố, Mẹ, Bà nội, Ông ngoại..." required />
+              <datalist id="pwdOwnerSuggestions">
+                <option value="Bố"></option>
+                <option value="Mẹ"></option>
+                <option value="Ông nội"></option>
+                <option value="Bà nội"></option>
+                <option value="Ông ngoại"></option>
+                <option value="Bà ngoại"></option>
+                <option value="Vợ"></option>
+                <option value="Chồng"></option>
+              </datalist>
+            </div>
+
+            <div class="modal-form-group">
+              <label for="pwdCategorySelect">Phân loại danh mục</label>
+              <select id="pwdCategorySelect">
+                <option value="bank">Ngân hàng &amp; Ví tiền</option>
+                <option value="social">Mạng xã hội (Zalo, FB)</option>
+                <option value="gov">Dịch vụ công (VNeID, BHYT)</option>
+                <option value="email">Email &amp; Google / Apple</option>
+                <option value="other">Khác (WiFi, Mua sắm...)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="modal-form-group">
+            <label for="pwdServiceInput">Tên Dịch Vụ / Ứng Dụng / Ngân Hàng <span style="color: var(--danger);">*</span></label>
+            <input type="text" id="pwdServiceInput" list="pwdServiceSuggestions" placeholder="Ví dụ: Vietcombank Digibank, Zalo, VNeID, BIDV..." required />
+            <datalist id="pwdServiceSuggestions">
+              <option value="Vietcombank Digibank"></option>
+              <option value="BIDV SmartBanking"></option>
+              <option value="VietinBank iPay"></option>
+              <option value="Agribank E-Mobile"></option>
+              <option value="Techcombank"></option>
+              <option value="MB Bank"></option>
+              <option value="MoMo"></option>
+              <option value="Zalo"></option>
+              <option value="Facebook"></option>
+              <option value="VNeID (Định danh điện tử)"></option>
+              <option value="VssID (Bảo hiểm xã hội)"></option>
+              <option value="Gmail Google"></option>
+              <option value="iCloud Apple ID"></option>
+            </datalist>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="modal-form-group">
+              <label for="pwdUsernameInput">Tên Đăng Nhập / SĐT / STK <span style="color: var(--danger);">*</span></label>
+              <input type="text" id="pwdUsernameInput" placeholder="SĐT hoặc Username đăng nhập" required />
+            </div>
+
+            <div class="modal-form-group">
+              <label for="pwdPinInput">Mã PIN / Smart OTP / Mã phụ</label>
+              <input type="text" id="pwdPinInput" placeholder="Ví dụ: PIN 6 số: 123456" />
+            </div>
+          </div>
+
+          <div class="modal-form-group">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label for="pwdPasswordInput" style="margin-bottom: 0;">Mật Khẩu Hiện Tại <span style="color: var(--danger);">*</span></label>
+              <button type="button" id="btnGenPassword" class="btn btn-secondary" style="padding: 3px 10px; font-size: 0.8rem;">
+                <i class="fa-solid fa-dice"></i> Tạo MK Ngẫu Nhiên
+              </button>
+            </div>
+            <div style="position: relative;">
+              <input type="text" id="pwdPasswordInput" placeholder="Nhập mật khẩu" required style="padding-right: 42px; font-family: var(--font-mono);" />
+              <button type="button" id="togglePwdInputVisibility" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px;">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="modal-form-group">
+              <label for="pwdRotationSelect">Chu kỳ đổi mật khẩu</label>
+              <select id="pwdRotationSelect">
+                <option value="6" selected>6 tháng (Khuyên dùng cho Ngân hàng)</option>
+                <option value="3">3 tháng (Bảo mật cao)</option>
+                <option value="12">12 tháng (1 năm)</option>
+                <option value="0">Không bắt buộc đổi định kỳ</option>
+              </select>
+            </div>
+
+            <div class="modal-form-group">
+              <label for="pwdLastChangedInput">Ngày đổi mật khẩu gần nhất</label>
+              <input type="date" id="pwdLastChangedInput" required />
+            </div>
+          </div>
+
+          <!-- Notice when modifying password -->
+          <div id="pwdChangeNoticeBox" style="display: none; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-md); padding: 12px; margin-bottom: 16px;">
+            <div style="font-size: 0.85rem; color: var(--text-main); font-weight: 600; margin-bottom: 4px;">
+              <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Tự động ghi lại lịch sử mật khẩu cũ
+            </div>
+            <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px;">
+              Mật khẩu cũ sẽ được lưu tự động vào <strong>Lịch sử</strong> để xem lại bất cứ khi nào.
+            </div>
+            <input type="text" id="pwdChangeReasonInput" placeholder="Lý do đổi (ví dụ: Đổi định kỳ 6 tháng ngân hàng)..." style="font-size: 0.85rem; padding: 8px 12px;" />
+          </div>
+
+          <div class="modal-form-group">
+            <label for="pwdNoteInput">Ghi chú thêm (SIM nhận OTP, số CMND/CCCD, máy đang giữ...)</label>
+            <textarea id="pwdNoteInput" placeholder="Ví dụ: SIM Viettel chính chủ nhận OTP lắp ở máy Nokia của Bố..." style="min-height: 70px;"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button type="button" class="btn btn-secondary" id="cancelPwdModalBtn">Hủy</button>
+            <button type="submit" class="btn btn-primary" id="savePwdSubmitBtn">Lưu Tài Khoản</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL LỊCH SỬ MẬT KHẨU -->
+  <div class="article-modal" id="pwdHistoryModal" aria-hidden="true">
+    <div class="modal-backdrop" id="pwdHistoryBackdrop"></div>
+    <div class="modal-container" style="max-width: 580px;">
+      <button class="modal-close-btn" id="closePwdHistoryBtn">&times;</button>
+      <div class="modal-body" style="padding: 32px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-main);" id="pwdHistoryTitle">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Lịch Sử Mật Khẩu
+          </h2>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 20px;" id="pwdHistorySubtitle">
+          Danh sách các mật khẩu đã từng sử dụng trước đây kèm mốc thời gian.
+        </p>
+
+        <!-- Current Password Box -->
+        <div style="background: var(--bg-surface); border: 2px solid var(--primary); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px;">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">
+            <i class="fa-solid fa-circle-check"></i> Mật khẩu đang sử dụng hiện tại
+          </div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span id="pwdHistoryCurrentVal" style="font-family: var(--font-mono); font-size: 1.05rem; font-weight: 700; color: var(--text-main); word-break: break-all;"></span>
+            <div style="display: flex; gap: 6px; flex-shrink: 0;">
+              <button type="button" class="btn btn-secondary btn-sm" id="btnToggleHistoryCurrent" title="Hiện / Ẩn"><i class="fa-regular fa-eye"></i></button>
+              <button type="button" class="btn btn-secondary btn-sm" id="btnCopyHistoryCurrent" title="Sao chép"><i class="fa-regular fa-copy"></i> Copy</button>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 12px;">
+          Các mật khẩu đã dùng trong quá khứ:
+        </h4>
+
+        <div class="pwd-history-timeline" id="pwdHistoryList">
+          <!-- Rendered by JS -->
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+          <button type="button" class="btn btn-secondary" id="closePwdHistoryBtn2">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastNotification" class="toast-notification"></div>
+
   <!-- PRIVATE APP SCRIPT -->
   <script>
     // Theme sync
@@ -595,16 +903,18 @@
     const tabDeclarationsBtn = document.getElementById("tabDeclarationsBtn");
     const tabFilesBtn = document.getElementById("tabFilesBtn");
     const tabCalendarBtn = document.getElementById("tabCalendarBtn");
+    const tabPasswordsBtn = document.getElementById("tabPasswordsBtn");
     const notesView = document.getElementById("notesView");
     const declarationsView = document.getElementById("declarationsView");
     const filesView = document.getElementById("filesView");
     const calendarView = document.getElementById("calendarView");
+    const passwordsView = document.getElementById("passwordsView");
 
     function switchTab(activeBtn, activeView) {
-      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn, tabCalendarBtn].forEach(b => b.classList.remove("active"));
-      [notesView, declarationsView, filesView, calendarView].forEach(v => v.style.display = "none");
-      activeBtn.classList.add("active");
-      activeView.style.display = "block";
+      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn, tabCalendarBtn, tabPasswordsBtn].forEach(b => b && b.classList.remove("active"));
+      [notesView, declarationsView, filesView, calendarView, passwordsView].forEach(v => v && (v.style.display = "none"));
+      if (activeBtn) activeBtn.classList.add("active");
+      if (activeView) activeView.style.display = "block";
     }
 
     tabNotesBtn.addEventListener("click", () => switchTab(tabNotesBtn, notesView));
@@ -616,6 +926,10 @@
     tabCalendarBtn.addEventListener("click", () => {
       switchTab(tabCalendarBtn, calendarView);
       initCalendarView();
+    });
+    tabPasswordsBtn.addEventListener("click", () => {
+      switchTab(tabPasswordsBtn, passwordsView);
+      renderPasswords();
     });
 
     // ==========================================
@@ -1657,11 +1971,1031 @@
       }
     });
 
+    // ==========================================
+    // 6. KÉT MẬT KHẨU & TÀI KHOẢN NGƯỜI THÂN
+    // ==========================================
+    const FAMILY_PASSWORDS_KEY = "devlog_family_passwords";
+
+    const DEFAULT_FAMILY_PASSWORDS = [
+      {
+        id: "pwd_sample_1",
+        owner: "Bố",
+        service: "Vietcombank Digibank",
+        category: "bank",
+        username: "0912345678",
+        password: "BoVCB@2026",
+        pin: "101288",
+        rotationMonths: 6,
+        lastChanged: "2026-03-01",
+        note: "SIM Viettel chính chủ nhận OTP lắp ở máy Nokia của Bố. Thẻ ATM mở ở VCB Ba Đình.",
+        history: [
+          {
+            password: "BoCuongVCB2025",
+            changedAt: "2025-09-01T10:00:00.000Z",
+            reason: "Mật khẩu đợt mở tài khoản ban đầu"
+          }
+        ],
+        createdAt: "2025-09-01T10:00:00.000Z",
+        updatedAt: "2026-03-01T08:30:00.000Z"
+      },
+      {
+        id: "pwd_sample_2",
+        owner: "Mẹ",
+        service: "Zalo",
+        category: "social",
+        username: "0987654321",
+        password: "MeYeuDau#2026",
+        pin: "",
+        rotationMonths: 0,
+        lastChanged: "2026-07-15",
+        note: "Đăng nhập trên điện thoại Samsung của Mẹ và iPad ở phòng khách.",
+        history: [],
+        createdAt: "2026-07-15T14:00:00.000Z",
+        updatedAt: "2026-07-15T14:00:00.000Z"
+      },
+      {
+        id: "pwd_sample_3",
+        owner: "Bà nội",
+        service: "VNeID (Định danh điện tử)",
+        category: "gov",
+        username: "001150001234",
+        password: "BaNoi@1950",
+        pin: "123456",
+        rotationMonths: 12,
+        lastChanged: "2026-08-10",
+        note: "Mã số định danh CCCD của Bà. SIM nhận OTP số của Bố.",
+        history: [],
+        createdAt: "2026-08-10T09:15:00.000Z",
+        updatedAt: "2026-08-10T09:15:00.000Z"
+      },
+      {
+        id: "pwd_sample_4",
+        owner: "Bố",
+        service: "BIDV SmartBanking",
+        category: "bank",
+        username: "0912345678",
+        password: "BidvBo#2026",
+        pin: "654321",
+        rotationMonths: 6,
+        lastChanged: "2026-08-20",
+        note: "Tài khoản nhận lương hưu hàng tháng của Bố.",
+        history: [],
+        createdAt: "2026-08-20T11:00:00.000Z",
+        updatedAt: "2026-08-20T11:00:00.000Z"
+      }
+    ];
+
+    function getFamilyPasswords() {
+      const data = localStorage.getItem(FAMILY_PASSWORDS_KEY);
+      if (!data) {
+        localStorage.setItem(FAMILY_PASSWORDS_KEY, JSON.stringify(DEFAULT_FAMILY_PASSWORDS));
+        return DEFAULT_FAMILY_PASSWORDS;
+      }
+      try {
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : DEFAULT_FAMILY_PASSWORDS;
+      } catch (e) {
+        return DEFAULT_FAMILY_PASSWORDS;
+      }
+    }
+
+    function saveFamilyPasswords(list) {
+      localStorage.setItem(FAMILY_PASSWORDS_KEY, JSON.stringify(list));
+      familyPasswords = list;
+      if (pwdCountBadge) pwdCountBadge.textContent = list.length;
+    }
+
+    let familyPasswords = getFamilyPasswords();
+    let pwdSearchQuery = "";
+    let pwdOwnerFilter = "all";
+    let pwdCatFilter = "all";
+    let pwdStatusFilter = "all";
+    let pwdSortMode = "updated-desc";
+
+    let visiblePasswordsMap = {};
+    let visiblePinsMap = {};
+    let originalPasswordForEdit = "";
+
+    // DOM Elements
+    const pwdCardsGrid = document.getElementById("pwdCardsGrid");
+    const pwdCountBadge = document.getElementById("pwdCountBadge");
+    const statTotalPwds = document.getElementById("statTotalPwds");
+    const statBankPwds = document.getElementById("statBankPwds");
+    const statSocialPwds = document.getElementById("statSocialPwds");
+    const statExpiringPwds = document.getElementById("statExpiringPwds");
+    const pwdFilteredCount = document.getElementById("pwdFilteredCount");
+
+    const searchPwdInput = document.getElementById("searchPwdInput");
+    const filterPwdOwnerSelect = document.getElementById("filterPwdOwnerSelect");
+    const filterPwdCatSelect = document.getElementById("filterPwdCatSelect");
+    const filterPwdStatusSelect = document.getElementById("filterPwdStatusSelect");
+    const sortPwdSelect = document.getElementById("sortPwdSelect");
+
+    const openAddPwdBtn = document.getElementById("openAddPwdBtn");
+    const exportPwdExcelBtn = document.getElementById("exportPwdExcelBtn");
+    const exportPwdJsonBtn = document.getElementById("exportPwdJsonBtn");
+    const importPwdJsonBtn = document.getElementById("importPwdJsonBtn");
+    const importPwdJsonInput = document.getElementById("importPwdJsonInput");
+
+    // Modal elements
+    const pwdModal = document.getElementById("pwdModal");
+    const pwdModalBackdrop = document.getElementById("pwdModalBackdrop");
+    const closePwdModalBtn = document.getElementById("closePwdModalBtn");
+    const cancelPwdModalBtn = document.getElementById("cancelPwdModalBtn");
+    const pwdForm = document.getElementById("pwdForm");
+    const pwdModalTitle = document.getElementById("pwdModalTitle");
+    const pwdEditId = document.getElementById("pwdEditId");
+    const pwdOwnerInput = document.getElementById("pwdOwnerInput");
+    const pwdCategorySelect = document.getElementById("pwdCategorySelect");
+    const pwdServiceInput = document.getElementById("pwdServiceInput");
+    const pwdUsernameInput = document.getElementById("pwdUsernameInput");
+    const pwdPinInput = document.getElementById("pwdPinInput");
+    const pwdPasswordInput = document.getElementById("pwdPasswordInput");
+    const togglePwdInputVisibility = document.getElementById("togglePwdInputVisibility");
+    const btnGenPassword = document.getElementById("btnGenPassword");
+    const pwdRotationSelect = document.getElementById("pwdRotationSelect");
+    const pwdLastChangedInput = document.getElementById("pwdLastChangedInput");
+    const pwdChangeNoticeBox = document.getElementById("pwdChangeNoticeBox");
+    const pwdChangeReasonInput = document.getElementById("pwdChangeReasonInput");
+    const pwdNoteInput = document.getElementById("pwdNoteInput");
+
+    // History Modal elements
+    const pwdHistoryModal = document.getElementById("pwdHistoryModal");
+    const pwdHistoryBackdrop = document.getElementById("pwdHistoryBackdrop");
+    const closePwdHistoryBtn = document.getElementById("closePwdHistoryBtn");
+    const closePwdHistoryBtn2 = document.getElementById("closePwdHistoryBtn2");
+    const pwdHistoryTitle = document.getElementById("pwdHistoryTitle");
+    const pwdHistorySubtitle = document.getElementById("pwdHistorySubtitle");
+    const pwdHistoryCurrentVal = document.getElementById("pwdHistoryCurrentVal");
+    const btnToggleHistoryCurrent = document.getElementById("btnToggleHistoryCurrent");
+    const btnCopyHistoryCurrent = document.getElementById("btnCopyHistoryCurrent");
+    const pwdHistoryList = document.getElementById("pwdHistoryList");
+
+    let currentHistoryActiveItem = null;
+    let isHistoryCurrentVisible = false;
+
+    // Toast Notification helper
+    function showToast(message) {
+      const toast = document.getElementById("toastNotification");
+      if (!toast) return;
+      toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> ${message}`;
+      toast.classList.add("show");
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2200);
+    }
+
+    window.copyToClipboard = function(text, label) {
+      if (!text) return;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Đã sao chép ${label || 'nội dung'}!`);
+        }).catch(() => {
+          fallbackCopyText(text, label);
+        });
+      } else {
+        fallbackCopyText(text, label);
+      }
+    };
+
+    function fallbackCopyText(text, label) {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand("copy");
+        showToast(`Đã sao chép ${label || 'nội dung'}!`);
+      } catch (e) {
+        alert("Không thể tự động sao chép. Vui lòng sao chép thủ công: " + text);
+      }
+      document.body.removeChild(ta);
+    }
+
+    function generateStrongPassword() {
+      const upper = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+      const lower = "abcdefghijkmnopqrstuvwxyz";
+      const digits = "23456789";
+      const special = "@#$%!&";
+      const all = upper + lower + digits + special;
+      let pwd = "";
+      pwd += upper[Math.floor(Math.random() * upper.length)];
+      pwd += lower[Math.floor(Math.random() * lower.length)];
+      pwd += digits[Math.floor(Math.random() * digits.length)];
+      pwd += special[Math.floor(Math.random() * special.length)];
+      for (let i = 4; i < 12; i++) {
+        pwd += all[Math.floor(Math.random() * all.length)];
+      }
+      return pwd.split("").sort(() => 0.5 - Math.random()).join("");
+    }
+
+    function getPwdRotationStatus(item) {
+      const rotationMonths = Number(item.rotationMonths) || 0;
+      if (rotationMonths === 0) {
+        return {
+          status: "none",
+          text: "Không bắt buộc đổi định kỳ",
+          badgeClass: "none",
+          icon: "fa-solid fa-infinity",
+          daysLeft: 9999
+        };
+      }
+
+      const lastDate = item.lastChanged ? new Date(item.lastChanged) : new Date(item.createdAt || Date.now());
+      const nextDue = new Date(lastDate);
+      nextDue.setMonth(nextDue.getMonth() + rotationMonths);
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      nextDue.setHours(0, 0, 0, 0);
+
+      const diffMs = nextDue.getTime() - today.getTime();
+      const daysLeft = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+      if (daysLeft < 0) {
+        const overdue = Math.abs(daysLeft);
+        return {
+          status: "expired",
+          text: `Đã quá hạn ${overdue} ngày (Chu kỳ ${rotationMonths} tháng) - Cần đổi ngay!`,
+          badgeClass: "danger",
+          icon: "fa-solid fa-triangle-exclamation",
+          daysLeft: daysLeft
+        };
+      } else if (daysLeft <= 30) {
+        return {
+          status: "expiring",
+          text: `Sắp đến hạn đổi (Còn ${daysLeft} ngày là đủ ${rotationMonths} tháng)`,
+          badgeClass: "warning",
+          icon: "fa-solid fa-clock",
+          daysLeft: daysLeft
+        };
+      } else {
+        return {
+          status: "safe",
+          text: `Mới đổi gần đây (Còn ${daysLeft} ngày tới chu kỳ ${rotationMonths} tháng)`,
+          badgeClass: "ok",
+          icon: "fa-solid fa-circle-check",
+          daysLeft: daysLeft
+        };
+      }
+    }
+
+    function getServiceVisual(service, category) {
+      const s = (service || "").toLowerCase();
+      if (s.includes("vietcombank") || s.includes("vcb")) {
+        return { icon: "fa-solid fa-building-columns", class: "bank", label: "Vietcombank" };
+      }
+      if (s.includes("bidv") || s.includes("vietin") || s.includes("agribank") || s.includes("techcom") || s.includes("mb") || s.includes("tpbank") || s.includes("bank")) {
+        return { icon: "fa-solid fa-building-columns", class: "bank", label: "Ngân hàng" };
+      }
+      if (s.includes("momo") || s.includes("zalopay") || s.includes("viettel money") || s.includes("vnpt pay")) {
+        return { icon: "fa-solid fa-wallet", class: "bank", label: "Ví điện tử" };
+      }
+      if (s.includes("zalo")) {
+        return { icon: "fa-solid fa-comment-dots", class: "social", label: "Zalo" };
+      }
+      if (s.includes("facebook") || s.includes("fb") || s.includes("messenger")) {
+        return { icon: "fa-brands fa-facebook", class: "social", label: "Facebook" };
+      }
+      if (s.includes("vneid") || s.includes("vssid") || s.includes("định danh") || s.includes("bảo hiểm") || category === "gov") {
+        return { icon: "fa-solid fa-shield-halved", class: "gov", label: "Dịch vụ công" };
+      }
+      if (s.includes("google") || s.includes("gmail") || s.includes("icloud") || s.includes("apple") || category === "email") {
+        return { icon: "fa-solid fa-envelope", class: "email", label: "Email & Cloud" };
+      }
+      if (category === "bank") return { icon: "fa-solid fa-building-columns", class: "bank", label: "Ngân hàng" };
+      if (category === "social") return { icon: "fa-solid fa-comments", class: "social", label: "Mạng xã hội" };
+      return { icon: "fa-solid fa-key", class: "other", label: "Tài khoản" };
+    }
+
+    function getCategoryName(cat) {
+      const map = {
+        bank: "Ngân hàng & Ví tiền",
+        social: "Mạng xã hội & Chat",
+        gov: "Dịch vụ công & BHYT",
+        email: "Email & Tài khoản số",
+        other: "Khác"
+      };
+      return map[cat] || "Tài khoản";
+    }
+
+    function updateOwnerFilterOptions() {
+      if (!filterPwdOwnerSelect) return;
+      const currentVal = filterPwdOwnerSelect.value;
+      const ownersSet = new Set();
+      familyPasswords.forEach(p => {
+        if (p.owner && p.owner.trim()) ownersSet.add(p.owner.trim());
+      });
+      const owners = Array.from(ownersSet).sort((a, b) => a.localeCompare(b, "vi"));
+
+      let optionsHtml = `<option value="all">Tất cả người thân (${familyPasswords.length})</option>`;
+      owners.forEach(o => {
+        const count = familyPasswords.filter(p => (p.owner || "").trim() === o).length;
+        optionsHtml += `<option value="${escapeHtml(o)}">${escapeHtml(o)} (${count})</option>`;
+      });
+      filterPwdOwnerSelect.innerHTML = optionsHtml;
+      if (ownersSet.has(currentVal) || currentVal === "all") {
+        filterPwdOwnerSelect.value = currentVal;
+      } else {
+        filterPwdOwnerSelect.value = "all";
+      }
+    }
+
+    function renderPasswords() {
+      familyPasswords = getFamilyPasswords();
+      if (pwdCountBadge) pwdCountBadge.textContent = familyPasswords.length;
+
+      // Calculate stats
+      let bankCount = 0;
+      let socialCount = 0;
+      let expiringCount = 0;
+
+      familyPasswords.forEach(item => {
+        if (item.category === "bank") bankCount++;
+        if (item.category === "social") socialCount++;
+        const rot = getPwdRotationStatus(item);
+        if (rot.status === "expired" || rot.status === "expiring") {
+          expiringCount++;
+        }
+      });
+
+      if (statTotalPwds) statTotalPwds.textContent = familyPasswords.length;
+      if (statBankPwds) statBankPwds.textContent = bankCount;
+      if (statSocialPwds) statSocialPwds.textContent = socialCount;
+      if (statExpiringPwds) statExpiringPwds.textContent = expiringCount;
+
+      updateOwnerFilterOptions();
+
+      // Filtering
+      const query = pwdSearchQuery.toLowerCase();
+      let list = familyPasswords.filter(item => {
+        const matchSearch = !query ||
+          (item.owner || "").toLowerCase().includes(query) ||
+          (item.service || "").toLowerCase().includes(query) ||
+          (item.username || "").toLowerCase().includes(query) ||
+          (item.note || "").toLowerCase().includes(query) ||
+          (item.pin || "").toLowerCase().includes(query);
+
+        const matchOwner = pwdOwnerFilter === "all" || (item.owner || "").trim() === pwdOwnerFilter;
+        const matchCat = pwdCatFilter === "all" || item.category === pwdCatFilter;
+
+        const rot = getPwdRotationStatus(item);
+        let matchStatus = true;
+        if (pwdStatusFilter === "expired") matchStatus = rot.status === "expired";
+        else if (pwdStatusFilter === "expiring") matchStatus = rot.status === "expiring";
+        else if (pwdStatusFilter === "safe") matchStatus = rot.status === "safe";
+
+        return matchSearch && matchOwner && matchCat && matchStatus;
+      });
+
+      // Sorting
+      list.sort((a, b) => {
+        if (pwdSortMode === "owner-asc") {
+          return (a.owner || "").localeCompare(b.owner || "", "vi");
+        } else if (pwdSortMode === "service-asc") {
+          return (a.service || "").localeCompare(b.service || "", "vi");
+        } else if (pwdSortMode === "expiry-asc") {
+          const rotA = getPwdRotationStatus(a);
+          const rotB = getPwdRotationStatus(b);
+          return rotA.daysLeft - rotB.daysLeft;
+        } else {
+          // updated-desc
+          const timeA = new Date(a.updatedAt || a.lastChanged || a.createdAt || 0).getTime();
+          const timeB = new Date(b.updatedAt || b.lastChanged || b.createdAt || 0).getTime();
+          return timeB - timeA;
+        }
+      });
+
+      if (pwdFilteredCount) pwdFilteredCount.textContent = list.length;
+
+      if (list.length === 0) {
+        pwdCardsGrid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
+            <i class="fa-solid fa-key" style="font-size: 2.8rem; margin-bottom: 12px; color: var(--text-muted); opacity: 0.6; display: block;"></i>
+            <h3 style="font-size: 1.1rem; color: var(--text-main); margin-bottom: 6px;">Không tìm thấy tài khoản phù hợp</h3>
+            <p style="font-size: 0.88rem;">Hãy thử tìm kiếm từ khóa khác hoặc bấm nút "+ Thêm Tài Khoản Mới" để bắt đầu lưu trữ.</p>
+          </div>
+        `;
+        return;
+      }
+
+      pwdCardsGrid.innerHTML = list.map(item => {
+        const visual = getServiceVisual(item.service, item.category);
+        const rot = getPwdRotationStatus(item);
+        const isPwdVisible = Boolean(visiblePasswordsMap[item.id]);
+        const isPinVisible = Boolean(visiblePinsMap[item.id]);
+        const historyCount = item.history ? item.history.length : 0;
+
+        const maskedPwd = isPwdVisible ? escapeHtml(item.password || "") : "••••••••••••";
+        const maskedPin = isPinVisible ? escapeHtml(item.pin || "") : "••••••";
+
+        let formattedLastChanged = "—";
+        if (item.lastChanged) {
+          const d = new Date(item.lastChanged);
+          if (!isNaN(d.getTime())) {
+            formattedLastChanged = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+          }
+        }
+
+        return `
+          <div class="pwd-card ${rot.badgeClass}">
+            <div class="pwd-card-header">
+              <div class="pwd-service-info">
+                <div class="pwd-service-icon ${visual.class}">
+                  <i class="${visual.icon}"></i>
+                </div>
+                <div>
+                  <h3 class="pwd-service-name">${escapeHtml(item.service)}</h3>
+                  <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                    <span class="pwd-owner-tag"><i class="fa-solid fa-user"></i> ${escapeHtml(item.owner || "Người thân")}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${escapeHtml(getCategoryName(item.category))}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Fields -->
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <!-- Username Row -->
+              <div class="pwd-field-row">
+                <span class="pwd-field-label"><i class="fa-regular fa-user"></i> Tên ĐN:</span>
+                <span class="pwd-field-val" title="${escapeHtml(item.username)}">${escapeHtml(item.username)}</span>
+                <div class="pwd-field-actions">
+                  <button type="button" class="pwd-icon-btn" title="Sao chép tên đăng nhập" onclick="copyToClipboard('${escapeHtml(item.username)}', 'tên đăng nhập')">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Password Row -->
+              <div class="pwd-field-row">
+                <span class="pwd-field-label"><i class="fa-solid fa-lock"></i> Mật khẩu:</span>
+                <span class="pwd-field-val" style="color: ${isPwdVisible ? 'var(--primary)' : 'inherit'};">${maskedPwd}</span>
+                <div class="pwd-field-actions">
+                  <button type="button" class="pwd-icon-btn" title="${isPwdVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}" onclick="togglePasswordVisibility('${item.id}')">
+                    <i class="fa-regular ${isPwdVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                  </button>
+                  <button type="button" class="pwd-icon-btn" title="Sao chép mật khẩu" onclick="copyToClipboard('${escapeHtml(item.password)}', 'mật khẩu')">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- PIN Row (if present) -->
+              ${item.pin ? `
+                <div class="pwd-field-row">
+                  <span class="pwd-field-label"><i class="fa-solid fa-key"></i> Mã PIN/OTP:</span>
+                  <span class="pwd-field-val" style="color: ${isPinVisible ? '#059669' : 'inherit'};">${maskedPin}</span>
+                  <div class="pwd-field-actions">
+                    <button type="button" class="pwd-icon-btn" title="${isPinVisible ? 'Ẩn PIN' : 'Hiện PIN'}" onclick="togglePinVisibility('${item.id}')">
+                      <i class="fa-regular ${isPinVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                    </button>
+                    <button type="button" class="pwd-icon-btn" title="Sao chép mã PIN" onclick="copyToClipboard('${escapeHtml(item.pin)}', 'mã PIN')">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            <!-- Rotation / Expiry Status Badge -->
+            <div class="pwd-expiry-badge ${rot.badgeClass}">
+              <i class="${rot.icon}"></i>
+              <div style="flex: 1;">
+                <div>${rot.text}</div>
+                <div style="font-size: 0.73rem; opacity: 0.85; margin-top: 2px;">Đổi ngày: <strong>${formattedLastChanged}</strong> (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})</div>
+              </div>
+            </div>
+
+            <!-- Notes if present -->
+            ${item.note ? `
+              <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-hover); padding: 8px 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--border-color); line-height: 1.4;">
+                <i class="fa-regular fa-note-sticky" style="margin-right: 4px;"></i> ${escapeHtml(item.note)}
+              </div>
+            ` : ''}
+
+            <!-- Card Footer -->
+            <div class="pwd-card-footer">
+              <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
+                <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${historyCount})
+              </button>
+              <div style="display: flex; gap: 6px;">
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="editPasswordAccount('${item.id}')">
+                  <i class="fa-solid fa-pen-to-square"></i> Sửa / Đổi MK
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.8rem; padding: 5px 10px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Toggle Visibility
+    window.togglePasswordVisibility = function(id) {
+      visiblePasswordsMap[id] = !visiblePasswordsMap[id];
+      renderPasswords();
+    };
+
+    window.togglePinVisibility = function(id) {
+      visiblePinsMap[id] = !visiblePinsMap[id];
+      renderPasswords();
+    };
+
+    // Modal Add / Edit
+    function openAddModal() {
+      pwdForm.reset();
+      pwdEditId.value = "";
+      originalPasswordForEdit = "";
+      pwdModalTitle.innerHTML = `<i class="fa-solid fa-key" style="color: var(--primary);"></i> Thêm Tài Khoản Người Thân`;
+      pwdChangeNoticeBox.style.display = "none";
+      pwdLastChangedInput.value = new Date().toISOString().split("T")[0];
+      pwdRotationSelect.value = "6";
+      pwdModal.classList.add("active");
+    }
+
+    window.editPasswordAccount = function(id) {
+      const item = familyPasswords.find(p => p.id === id);
+      if (!item) return;
+
+      pwdEditId.value = item.id;
+      originalPasswordForEdit = item.password || "";
+      pwdOwnerInput.value = item.owner || "";
+      pwdCategorySelect.value = item.category || "bank";
+      pwdServiceInput.value = item.service || "";
+      pwdUsernameInput.value = item.username || "";
+      pwdPinInput.value = item.pin || "";
+      pwdPasswordInput.value = item.password || "";
+      pwdRotationSelect.value = item.rotationMonths !== undefined ? String(item.rotationMonths) : "6";
+      pwdLastChangedInput.value = item.lastChanged || new Date().toISOString().split("T")[0];
+      pwdNoteInput.value = item.note || "";
+      pwdChangeReasonInput.value = "";
+      pwdChangeNoticeBox.style.display = "none";
+
+      pwdModalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Sửa Tài Khoản: ${escapeHtml(item.service)} (${escapeHtml(item.owner || "Người thân")})`;
+      pwdModal.classList.add("active");
+    };
+
+    function closePwdModal() {
+      pwdModal.classList.remove("active");
+      pwdForm.reset();
+    }
+
+    // Monitor password change while editing
+    pwdPasswordInput.addEventListener("input", () => {
+      if (pwdEditId.value && originalPasswordForEdit) {
+        if (pwdPasswordInput.value !== originalPasswordForEdit) {
+          pwdChangeNoticeBox.style.display = "block";
+        } else {
+          pwdChangeNoticeBox.style.display = "none";
+        }
+      }
+    });
+
+    // Random password generator button
+    btnGenPassword.addEventListener("click", () => {
+      const gen = generateStrongPassword();
+      pwdPasswordInput.value = gen;
+      pwdPasswordInput.type = "text";
+      if (pwdEditId.value && originalPasswordForEdit && gen !== originalPasswordForEdit) {
+        pwdChangeNoticeBox.style.display = "block";
+      }
+      showToast("Đã tạo mật khẩu ngẫu nhiên an toàn!");
+    });
+
+    // Toggle password input visibility in form
+    togglePwdInputVisibility.addEventListener("click", () => {
+      const icon = togglePwdInputVisibility.querySelector("i");
+      if (pwdPasswordInput.type === "password") {
+        pwdPasswordInput.type = "text";
+        icon.className = "fa-regular fa-eye-slash";
+      } else {
+        pwdPasswordInput.type = "password";
+        icon.className = "fa-regular fa-eye";
+      }
+    });
+
+    pwdForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const id = pwdEditId.value;
+      const owner = pwdOwnerInput.value.trim();
+      const category = pwdCategorySelect.value;
+      const service = pwdServiceInput.value.trim();
+      const username = pwdUsernameInput.value.trim();
+      const pin = pwdPinInput.value.trim();
+      const password = pwdPasswordInput.value.trim();
+      const rotationMonths = Number(pwdRotationSelect.value);
+      const lastChanged = pwdLastChangedInput.value || new Date().toISOString().split("T")[0];
+      const note = pwdNoteInput.value.trim();
+      const changeReason = pwdChangeReasonInput.value.trim();
+
+      if (!owner || !service || !username || !password) {
+        alert("Vui lòng điền đầy đủ Người thân, Dịch vụ, Tên đăng nhập và Mật khẩu!");
+        return;
+      }
+
+      if (id) {
+        // Edit existing
+        const idx = familyPasswords.findIndex(p => p.id === id);
+        if (idx !== -1) {
+          const item = familyPasswords[idx];
+          // Check if password changed -> push to history
+          if (originalPasswordForEdit && password !== originalPasswordForEdit) {
+            if (!item.history) item.history = [];
+            item.history.unshift({
+              password: originalPasswordForEdit,
+              changedAt: new Date().toISOString(),
+              reason: changeReason || "Đổi mật khẩu định kỳ"
+            });
+            // Update lastChanged if user didn't manually pick a different date
+            item.lastChanged = new Date().toISOString().split("T")[0];
+          } else {
+            item.lastChanged = lastChanged;
+          }
+
+          item.owner = owner;
+          item.category = category;
+          item.service = service;
+          item.username = username;
+          item.pin = pin;
+          item.password = password;
+          item.rotationMonths = rotationMonths;
+          item.note = note;
+          item.updatedAt = new Date().toISOString();
+        }
+      } else {
+        // Add new
+        const newItem = {
+          id: "pwd_" + Date.now(),
+          owner: owner,
+          category: category,
+          service: service,
+          username: username,
+          pin: pin,
+          password: password,
+          rotationMonths: rotationMonths,
+          lastChanged: lastChanged,
+          note: note,
+          history: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        familyPasswords.unshift(newItem);
+      }
+
+      saveFamilyPasswords(familyPasswords);
+      renderPasswords();
+      closePwdModal();
+      showToast("Đã lưu thông tin tài khoản thành công!");
+    });
+
+    window.deletePasswordAccount = function(id) {
+      const item = familyPasswords.find(p => p.id === id);
+      if (!item) return;
+      if (confirm(`Bạn có chắc chắn muốn xóa tài khoản "${item.service}" của ${item.owner}?`)) {
+        familyPasswords = familyPasswords.filter(p => p.id !== id);
+        saveFamilyPasswords(familyPasswords);
+        renderPasswords();
+        showToast("Đã xóa tài khoản.");
+      }
+    };
+
+    // History Modal
+    window.openPwdHistory = function(id) {
+      const item = familyPasswords.find(p => p.id === id);
+      if (!item) return;
+      currentHistoryActiveItem = item;
+      isHistoryCurrentVisible = false;
+
+      pwdHistoryTitle.innerHTML = `<i class="fa-solid fa-clock-rotate-left" style="color: var(--primary);"></i> Lịch Sử Mật Khẩu`;
+      pwdHistorySubtitle.innerHTML = `Tài khoản: <strong>${escapeHtml(item.service)}</strong> - Chủ tài khoản: <strong>${escapeHtml(item.owner)}</strong>`;
+
+      updateHistoryCurrentDisplay();
+
+      const history = item.history || [];
+      if (history.length === 0) {
+        pwdHistoryList.innerHTML = `
+          <div style="text-align: center; padding: 24px; color: var(--text-muted); background: var(--bg-hover); border-radius: var(--radius-md);">
+            <i class="fa-regular fa-clock" style="font-size: 1.8rem; margin-bottom: 8px; display: block;"></i>
+            Chưa có lần thay đổi mật khẩu nào được ghi nhận trước đây.
+          </div>
+        `;
+      } else {
+        pwdHistoryList.innerHTML = history.map((h, idx) => {
+          const d = new Date(h.changedAt);
+          let dateStr = h.changedAt;
+          if (!isNaN(d.getTime())) {
+            dateStr = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} lúc ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+          }
+
+          return `
+            <div class="pwd-history-item">
+              <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">
+                  <i class="fa-solid fa-clock"></i> Lần đổi #${history.length - idx}: ${dateStr}
+                </span>
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 3px 8px;" onclick="restoreHistoricalPassword('${item.id}', ${idx})" title="Khôi phục lại mật khẩu này làm mật khẩu hiện tại">
+                  <i class="fa-solid fa-rotate-left"></i> Đặt lại mật khẩu này
+                </button>
+              </div>
+
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 4px;">
+                <span style="font-family: var(--font-mono); font-size: 0.98rem; font-weight: 700; color: var(--text-main); word-break: break-all;" id="histVal_${idx}">
+                  ••••••••••••
+                </span>
+                <div style="display: flex; gap: 4px; flex-shrink: 0;">
+                  <button type="button" class="pwd-icon-btn" onclick="toggleHistoricalVal(${idx}, '${escapeHtml(h.password)}')" title="Hiện / Ẩn">
+                    <i class="fa-regular fa-eye" id="histEye_${idx}"></i>
+                  </button>
+                  <button type="button" class="pwd-icon-btn" onclick="copyToClipboard('${escapeHtml(h.password)}', 'mật khẩu cũ')" title="Sao chép">
+                    <i class="fa-regular fa-copy"></i>
+                  </button>
+                </div>
+              </div>
+
+              ${h.reason ? `
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">
+                  <em>Ghi chú: ${escapeHtml(h.reason)}</em>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join("");
+      }
+
+      pwdHistoryModal.classList.add("active");
+    };
+
+    function updateHistoryCurrentDisplay() {
+      if (!currentHistoryActiveItem) return;
+      if (isHistoryCurrentVisible) {
+        pwdHistoryCurrentVal.textContent = currentHistoryActiveItem.password || "";
+        btnToggleHistoryCurrent.innerHTML = `<i class="fa-regular fa-eye-slash"></i>`;
+      } else {
+        pwdHistoryCurrentVal.textContent = "••••••••••••";
+        btnToggleHistoryCurrent.innerHTML = `<i class="fa-regular fa-eye"></i>`;
+      }
+    }
+
+    btnToggleHistoryCurrent.addEventListener("click", () => {
+      isHistoryCurrentVisible = !isHistoryCurrentVisible;
+      updateHistoryCurrentDisplay();
+    });
+
+    btnCopyHistoryCurrent.addEventListener("click", () => {
+      if (currentHistoryActiveItem) {
+        copyToClipboard(currentHistoryActiveItem.password, "mật khẩu hiện tại");
+      }
+    });
+
+    window.toggleHistoricalVal = function(idx, rawVal) {
+      const el = document.getElementById(`histVal_${idx}`);
+      const eye = document.getElementById(`histEye_${idx}`);
+      if (!el || !eye) return;
+      if (el.textContent.includes("••••")) {
+        el.textContent = rawVal;
+        eye.className = "fa-regular fa-eye-slash";
+      } else {
+        el.textContent = "••••••••••••";
+        eye.className = "fa-regular fa-eye";
+      }
+    };
+
+    window.restoreHistoricalPassword = function(itemId, histIdx) {
+      const item = familyPasswords.find(p => p.id === itemId);
+      if (!item || !item.history || !item.history[histIdx]) return;
+      const targetHistorical = item.history[histIdx];
+
+      if (confirm(`Bạn có chắc chắn muốn khôi phục mật khẩu "${targetHistorical.password}" làm mật khẩu hiện tại cho ${item.service}? Mật khẩu hiện tại sẽ được lưu ngược vào lịch sử.`)) {
+        const oldCurrent = item.password;
+        item.history.unshift({
+          password: oldCurrent,
+          changedAt: new Date().toISOString(),
+          reason: "Khôi phục lại mật khẩu cũ trước đây"
+        });
+        item.password = targetHistorical.password;
+        item.lastChanged = new Date().toISOString().split("T")[0];
+        item.updatedAt = new Date().toISOString();
+
+        saveFamilyPasswords(familyPasswords);
+        renderPasswords();
+        openPwdHistory(itemId);
+        showToast("Đã khôi phục mật khẩu thành công!");
+      }
+    };
+
+    function closePwdHistoryModal() {
+      pwdHistoryModal.classList.remove("active");
+    }
+
+    // Modal buttons wiring
+    openAddPwdBtn.addEventListener("click", openAddModal);
+    closePwdModalBtn.addEventListener("click", closePwdModal);
+    cancelPwdModalBtn.addEventListener("click", closePwdModal);
+    pwdModalBackdrop.addEventListener("click", closePwdModal);
+
+    closePwdHistoryBtn.addEventListener("click", closePwdHistoryModal);
+    closePwdHistoryBtn2.addEventListener("click", closePwdHistoryModal);
+    pwdHistoryBackdrop.addEventListener("click", closePwdHistoryModal);
+
+    // Toolbar filters wiring
+    searchPwdInput.addEventListener("input", (e) => {
+      pwdSearchQuery = e.target.value.trim();
+      renderPasswords();
+    });
+
+    filterPwdOwnerSelect.addEventListener("change", (e) => {
+      pwdOwnerFilter = e.target.value;
+      renderPasswords();
+    });
+
+    filterPwdCatSelect.addEventListener("change", (e) => {
+      pwdCatFilter = e.target.value;
+      renderPasswords();
+    });
+
+    filterPwdStatusSelect.addEventListener("change", (e) => {
+      pwdStatusFilter = e.target.value;
+      renderPasswords();
+    });
+
+    sortPwdSelect.addEventListener("change", (e) => {
+      pwdSortMode = e.target.value;
+      renderPasswords();
+    });
+
+    // Excel Export
+    exportPwdExcelBtn.addEventListener("click", () => {
+      if (familyPasswords.length === 0) {
+        alert("Không có tài khoản nào để xuất Excel.");
+        return;
+      }
+
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+      const filename = `Mat_Khau_Nguoi_Than_${dateStr}.xlsx`;
+
+      try {
+        if (typeof XLSX !== "undefined") {
+          const wsData = [
+            [
+              "STT",
+              "Người thân (Chủ TK)",
+              "Dịch vụ / Ứng dụng",
+              "Danh mục",
+              "Tên đăng nhập / SĐT / STK",
+              "Mật khẩu hiện tại",
+              "Mã PIN / Smart OTP",
+              "Ngày đổi gần nhất",
+              "Chu kỳ đổi",
+              "Tình trạng hạn đổi",
+              "Số lần đổi cũ",
+              "Ghi chú bảo mật"
+            ]
+          ];
+
+          familyPasswords.forEach((item, idx) => {
+            const rot = getPwdRotationStatus(item);
+            wsData.push([
+              idx + 1,
+              item.owner || "",
+              item.service || "",
+              getCategoryName(item.category),
+              item.username || "",
+              item.password || "",
+              item.pin || "",
+              item.lastChanged || "",
+              item.rotationMonths ? `${item.rotationMonths} tháng` : "Không bắt buộc",
+              rot.text,
+              item.history ? item.history.length : 0,
+              item.note || ""
+            ]);
+          });
+
+          const wb = XLSX.utils.book_new();
+          const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+          ws["!cols"] = [
+            { wch: 6 },
+            { wch: 18 },
+            { wch: 25 },
+            { wch: 20 },
+            { wch: 22 },
+            { wch: 20 },
+            { wch: 16 },
+            { wch: 16 },
+            { wch: 16 },
+            { wch: 35 },
+            { wch: 14 },
+            { wch: 35 }
+          ];
+
+          XLSX.utils.book_append_sheet(wb, ws, "Mật Khẩu Người Thân");
+          XLSX.writeFile(wb, filename);
+        } else {
+          // Fallback: CSV UTF-8 with BOM
+          let csv = "\uFEFFSTT,Người thân,Dịch vụ,Danh mục,Tên đăng nhập,Mật khẩu,Mã PIN,Ngày đổi,Chu kỳ,Tình trạng,Số lần đổi,Ghi chú\n";
+          familyPasswords.forEach((item, idx) => {
+            const rot = getPwdRotationStatus(item);
+            const row = [
+              idx + 1,
+              `"${(item.owner || "").replace(/"/g, '""')}"`,
+              `"${(item.service || "").replace(/"/g, '""')}"`,
+              `"${getCategoryName(item.category)}"`,
+              `"${(item.username || "").replace(/"/g, '""')}"`,
+              `"${(item.password || "").replace(/"/g, '""')}"`,
+              `"${(item.pin || "").replace(/"/g, '""')}"`,
+              `"${(item.lastChanged || "").replace(/"/g, '""')}"`,
+              `"${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'}"`,
+              `"${rot.text.replace(/"/g, '""')}"`,
+              item.history ? item.history.length : 0,
+              `"${(item.note || "").replace(/"/g, '""')}"`
+            ];
+            csv += row.join(",") + "\n";
+          });
+
+          const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Mat_Khau_Nguoi_Than_${dateStr}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }
+
+        const orig = exportPwdExcelBtn.innerHTML;
+        exportPwdExcelBtn.innerHTML = `<i class="fa-solid fa-check" style="color: #107c41;"></i> Đã xuất (${familyPasswords.length})`;
+        setTimeout(() => { exportPwdExcelBtn.innerHTML = orig; }, 2500);
+      } catch (err) {
+        console.error("Lỗi xuất Excel:", err);
+        alert("Có lỗi khi xuất file Excel: " + err.message);
+      }
+    });
+
+    // JSON Backup & Restore
+    exportPwdJsonBtn.addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(familyPasswords, null, 2));
+      const now = new Date();
+      const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
+      const a = document.createElement("a");
+      a.href = dataStr;
+      a.download = `Mat_Khau_Nguoi_Than_Backup_${dateStr}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast("Đã tải xuống file sao lưu JSON an toàn!");
+    });
+
+    importPwdJsonBtn.addEventListener("click", () => {
+      importPwdJsonInput.click();
+    });
+
+    importPwdJsonInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target.result);
+          if (!Array.isArray(parsed)) throw new Error("File không đúng định dạng danh sách mật khẩu.");
+          if (confirm(`Tìm thấy ${parsed.length} tài khoản trong file. Bạn có muốn thêm vào danh sách hiện tại không?`)) {
+            const existingIds = new Set(familyPasswords.map(p => p.id));
+            let addedCount = 0;
+            parsed.forEach(p => {
+              if (p.service && p.username) {
+                if (existingIds.has(p.id)) {
+                  p.id = "pwd_" + Date.now() + "_" + Math.random().toString(36).substr(2, 4);
+                }
+                familyPasswords.push(p);
+                addedCount++;
+              }
+            });
+            saveFamilyPasswords(familyPasswords);
+            renderPasswords();
+            showToast(`Đã khôi phục thành công ${addedCount} tài khoản!`);
+          }
+        } catch (err) {
+          alert("Lỗi đọc file JSON: " + err.message);
+        }
+        importPwdJsonInput.value = "";
+      };
+      reader.readAsText(file);
+    });
+
     // Initial render & Cloud auto-pull if connected
     updateCloudBadge();
     renderNotes();
     renderFiles();
     loadDeclarations();
+    renderPasswords();
 
     if (DevLogAuth.isCloudConnected()) {
       syncIcon.classList.add("sync-spinner");
