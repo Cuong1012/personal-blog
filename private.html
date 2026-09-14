@@ -83,14 +83,42 @@
           <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
           <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
         </a>
-        <span class="badge-secret"><i class="fa-solid fa-user-shield"></i> Khu Vực Riêng Tư</span>
+
+        <!-- Portal Navigation Dropdown Menu (Menu trên tiêu đề) -->
+        <div class="portal-nav-dropdown" id="portalNavDropdown">
+          <button type="button" class="portal-nav-trigger" id="portalNavTrigger" title="Bấm hoặc rê chuột để chuyển phân hệ">
+            <span id="activeNavLabel"><i class="fa-solid fa-book-bookmark" style="color: var(--primary);"></i> Ghi Chú &amp; Nhật Ký</span>
+            <i class="fa-solid fa-chevron-down" style="font-size: 0.72rem; margin-left: 6px; opacity: 0.7;"></i>
+          </button>
+          <div class="portal-nav-menu" id="portalNavMenu">
+            <div class="portal-nav-item active" id="navItemNotes">
+              <i class="fa-solid fa-book-bookmark" style="color: var(--primary);"></i> Ghi Chú &amp; Nhật Ký
+            </div>
+            <div class="portal-nav-item" id="navItemPasswords">
+              <i class="fa-solid fa-vault" style="color: #ec4899;"></i> Mật Khẩu &amp; Tài Khoản (<span id="pwdCountBadge">0</span>)
+            </div>
+            <div class="portal-nav-item" id="navItemDeclarations">
+              <i class="fa-solid fa-id-card" style="color: #3b82f6;"></i> Danh Sách Khai Báo (<span id="declCountBadge">0</span>)
+            </div>
+            <div class="portal-nav-item" id="navItemFiles">
+              <i class="fa-brands fa-google-drive" style="color: #10b981;"></i> Tệp &amp; Tài Liệu Drive (<span id="fileCountBadge">0</span>)
+            </div>
+            <div class="portal-nav-item" id="navItemCalendar">
+              <i class="fa-regular fa-calendar-days" style="color: #f59e0b;"></i> Google Lịch
+            </div>
+            <div class="portal-nav-divider"></div>
+            <a href="clipboard.html" target="_blank" class="portal-nav-item" style="text-decoration: none;">
+              <i class="fa-regular fa-image" style="color: #8b5cf6;"></i> Xem Ảnh Clipboard
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.72rem; margin-left: auto; opacity: 0.5;"></i>
+            </a>
+          </div>
+        </div>
       </div>
 
       <div class="private-actions">
-        <!-- Google Drive Cloud Status Badge -->
-        <div id="cloudStatusBadge" class="cloud-status-badge disconnected" title="Bấm để cấu hình kết nối Google Drive / Google Sheets">
-          <i class="fa-solid fa-cloud"></i>
-          <span id="cloudStatusText">Chưa kết nối Drive</span>
+        <!-- Google Drive Cloud Status Icon Badge (Chỉ hiện icon xanh / đỏ, rê chuột báo trạng thái) -->
+        <div id="cloudStatusBadge" class="cloud-status-badge disconnected" title="Google Drive: Chưa kết nối (Bấm để kết nối)">
+          <i class="fa-solid fa-cloud-slash"></i>
         </div>
 
         <!-- Theme Toggle -->
@@ -99,43 +127,20 @@
           <i class="fa-regular fa-sun light-icon"></i>
         </button>
 
-        <!-- Open Clipboard Viewer Button -->
-        <a href="clipboard.html" target="_blank" class="btn btn-secondary private-header-btn" style="padding: 8px 14px; font-size: 0.88rem;" title="Mở Trình Xem & Dán Ảnh Clipboard">
-          <i class="fa-regular fa-image"></i> <span class="header-btn-text">Xem Ảnh Clipboard</span>
-        </a>
-
         <!-- Change Password Button -->
-        <button id="openChangePassBtn" class="btn btn-secondary private-header-btn" style="padding: 8px 16px; font-size: 0.88rem;" title="Đổi Mật Khẩu Đăng Nhập">
+        <button id="openChangePassBtn" class="btn btn-secondary private-header-btn" style="padding: 8px 14px; font-size: 0.88rem;" title="Đổi Mật Khẩu Đăng Nhập">
           <i class="fa-solid fa-key"></i> <span class="header-btn-text">Đổi Mật Khẩu</span>
         </button>
 
         <!-- Logout Button -->
-        <button id="logoutBtn" class="btn btn-primary private-header-btn" style="padding: 8px 18px; font-size: 0.88rem; background: var(--danger);" title="Đăng Xuất">
+        <button id="logoutBtn" class="btn btn-primary private-header-btn" style="padding: 8px 16px; font-size: 0.88rem; background: var(--danger);" title="Đăng Xuất">
           <i class="fa-solid fa-arrow-right-from-bracket"></i> <span class="header-btn-text">Đăng Xuất</span>
         </button>
       </div>
     </div>
   </header>
 
-  <main class="container" style="padding-top: 30px;">
-    <!-- PORTAL TAB SWITCHER -->
-    <div class="portal-tabs">
-      <button class="portal-tab-btn active" id="tabNotesBtn">
-        <i class="fa-solid fa-book-bookmark"></i> Ghi Chú &amp; Nhật Ký
-      </button>
-      <button class="portal-tab-btn" id="tabDeclarationsBtn">
-        <i class="fa-solid fa-id-card"></i> Danh Sách Khai Báo (<span id="declCountBadge">0</span>)
-      </button>
-      <button class="portal-tab-btn" id="tabFilesBtn">
-        <i class="fa-brands fa-google-drive"></i> Tệp &amp; Tài Liệu Drive (<span id="fileCountBadge">0</span>)
-      </button>
-      <button class="portal-tab-btn" id="tabCalendarBtn">
-        <i class="fa-regular fa-calendar-days"></i> Google Lịch
-      </button>
-      <button class="portal-tab-btn" id="tabPasswordsBtn">
-        <i class="fa-solid fa-vault"></i> Mật Khẩu (<span id="pwdCountBadge">0</span>)
-      </button>
-    </div>
+  <main class="container" style="padding-top: 15px;">
 
     <!-- =========================================================
          VIEW 1: GHI CHÚ & NHẬT KÝ (NOTES VIEW)
@@ -419,31 +424,28 @@
          VIEW 5: MẬT KHẨU & TÀI KHOẢN (PASSWORD VAULT)
          ========================================================= -->
     <section class="dashboard-hero" id="passwordsView" style="display: none;">
-      <div class="dashboard-welcome">
-        <div class="welcome-text">
-          <h1>Két Mật Khẩu &amp; Tài Khoản 🔐</h1>
-          <p>Lưu trữ và quản lý an toàn tài khoản ngân hàng, mã PIN/OTP, Zalo, Facebook, VNeID, công việc... cho bản thân và gia đình. Tự động cảnh báo chu kỳ đổi mật khẩu 6 tháng &amp; lưu vết toàn bộ lịch sử.</p>
-        </div>
-        <div class="toolbar-actions">
-          <button id="openAddPwdBtn" class="btn btn-primary">
+      <!-- COMPACT ACTION TOOLBAR -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        <div class="toolbar-actions" style="flex-wrap: wrap; gap: 6px;">
+          <button id="openAddPwdBtn" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.84rem;">
             <i class="fa-solid fa-plus"></i> Thêm Tài Khoản
           </button>
-          <button type="button" id="openManageCatBtn" class="btn btn-secondary" title="Thêm mới, sửa hoặc xóa danh mục mật khẩu">
+          <button type="button" id="openManageCatBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem;" title="Thêm mới, sửa hoặc xóa danh mục mật khẩu">
             <i class="fa-solid fa-tags"></i> Quản Lý Danh Mục
           </button>
-          <button id="syncPwdCloudBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;" title="Đồng bộ danh sách mật khẩu lên Google Drive / Sheets cá nhân">
+          <button id="syncPwdCloudBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem; color: #107c41; border-color: #107c41; font-weight: 600;" title="Đồng bộ danh sách mật khẩu lên Google Drive / Sheets cá nhân">
             <i class="fa-solid fa-cloud-arrow-up"></i> Đồng Bộ Drive
           </button>
-          <button id="pullPwdCloudBtn" class="btn btn-secondary" style="color: #2563eb; border-color: #2563eb; font-weight: 600;" title="Tải danh sách mật khẩu từ Google Sheets về">
+          <button id="pullPwdCloudBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem; color: #2563eb; border-color: #2563eb; font-weight: 600;" title="Tải danh sách mật khẩu từ Google Sheets về">
             <i class="fa-solid fa-rotate"></i> Tải Từ Drive
           </button>
-          <button id="exportPwdExcelBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;">
+          <button id="exportPwdExcelBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem; color: #107c41; border-color: #107c41; font-weight: 600;">
             <i class="fa-solid fa-file-excel"></i> Xuất Excel
           </button>
-          <button id="exportPwdJsonBtn" class="btn btn-secondary" title="Sao lưu toàn bộ két mật khẩu dạng file JSON">
+          <button id="exportPwdJsonBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem;" title="Sao lưu toàn bộ két mật khẩu dạng file JSON">
             <i class="fa-solid fa-download"></i> Sao Lưu
           </button>
-          <button id="importPwdJsonBtn" class="btn btn-secondary" title="Phục hồi dữ liệu từ file JSON">
+          <button id="importPwdJsonBtn" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.84rem;" title="Phục hồi dữ liệu từ file JSON">
             <i class="fa-solid fa-upload"></i> Khôi Phục
           </button>
           <input type="file" id="importPwdJsonInput" accept=".json" style="display: none;" />
@@ -483,66 +485,65 @@
       </div>
 
       <!-- TOOLBAR -->
-      <div class="dashboard-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; flex: 1;">
-          <div class="search-private-box" style="max-width: 320px; min-width: 240px;">
+      <div class="dashboard-toolbar" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; flex: 1;">
+          <div class="search-private-box" style="max-width: 260px; min-width: 180px; padding: 4px 10px; font-size: 0.82rem;">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchPwdInput" placeholder="Tìm theo chủ tài khoản, dịch vụ, SĐT..." />
+            <input type="text" id="searchPwdInput" placeholder="Tìm kiếm tài khoản..." style="font-size: 0.82rem;" />
           </div>
 
           <!-- Filter by Owner -->
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-user" style="color: var(--primary); font-size: 0.9rem;"></i>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Chủ TK:</span>
-            <select id="filterPwdOwnerSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
-              <option value="all">Tất cả chủ tài khoản</option>
+          <div style="display: flex; align-items: center; gap: 5px; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-user" style="color: var(--primary); font-size: 0.82rem;"></i>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Chủ:</span>
+            <select id="filterPwdOwnerSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.82rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="all">Tất cả</option>
             </select>
           </div>
 
           <!-- Filter by Category -->
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-layer-group" style="color: var(--primary); font-size: 0.9rem;"></i>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Danh mục:</span>
-            <select id="filterPwdCatSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+          <div style="display: flex; align-items: center; gap: 5px; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-layer-group" style="color: var(--primary); font-size: 0.82rem;"></i>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Mục:</span>
+            <select id="filterPwdCatSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.82rem; cursor: pointer; outline: none; font-weight: 600;">
               <option value="all">Tất cả danh mục</option>
-              <!-- Rendered dynamically by JS -->
             </select>
           </div>
 
           <!-- Filter by Rotation Status -->
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); font-size: 0.9rem;"></i>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Chu kỳ:</span>
-            <select id="filterPwdStatusSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
-              <option value="all">Tất cả chu kỳ</option>
-              <option value="expired">⚠️ Đã quá 6 tháng (Cần đổi)</option>
-              <option value="expiring">⏳ Sắp đến hạn (&lt; 30 ngày)</option>
-              <option value="safe">✅ Mới đổi (An toàn)</option>
+          <div style="display: flex; align-items: center; gap: 5px; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary); font-size: 0.82rem;"></i>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Chu kỳ:</span>
+            <select id="filterPwdStatusSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.82rem; cursor: pointer; outline: none; font-weight: 600;">
+              <option value="all">Tất cả</option>
+              <option value="expired">⚠️ Quá 6 tháng</option>
+              <option value="expiring">⏳ Sắp đến hạn</option>
+              <option value="safe">✅ An toàn</option>
             </select>
           </div>
 
           <!-- Sort -->
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-card); padding: 6px 12px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-            <i class="fa-solid fa-arrow-down-a-z" style="color: var(--primary); font-size: 0.9rem;"></i>
-            <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500;">Sắp xếp:</span>
-            <select id="sortPwdSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.88rem; cursor: pointer; outline: none; font-weight: 600;">
+          <div style="display: flex; align-items: center; gap: 5px; background: var(--bg-card); padding: 4px 10px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+            <i class="fa-solid fa-arrow-down-a-z" style="color: var(--primary); font-size: 0.82rem;"></i>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">Xếp:</span>
+            <select id="sortPwdSelect" style="border: none; background: transparent; color: var(--text-main); font-size: 0.82rem; cursor: pointer; outline: none; font-weight: 600;">
               <option value="updated-desc">Mới cập nhật</option>
               <option value="owner-asc">Chủ TK: A → Z</option>
               <option value="service-asc">Dịch vụ: A → Z</option>
-              <option value="expiry-asc">Hạn đổi: Cần đổi trước</option>
+              <option value="expiry-asc">Hạn: Cần đổi trước</option>
             </select>
           </div>
         </div>
 
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div style="font-size: 0.92rem; color: var(--text-muted); white-space: nowrap;">
-            Hiển thị: <strong id="pwdFilteredCount" style="color: var(--primary);">0</strong> tài khoản
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div style="font-size: 0.82rem; color: var(--text-muted); white-space: nowrap;">
+            Hiển thị: <strong id="pwdFilteredCount" style="color: var(--primary);">0</strong>
           </div>
           <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2px; gap: 2px;">
-            <button type="button" id="btnPwdViewList" class="btn btn-sm btn-secondary" style="padding: 4px 10px; border: none; font-size: 0.8rem; background: var(--primary); color: #fff;" title="Dạng 1 hàng ngang gọn gàng (Mặc định)">
+            <button type="button" id="btnPwdViewList" class="btn btn-sm btn-secondary" style="padding: 3px 8px; border: none; font-size: 0.78rem; background: var(--primary); color: #fff;" title="Dạng 1 hàng ngang gọn gàng (Mặc định)">
               <i class="fa-solid fa-list"></i> Dòng
             </button>
-            <button type="button" id="btnPwdViewGrid" class="btn btn-sm btn-secondary" style="padding: 4px 10px; border: none; font-size: 0.8rem; background: transparent; color: var(--text-muted);" title="Dạng thẻ khối lớn">
+            <button type="button" id="btnPwdViewGrid" class="btn btn-sm btn-secondary" style="padding: 3px 8px; border: none; font-size: 0.78rem; background: transparent; color: var(--text-muted);" title="Dạng thẻ khối lớn">
               <i class="fa-solid fa-table-cells-large"></i> Thẻ
             </button>
           </div>
@@ -1021,40 +1022,126 @@
     });
 
     // ==========================================
-    // TAB SWITCHING (NOTES VS DECLARATIONS VS FILES VS CALENDAR)
+    // TAB SWITCHING (HEADER DROPDOWN MENU)
     // ==========================================
-    const tabNotesBtn = document.getElementById("tabNotesBtn");
-    const tabDeclarationsBtn = document.getElementById("tabDeclarationsBtn");
-    const tabFilesBtn = document.getElementById("tabFilesBtn");
-    const tabCalendarBtn = document.getElementById("tabCalendarBtn");
-    const tabPasswordsBtn = document.getElementById("tabPasswordsBtn");
+    const portalNavDropdown = document.getElementById("portalNavDropdown");
+    const portalNavTrigger = document.getElementById("portalNavTrigger");
+    const portalNavMenu = document.getElementById("portalNavMenu");
+    const activeNavLabel = document.getElementById("activeNavLabel");
+
+    const navItemNotes = document.getElementById("navItemNotes");
+    const navItemPasswords = document.getElementById("navItemPasswords");
+    const navItemDeclarations = document.getElementById("navItemDeclarations");
+    const navItemFiles = document.getElementById("navItemFiles");
+    const navItemCalendar = document.getElementById("navItemCalendar");
+
     const notesView = document.getElementById("notesView");
     const declarationsView = document.getElementById("declarationsView");
     const filesView = document.getElementById("filesView");
     const calendarView = document.getElementById("calendarView");
     const passwordsView = document.getElementById("passwordsView");
 
-    function switchTab(activeBtn, activeView) {
-      [tabNotesBtn, tabDeclarationsBtn, tabFilesBtn, tabCalendarBtn, tabPasswordsBtn].forEach(b => b && b.classList.remove("active"));
-      [notesView, declarationsView, filesView, calendarView, passwordsView].forEach(v => v && (v.style.display = "none"));
-      if (activeBtn) activeBtn.classList.add("active");
-      if (activeView) activeView.style.display = "block";
+    let currentTabKey = "notes";
+
+    const tabConfig = {
+      notes: {
+        navItem: navItemNotes,
+        view: notesView,
+        labelHtml: '<i class="fa-solid fa-book-bookmark" style="color: var(--primary);"></i> Ghi Chú &amp; Nhật Ký',
+        onActivate: () => {}
+      },
+      passwords: {
+        navItem: navItemPasswords,
+        view: passwordsView,
+        labelHtml: () => `<i class="fa-solid fa-vault" style="color: #ec4899;"></i> Mật Khẩu (${typeof familyPasswords !== "undefined" ? familyPasswords.length : 0})`,
+        onActivate: () => { if (typeof renderPasswords === "function") renderPasswords(); }
+      },
+      declarations: {
+        navItem: navItemDeclarations,
+        view: declarationsView,
+        labelHtml: () => `<i class="fa-solid fa-id-card" style="color: #3b82f6;"></i> Danh Sách Khai Báo (${typeof declarationsList !== "undefined" ? declarationsList.length : 0})`,
+        onActivate: () => { if (typeof loadDeclarations === "function") loadDeclarations(); }
+      },
+      files: {
+        navItem: navItemFiles,
+        view: filesView,
+        labelHtml: () => `<i class="fa-brands fa-google-drive" style="color: #10b981;"></i> Tệp &amp; Tài Liệu Drive (${typeof files !== "undefined" ? files.length : 0})`,
+        onActivate: () => {}
+      },
+      calendar: {
+        navItem: navItemCalendar,
+        view: calendarView,
+        labelHtml: '<i class="fa-regular fa-calendar-days" style="color: #f59e0b;"></i> Google Lịch',
+        onActivate: () => { if (typeof initCalendarView === "function") initCalendarView(); }
+      }
+    };
+
+    function refreshNavLabel() {
+      const cfg = tabConfig[currentTabKey];
+      if (cfg && activeNavLabel) {
+        activeNavLabel.innerHTML = typeof cfg.labelHtml === "function" ? cfg.labelHtml() : cfg.labelHtml;
+      }
     }
 
-    tabNotesBtn.addEventListener("click", () => switchTab(tabNotesBtn, notesView));
-    tabDeclarationsBtn.addEventListener("click", () => {
-      switchTab(tabDeclarationsBtn, declarationsView);
-      loadDeclarations();
+    function switchTab(target, fallbackView) {
+      let tabKey = "notes";
+      if (typeof target === "string") {
+        tabKey = target.toLowerCase();
+      } else if (target === navItemPasswords || target === passwordsView || fallbackView === passwordsView) {
+        tabKey = "passwords";
+      } else if (target === navItemDeclarations || target === declarationsView || fallbackView === declarationsView) {
+        tabKey = "declarations";
+      } else if (target === navItemFiles || target === filesView || fallbackView === filesView) {
+        tabKey = "files";
+      } else if (target === navItemCalendar || target === calendarView || fallbackView === calendarView) {
+        tabKey = "calendar";
+      } else {
+        tabKey = "notes";
+      }
+
+      const cfg = tabConfig[tabKey] || tabConfig.notes;
+      currentTabKey = tabKey;
+
+      [notesView, declarationsView, filesView, calendarView, passwordsView].forEach(v => v && (v.style.display = "none"));
+      [navItemNotes, navItemPasswords, navItemDeclarations, navItemFiles, navItemCalendar].forEach(i => i && i.classList.remove("active"));
+
+      if (cfg.view) cfg.view.style.display = "block";
+      if (cfg.navItem) cfg.navItem.classList.add("active");
+
+      if (activeNavLabel) {
+        activeNavLabel.innerHTML = typeof cfg.labelHtml === "function" ? cfg.labelHtml() : cfg.labelHtml;
+      }
+
+      if (portalNavDropdown) portalNavDropdown.classList.remove("open");
+      if (cfg.onActivate) cfg.onActivate();
+    }
+
+    // Dropdown toggle click
+    if (portalNavTrigger) {
+      portalNavTrigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (portalNavDropdown) portalNavDropdown.classList.toggle("open");
+      });
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener("click", (e) => {
+      if (portalNavDropdown && !portalNavDropdown.contains(e.target)) {
+        portalNavDropdown.classList.remove("open");
+      }
     });
-    tabFilesBtn.addEventListener("click", () => switchTab(tabFilesBtn, filesView));
-    tabCalendarBtn.addEventListener("click", () => {
-      switchTab(tabCalendarBtn, calendarView);
-      initCalendarView();
-    });
-    tabPasswordsBtn.addEventListener("click", () => {
-      switchTab(tabPasswordsBtn, passwordsView);
-      renderPasswords();
-    });
+
+    if (navItemNotes) navItemNotes.addEventListener("click", () => switchTab("notes"));
+    if (navItemPasswords) navItemPasswords.addEventListener("click", () => switchTab("passwords"));
+    if (navItemDeclarations) navItemDeclarations.addEventListener("click", () => switchTab("declarations"));
+    if (navItemFiles) navItemFiles.addEventListener("click", () => switchTab("files"));
+    if (navItemCalendar) navItemCalendar.addEventListener("click", () => switchTab("calendar"));
+
+    // Check initial tab from URL params or hash
+    const initialUrlTab = new URLSearchParams(window.location.search).get("tab") || (window.location.hash ? window.location.hash.replace("#", "") : "");
+    if (initialUrlTab && tabConfig[initialUrlTab.toLowerCase()]) {
+      switchTab(initialUrlTab.toLowerCase());
+    }
 
     // ==========================================
     // NOTES STATE & RENDERING
@@ -1076,14 +1163,19 @@
     const syncIcon = document.getElementById("syncIcon");
 
     function updateCloudBadge() {
+      if (!cloudStatusBadge) return;
       if (DevLogAuth.isCloudConnected()) {
         cloudStatusBadge.className = "cloud-status-badge connected";
-        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-check"></i> <span>Google Drive: Đã kết nối</span>';
-        document.getElementById("disconnectCloudBtn").style.display = "inline-flex";
+        cloudStatusBadge.title = "Google Drive: Đã kết nối (Bấm để mở cài đặt)";
+        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-check"></i>';
+        const discBtn = document.getElementById("disconnectCloudBtn");
+        if (discBtn) discBtn.style.display = "inline-flex";
       } else {
         cloudStatusBadge.className = "cloud-status-badge disconnected";
-        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> <span>Google Drive: Chưa kết nối</span>';
-        document.getElementById("disconnectCloudBtn").style.display = "none";
+        cloudStatusBadge.title = "Google Drive: Chưa kết nối (Bấm để kết nối)";
+        cloudStatusBadge.innerHTML = '<i class="fa-solid fa-cloud-slash"></i>';
+        const discBtn = document.getElementById("disconnectCloudBtn");
+        if (discBtn) discBtn.style.display = "none";
       }
     }
 
@@ -1283,6 +1375,7 @@
 
     function renderFiles() {
       fileCountBadge.textContent = files.length;
+      if (typeof refreshNavLabel === "function") refreshNavLabel();
       const filtered = files.filter(f => f.name.toLowerCase().includes(fileFilterQuery.toLowerCase()));
 
       if (filtered.length === 0) {
@@ -1708,6 +1801,7 @@
     function renderDeclarations() {
       if (declCountBadge) declCountBadge.textContent = declarationsList.length;
       if (totalDeclCount) totalDeclCount.textContent = declarationsList.length;
+      if (typeof refreshNavLabel === "function") refreshNavLabel();
 
       updateSortHeaderIcons();
 
@@ -2614,6 +2708,7 @@
     function renderPasswords() {
       familyPasswords = getFamilyPasswords();
       if (pwdCountBadge) pwdCountBadge.textContent = familyPasswords.length;
+      if (typeof refreshNavLabel === "function") refreshNavLabel();
 
       // Calculate stats
       let bankCount = 0;
