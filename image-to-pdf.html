@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuyển Ảnh Sang PDF (Image to PDF Converter) - cuongtv.</title>
+  <meta name="description" content="Công cụ chuyển đổi nhiều hình ảnh thành file PDF chất lượng cao, tích hợp bộ lọc làm sạch nền scan tài liệu, trắng đen và tùy chỉnh khổ giấy A4/A3." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
+
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Base Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- jsPDF Library (Client-Side PDF Generator) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    /* Scoped Styles for Image to PDF Converter */
+    .converter-container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 30px 20px 80px;
+    }
+
+    .converter-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .converter-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .converter-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Converter Grid */
+    .converter-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 992px) {
+      .converter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Dropzone */
+    .dropzone-area {
+      background: var(--bg-card);
+      border: 2px dashed var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .dropzone-area:hover,
+    .dropzone-area.drag-over {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .dropzone-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 14px;
+      display: inline-block;
+      transition: var(--transition);
+    }
+
+    .dropzone-area:hover .dropzone-icon {
+      transform: scale(1.1);
+    }
+
+    .dropzone-text h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .dropzone-text p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .dropzone-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Pages List Toolbar */
+    .pages-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 16px;
+      margin-bottom: 16px;
+    }
+
+    .pages-count-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Pages Grid */
+    .pages-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .page-card {
+      background: var(--bg-card);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .page-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+    }
+
+    .page-card.active {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    .page-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--text-muted);
+    }
+
+    .page-card-preview {
+      height: 180px;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+    }
+
+    [data-theme="dark"] .page-card-preview {
+      background: #0f172a;
+    }
+
+    .page-card-preview img,
+    .page-card-preview canvas {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease;
+    }
+
+    .page-card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 6px 8px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border-color);
+      gap: 4px;
+    }
+
+    .page-action-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 0.76rem;
+      transition: var(--transition);
+    }
+
+    .page-action-btn:hover {
+      color: var(--primary);
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .page-action-btn.btn-delete:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Sidebar Panels */
+    .sidebar-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 20px;
+    }
+
+    .panel-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Filter Preset Buttons */
+    .filter-presets-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .filter-preset-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: left;
+    }
+
+    .filter-preset-btn:hover {
+      border-color: var(--primary);
+      background: var(--bg-hover);
+    }
+
+    .filter-preset-btn.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    .filter-preset-btn i {
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    /* Sliders */
+    .slider-group {
+      margin-bottom: 12px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .slider-input {
+      width: 100%;
+      accent-color: var(--primary);
+      height: 5px;
+      background: var(--border-color);
+      border-radius: var(--radius-full);
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* Settings Form Control */
+    .setting-item {
+      margin-bottom: 14px;
+    }
+
+    .setting-item label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .setting-select,
+    .setting-input {
+      width: 100%;
+      padding: 8px 12px;
+      font-size: 0.86rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      background: var(--bg-surface);
+      color: var(--text-main);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .setting-select:focus,
+    .setting-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-glow);
+    }
+
+    /* Convert CTA Box */
+    .convert-cta-box {
+      margin-top: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-convert-pdf {
+      width: 100%;
+      padding: 12px 20px;
+      font-size: 1rem;
+      font-weight: 800;
+      color: #fff;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+      transition: var(--transition);
+    }
+
+    .btn-convert-pdf:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.45);
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+    }
+
+    .btn-convert-pdf:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state i {
+      font-size: 2.8rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+      display: block;
+    }
+
+    /* Progress Modal */
+    .progress-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+
+    .progress-overlay.active {
+      display: flex;
+    }
+
+    .progress-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 30px;
+      width: 90%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: var(--shadow-xl);
+    }
+
+    .progress-bar-container {
+      height: 8px;
+      background: var(--border-color);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+      margin: 16px 0 10px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #ef4444);
+      width: 0%;
+      transition: width 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="index.html" class="brand-logo" title="Về trang chủ">
+        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+        <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
+      </a>
+
+      <nav class="main-nav">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
+          <li><a href="image-to-pdf.html" class="nav-link active" style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Ảnh sang PDF</a></li>
+          <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Xem ảnh Clipboard</a></li>
+          <li><a href="form.html" class="nav-link"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Private Portal Link -->
+        <a href="private.html" class="icon-btn" title="Khu vực quản trị riêng tư">
+          <i class="fa-solid fa-vault"></i>
+        </a>
+
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="icon-btn theme-toggle" title="Chuyển chế độ Sáng / Tối">
+          <i class="fa-regular fa-moon dark-icon"></i>
+          <i class="fa-regular fa-sun light-icon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="converter-container">
+    <!-- HERO HEADER -->
+    <div class="converter-header">
+      <h1 class="converter-title">
+        <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i>
+        Chuyển Ảnh Sang PDF &amp; Quét Tài Liệu
+      </h1>
+      <p class="converter-desc">
+        Chuyển đổi tức thì hàng loạt hình ảnh thành tài liệu PDF chuẩn. Tích hợp bộ lọc quét tài liệu (CamScanner) làm trắng nền giấy, khử bóng mờ, làm đậm nét chữ và tối ưu in ấn — hoàn toàn xử lý ngay trên trình duyệt của bạn!
+      </p>
+    </div>
+
+    <!-- MAIN CONVERTER GRID -->
+    <div class="converter-grid">
+      <!-- LEFT COLUMN: DROPZONE & PAGES -->
+      <div class="converter-main-pane">
+        <!-- DROPZONE -->
+        <div class="dropzone-area" id="dropzoneArea">
+          <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" />
+          <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+          <div class="dropzone-text">
+            <h3>Kéo thả ảnh vào đây hoặc bấm để chọn ảnh</h3>
+            <p>Hỗ trợ JPG, PNG, WEBP, GIF, SVG, BMP (Hoặc bấm <strong>Ctrl + V</strong> để dán ảnh chụp màn hình)</p>
+          </div>
+          <div class="dropzone-actions">
+            <button type="button" class="btn btn-primary" id="btnSelectFiles">
+              <i class="fa-solid fa-plus"></i> Chọn Ảnh Từ Máy
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnPasteClipboard" title="Dán ảnh từ Clipboard (Ctrl+V)">
+              <i class="fa-regular fa-paste"></i> Dán Ảnh Clipboard
+            </button>
+          </div>
+        </div>
+
+        <!-- PAGES TOOLBAR -->
+        <div class="pages-toolbar">
+          <div class="pages-count-badge">
+            <i class="fa-regular fa-copy" style="color: var(--primary);"></i>
+            <span>Danh sách trang: <strong id="pagesCountText">0</strong> trang</span>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button type="button" class="btn btn-sm btn-secondary" id="btnRotateAll" title="Xoay tất cả các trang 90°">
+              <i class="fa-solid fa-rotate-right"></i> Xoay tất cả
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="btnClearAll" style="color: var(--danger);" title="Xóa tất cả các trang hiện có">
+              <i class="fa-solid fa-trash-can"></i> Xóa tất cả
+            </button>
+          </div>
+        </div>
+
+        <!-- PAGES GRID -->
+        <div class="pages-grid" id="pagesGrid">
+          <!-- Rendered dynamically by JS -->
+          <div class="empty-state" style="grid-column: 1 / -1;" id="emptyPagesNotice">
+            <i class="fa-regular fa-images"></i>
+            <h4>Chưa có hình ảnh nào</h4>
+            <p>Hãy tải ảnh lên hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: FILTERS & PDF CONFIG -->
+      <aside class="converter-sidebar">
+        <!-- PANEL 1: BỘ LỌC ẢNH (FILTERS) -->
+        <div class="sidebar-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: #8b5cf6;"></i>
+            Bộ Lọc Ảnh &amp; Quét Scan
+          </div>
+
+          <!-- Presets -->
+          <div class="filter-presets-grid">
+            <button type="button" class="filter-preset-btn active" data-preset="original">
+              <i class="fa-regular fa-image" style="color: #3b82f6;"></i> Ảnh Gốc
+            </button>
+            <button type="button" class="filter-preset-btn" data-preset="scan">
+              <i class="fa-solid fa-file-lines" style="color: #10b981;"></i> Quét Scan
+            </button>
+            <button type="button" class="filter-preset-btn" data-preset="grayscale">
+              <i class="fa-solid fa-circle-half-stroke" style="color: #64748b;"></i> Trắng Đen
+            </button>
+            <button type="button" class="filter-preset-btn" data-preset="threshold">
+              <i class="fa-solid fa-barcode" style="color: #0f172a;"></i> Chữ Nét
+            </button>
+            <button type="button" class="filter-preset-btn" data-preset="vivid">
+              <i class="fa-solid fa-palette" style="color: #ec4899;"></i> Tăng Màu
+            </button>
+            <button type="button" class="filter-preset-btn" data-preset="clean">
+              <i class="fa-solid fa-sun" style="color: #f59e0b;"></i> Sáng Nền
+            </button>
+          </div>
+
+          <!-- Sliders -->
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Độ sáng:</span>
+              <span id="brightnessValText">0%</span>
+            </div>
+            <input type="range" id="brightnessInput" class="slider-input" min="-80" max="80" value="0" />
+          </div>
+
+          <div class="slider-group">
+            <div class="slider-header">
+              <span>Độ tương phản:</span>
+              <span id="contrastValText">0%</span>
+            </div>
+            <input type="range" id="contrastInput" class="slider-input" min="-80" max="80" value="0" />
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-color);">
+            <label style="display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 600; color: var(--text-main); cursor: pointer;">
+              <input type="checkbox" id="sharpenCheckbox" /> Làm nét chữ (Sharpen)
+            </label>
+            <button type="button" id="btnResetFilters" class="btn btn-sm btn-secondary" style="padding: 2px 8px; font-size: 0.76rem;" title="Đặt lại về mặc định">
+              Đặt lại
+            </button>
+          </div>
+
+          <button type="button" id="btnApplyAllPages" class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 14px; justify-content: center;">
+            <i class="fa-solid fa-check-double"></i> Áp Dụng Cho Tất Cả Các Trang
+          </button>
+        </div>
+
+        <!-- PANEL 2: THIẾT LẬP FILE PDF -->
+        <div class="sidebar-panel">
+          <div class="panel-title">
+            <i class="fa-solid fa-sliders" style="color: #ef4444;"></i>
+            Cài Đặt Xuất File PDF
+          </div>
+
+          <!-- Page Format -->
+          <div class="setting-item">
+            <label for="pdfPageFormat"><i class="fa-regular fa-file"></i> Khổ giấy:</label>
+            <select id="pdfPageFormat" class="setting-select">
+              <option value="a4" selected>A4 (210 x 297 mm) - Chuẩn văn phòng</option>
+              <option value="a3">A3 (297 x 420 mm) - Bản vẽ lớn</option>
+              <option value="a5">A5 (148 x 210 mm) - Sổ tay nhỏ</option>
+              <option value="letter">Letter (216 x 279 mm) - Chuẩn Mỹ</option>
+              <option value="fit">Khớp kích thước ảnh (Fit to Image)</option>
+            </select>
+          </div>
+
+          <!-- Page Orientation -->
+          <div class="setting-item">
+            <label for="pdfOrientation"><i class="fa-solid fa-arrows-split-up-and-left"></i> Hướng trang:</label>
+            <select id="pdfOrientation" class="setting-select">
+              <option value="auto" selected>Tự động (Khớp theo tỷ lệ ảnh)</option>
+              <option value="portrait">Dọc (Portrait)</option>
+              <option value="landscape">Ngang (Landscape)</option>
+            </select>
+          </div>
+
+          <!-- Margins -->
+          <div class="setting-item">
+            <label for="pdfMargin"><i class="fa-solid fa-border-all"></i> Căn lề giấy:</label>
+            <select id="pdfMargin" class="setting-select">
+              <option value="0">Không lề (0 mm) - Tràn viền</option>
+              <option value="5" selected>Lề hẹp (5 mm) - Cân đối</option>
+              <option value="10">Lề chuẩn (10 mm) - Để đóng tập</option>
+            </select>
+          </div>
+
+          <!-- Image Quality -->
+          <div class="setting-item">
+            <label for="pdfQuality"><i class="fa-solid fa-compress"></i> Chất lượng ảnh &amp; Nén:</label>
+            <select id="pdfQuality" class="setting-select">
+              <option value="0.95" selected>Chất lượng cao (95% - Sắc nét nhất)</option>
+              <option value="0.80">Tiêu chuẩn (80% - Cân bằng)</option>
+              <option value="0.60">Nén nhẹ (60% - Tiết kiệm dung lượng gửi email)</option>
+            </select>
+          </div>
+
+          <!-- Filename -->
+          <div class="setting-item">
+            <label for="pdfFileName"><i class="fa-regular fa-keyboard"></i> Tên tệp PDF:</label>
+            <input type="text" id="pdfFileName" class="setting-input" value="Tai_Lieu_Scan.pdf" placeholder="Tên tệp xuất..." />
+          </div>
+
+          <!-- CONVERT BUTTON -->
+          <div class="convert-cta-box">
+            <button type="button" id="btnExportPDF" class="btn-convert-pdf" disabled>
+              <i class="fa-solid fa-file-arrow-down" style="font-size: 1.2rem;"></i>
+              <span>Xuất &amp; Tải PDF Ngay</span>
+            </button>
+            <div style="font-size: 0.76rem; color: var(--text-muted); text-align: center;">
+              <i class="fa-solid fa-shield-check" style="color: #10b981;"></i> 100% xử lý an toàn tại máy của bạn
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- PROGRESS OVERLAY -->
+  <div class="progress-overlay" id="progressOverlay">
+    <div class="progress-card">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.2rem; color: #ef4444; margin-bottom: 12px; display: inline-block;"></i>
+      <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--text-main); margin-bottom: 4px;" id="progressTitle">
+        Đang xử lý &amp; tạo PDF...
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted);" id="progressSub">
+        Vui lòng đợi giây lát...
+      </p>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="progressBarFill"></div>
+      </div>
+      <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary);" id="progressPercentText">0%</span>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Theme sync with site
+    const savedTheme = localStorage.getItem("devlog-theme") || "light";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+
+    const themeToggle = document.getElementById("themeToggle");
+    if (themeToggle) {
+      themeToggle.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme");
+        const nextTheme = current === "dark" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        localStorage.setItem("devlog-theme", nextTheme);
+      });
+    }
+
+    // STATE
+    // Each page item:
+    // {
+    //   id: string,
+    //   name: string,
+    //   originalImage: HTMLImageElement,
+    //   width: number,
+    //   height: number,
+    //   rotation: number (0, 90, 180, 270),
+    //   filter: 'original' | 'scan' | 'grayscale' | 'threshold' | 'vivid' | 'clean',
+    //   brightness: number (-80 to 80),
+    //   contrast: number (-80 to 80),
+    //   sharpen: boolean,
+    //   cachedDataUrl: string
+    // }
+    let pages = [];
+    let selectedPageIndex = -1;
+
+    // DOM References
+    const dropzoneArea = document.getElementById("dropzoneArea");
+    const fileInput = document.getElementById("fileInput");
+    const btnSelectFiles = document.getElementById("btnSelectFiles");
+    const btnPasteClipboard = document.getElementById("btnPasteClipboard");
+    const pagesGrid = document.getElementById("pagesGrid");
+    const pagesCountText = document.getElementById("pagesCountText");
+    const emptyPagesNotice = document.getElementById("emptyPagesNotice");
+    const btnClearAll = document.getElementById("btnClearAll");
+    const btnRotateAll = document.getElementById("btnRotateAll");
+    const btnExportPDF = document.getElementById("btnExportPDF");
+
+    // Filter controls
+    const filterPresetBtns = document.querySelectorAll(".filter-preset-btn");
+    const brightnessInput = document.getElementById("brightnessInput");
+    const contrastInput = document.getElementById("contrastInput");
+    const sharpenCheckbox = document.getElementById("sharpenCheckbox");
+    const brightnessValText = document.getElementById("brightnessValText");
+    const contrastValText = document.getElementById("contrastValText");
+    const btnResetFilters = document.getElementById("btnResetFilters");
+    const btnApplyAllPages = document.getElementById("btnApplyAllPages");
+
+    // PDF Settings controls
+    const pdfPageFormat = document.getElementById("pdfPageFormat");
+    const pdfOrientation = document.getElementById("pdfOrientation");
+    const pdfMargin = document.getElementById("pdfMargin");
+    const pdfQuality = document.getElementById("pdfQuality");
+    const pdfFileName = document.getElementById("pdfFileName");
+
+    // Progress Modal
+    const progressOverlay = document.getElementById("progressOverlay");
+    const progressBarFill = document.getElementById("progressBarFill");
+    const progressPercentText = document.getElementById("progressPercentText");
+    const progressTitle = document.getElementById("progressTitle");
+    const progressSub = document.getElementById("progressSub");
+
+    // Initialize Default PDF filename with date
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+    pdfFileName.value = `Tai_Lieu_Scan_${dateStr}.pdf`;
+
+    // =========================================================
+    // FILE UPLOADING & CLIPBOARD PASTE
+    // =========================================================
+    btnSelectFiles.addEventListener("click", (e) => {
+      e.stopPropagation();
+      fileInput.click();
+    });
+
+    dropzoneArea.addEventListener("click", () => fileInput.click());
+
+    dropzoneArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzoneArea.classList.add("drag-over");
+    });
+
+    dropzoneArea.addEventListener("dragleave", () => {
+      dropzoneArea.classList.remove("drag-over");
+    });
+
+    dropzoneArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzoneArea.classList.remove("drag-over");
+      if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handleFiles(e.dataTransfer.files);
+      }
+    });
+
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files && fileInput.files.length > 0) {
+        handleFiles(fileInput.files);
+        fileInput.value = "";
+      }
+    });
+
+    // Global Paste (Ctrl + V)
+    window.addEventListener("paste", (e) => {
+      const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+      const imageFiles = [];
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].type.indexOf("image") !== -1) {
+          const file = items[i].getAsFile();
+          if (file) imageFiles.push(file);
+        }
+      }
+      if (imageFiles.length > 0) {
+        e.preventDefault();
+        handleFiles(imageFiles);
+      }
+    });
+
+    btnPasteClipboard.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      try {
+        if (navigator.clipboard && navigator.clipboard.read) {
+          const clipboardItems = await navigator.clipboard.read();
+          const imgFiles = [];
+          for (const item of clipboardItems) {
+            for (const type of item.types) {
+              if (type.startsWith("image/")) {
+                const blob = await item.getType(type);
+                imgFiles.push(new File([blob], `clipboard_${Date.now()}.png`, { type }));
+              }
+            }
+          }
+          if (imgFiles.length > 0) {
+            handleFiles(imgFiles);
+          } else {
+            alert("Không tìm thấy hình ảnh nào trong Clipboard của bạn! Hãy chụp hoặc sao chép ảnh rồi bấm lại.");
+          }
+        } else {
+          alert("Vui lòng nhấn phím tổ hợp Ctrl + V (hoặc Cmd + V trên Mac) để dán ảnh trực tiếp.");
+        }
+      } catch (err) {
+        alert("Không thể đọc trực tiếp Clipboard do quyền trình duyệt. Hãy bấm phím Ctrl + V trên bàn phím để dán!");
+      }
+    });
+
+    // Handle files list
+    function handleFiles(fileList) {
+      const validFiles = Array.from(fileList).filter(f => f.type.startsWith("image/"));
+      if (validFiles.length === 0) {
+        alert("Vui lòng chỉ chọn các tệp hình ảnh (JPG, PNG, WEBP, GIF...)!");
+        return;
+      }
+
+      let loadedCount = 0;
+      validFiles.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const newPage = {
+              id: "p_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
+              name: file.name,
+              originalImage: img,
+              width: img.naturalWidth,
+              height: img.naturalHeight,
+              rotation: 0,
+              filter: "original",
+              brightness: 0,
+              contrast: 0,
+              sharpen: false,
+              cachedDataUrl: null
+            };
+            pages.push(newPage);
+            loadedCount++;
+            if (loadedCount === validFiles.length) {
+              if (selectedPageIndex === -1) selectedPageIndex = 0;
+              renderPagesList();
+              updateFilterControls();
+            }
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // =========================================================
+    // IMAGE FILTER & CANVAS PROCESSING
+    // =========================================================
+    function applyFilterToCanvas(page, targetWidth, targetHeight) {
+      const img = page.originalImage;
+      const rotation = (page.rotation || 0) % 360;
+      const isSwapped = rotation === 90 || rotation === 270;
+
+      const srcW = img.naturalWidth;
+      const srcH = img.naturalHeight;
+
+      // Create offscreen canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = isSwapped ? srcH : srcW;
+      canvas.height = isSwapped ? srcW : srcH;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+      // Apply rotation
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate((rotation * Math.PI) / 180);
+      ctx.drawImage(img, -srcW / 2, -srcH / 2, srcW, srcH);
+      ctx.restore();
+
+      // If original and no sliders, return straight
+      if (page.filter === "original" && page.brightness === 0 && page.contrast === 0 && !page.sharpen) {
+        return canvas;
+      }
+
+      // Pixel Manipulation
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+      const len = data.length;
+
+      const filter = page.filter || "original";
+      const bOffset = Number(page.brightness || 0);
+      const cVal = Number(page.contrast || 0);
+
+      // Contrast factor formula
+      const contrastFactor = (259 * (cVal + 255)) / (255 * (259 - cVal));
+
+      for (let i = 0; i < len; i += 4) {
+        let r = data[i];
+        let g = data[i + 1];
+        let b = data[i + 2];
+
+        // 1. Filter Preset Transform
+        if (filter === "scan") {
+          // Document CamScanner filter: Grayscale + dynamic stretch + whitening background
+          let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          // Apply contrast stretch
+          let stretched = (gray - 128) * 1.6 + 128;
+          if (stretched > 185) {
+            r = g = b = 255; // White paper
+          } else if (stretched < 75) {
+            r = g = b = Math.max(0, stretched * 0.7); // Dark ink
+          } else {
+            r = g = b = Math.min(255, Math.max(0, stretched));
+          }
+        } else if (filter === "grayscale") {
+          // Standard Grayscale
+          let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          r = g = b = gray;
+        } else if (filter === "threshold") {
+          // Pure Binary Black and White
+          let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          let val = (gray + bOffset) > 130 ? 255 : 0;
+          r = g = b = val;
+        } else if (filter === "vivid") {
+          // Magic Color: Keep stamps/signatures colorful, whiten pale gray paper
+          let maxC = Math.max(r, g, b);
+          let minC = Math.min(r, g, b);
+          let diff = maxC - minC;
+          if (maxC > 180 && diff < 25) {
+            r = g = b = 255;
+          } else {
+            r = Math.min(255, Math.max(0, (r - 128) * 1.25 + 128));
+            g = Math.min(255, Math.max(0, (g - 128) * 1.25 + 128));
+            b = Math.min(255, Math.max(0, (b - 128) * 1.25 + 128));
+          }
+        } else if (filter === "clean") {
+          // Brighten background paper
+          let gray = 0.299 * r + 0.587 * g + 0.114 * b;
+          if (gray > 170) {
+            r = g = b = 255;
+          } else {
+            r = Math.min(255, r + 20);
+            g = Math.min(255, g + 20);
+            b = Math.min(255, b + 20);
+          }
+        }
+
+        // 2. Sliders adjustment (Brightness & Contrast)
+        if (filter !== "threshold") {
+          if (bOffset !== 0) {
+            r += bOffset;
+            g += bOffset;
+            b += bOffset;
+          }
+          if (cVal !== 0) {
+            r = contrastFactor * (r - 128) + 128;
+            g = contrastFactor * (g - 128) + 128;
+            b = contrastFactor * (b - 128) + 128;
+          }
+        }
+
+        data[i] = Math.min(255, Math.max(0, r));
+        data[i + 1] = Math.min(255, Math.max(0, g));
+        data[i + 2] = Math.min(255, Math.max(0, b));
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+
+      // 3. Sharpening filter if enabled
+      if (page.sharpen) {
+        applySharpenKernel(ctx, canvas.width, canvas.height);
+      }
+
+      return canvas;
+    }
+
+    // 3x3 Convolution Sharpening
+    function applySharpenKernel(ctx, w, h) {
+      const srcData = ctx.getImageData(0, 0, w, h);
+      const dstData = ctx.createImageData(w, h);
+      const s = srcData.data;
+      const d = dstData.data;
+
+      // Sharpen kernel
+      // [ 0, -0.5,  0]
+      // [-0.5, 3, -0.5]
+      // [ 0, -0.5,  0]
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          const idx = (y * w + x) * 4;
+          for (let c = 0; c < 3; c++) {
+            const center = s[idx + c] * 3;
+            const up = s[((y - 1) * w + x) * 4 + c] * 0.5;
+            const down = s[((y + 1) * w + x) * 4 + c] * 0.5;
+            const left = s[(y * w + (x - 1)) * 4 + c] * 0.5;
+            const right = s[(y * w + (x + 1)) * 4 + c] * 0.5;
+            const val = center - up - down - left - right;
+            d[idx + c] = Math.min(255, Math.max(0, val));
+          }
+          d[idx + 3] = s[idx + 3];
+        }
+      }
+      ctx.putImageData(dstData, 0, 0);
+    }
+
+    // =========================================================
+    // RENDER PAGES LIST
+    // =========================================================
+    function renderPagesList() {
+      pagesCountText.textContent = pages.length;
+      btnExportPDF.disabled = pages.length === 0;
+
+      if (pages.length === 0) {
+        pagesGrid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <i class="fa-regular fa-images"></i>
+            <h4>Chưa có hình ảnh nào</h4>
+            <p>Hãy tải ảnh lên hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
+          </div>
+        `;
+        selectedPageIndex = -1;
+        return;
+      }
+
+      if (selectedPageIndex >= pages.length) selectedPageIndex = pages.length - 1;
+      if (selectedPageIndex < 0) selectedPageIndex = 0;
+
+      pagesGrid.innerHTML = "";
+
+      pages.forEach((page, idx) => {
+        const isSelected = idx === selectedPageIndex;
+        const card = document.createElement("div");
+        card.className = `page-card ${isSelected ? "active" : ""}`;
+
+        // Header
+        const header = document.createElement("div");
+        header.className = "page-card-header";
+        header.innerHTML = `
+          <span><i class="fa-regular fa-file"></i> Trang ${idx + 1}</span>
+          <span style="font-size: 0.7rem; font-weight: 500; opacity: 0.8;">${page.rotation}°</span>
+        `;
+        card.appendChild(header);
+
+        // Preview
+        const preview = document.createElement("div");
+        preview.className = "page-card-preview";
+        preview.title = "Bấm để chọn trang này và điều chỉnh bộ lọc";
+
+        // Render filtered canvas thumbnail
+        const processedCanvas = applyFilterToCanvas(page);
+        const thumb = document.createElement("img");
+        thumb.src = processedCanvas.toDataURL("image/jpeg", 0.7);
+        preview.appendChild(thumb);
+
+        preview.addEventListener("click", () => {
+          selectedPageIndex = idx;
+          renderPagesList();
+          updateFilterControls();
+        });
+        card.appendChild(preview);
+
+        // Actions
+        const actions = document.createElement("div");
+        actions.className = "page-card-actions";
+        actions.innerHTML = `
+          <button type="button" class="page-action-btn" title="Di chuyển lên trước" onclick="movePage(${idx}, -1)" ${idx === 0 ? "disabled style='opacity:0.3;cursor:default;'" : ""}>
+            <i class="fa-solid fa-arrow-left"></i>
+          </button>
+          <button type="button" class="page-action-btn" title="Xoay 90 độ" onclick="rotatePage(${idx})">
+            <i class="fa-solid fa-rotate-right"></i>
+          </button>
+          <button type="button" class="page-action-btn" title="Di chuyển về sau" onclick="movePage(${idx}, 1)" ${idx === pages.length - 1 ? "disabled style='opacity:0.3;cursor:default;'" : ""}>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+          <button type="button" class="page-action-btn btn-delete" title="Xóa trang này" onclick="deletePage(${idx})">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        `;
+        card.appendChild(actions);
+
+        pagesGrid.appendChild(card);
+      });
+    }
+
+    // Page Actions
+    window.rotatePage = function(idx) {
+      if (!pages[idx]) return;
+      pages[idx].rotation = ((pages[idx].rotation || 0) + 90) % 360;
+      renderPagesList();
+    };
+
+    window.movePage = function(idx, direction) {
+      const targetIdx = idx + direction;
+      if (targetIdx < 0 || targetIdx >= pages.length) return;
+      const temp = pages[idx];
+      pages[idx] = pages[targetIdx];
+      pages[targetIdx] = temp;
+      selectedPageIndex = targetIdx;
+      renderPagesList();
+      updateFilterControls();
+    };
+
+    window.deletePage = function(idx) {
+      if (!pages[idx]) return;
+      pages.splice(idx, 1);
+      if (selectedPageIndex >= pages.length) selectedPageIndex = pages.length - 1;
+      renderPagesList();
+      updateFilterControls();
+    };
+
+    btnRotateAll.addEventListener("click", () => {
+      if (pages.length === 0) return;
+      pages.forEach(p => {
+        p.rotation = ((p.rotation || 0) + 90) % 360;
+      });
+      renderPagesList();
+    });
+
+    btnClearAll.addEventListener("click", () => {
+      if (pages.length === 0) return;
+      if (confirm("Bạn có chắc chắn muốn xóa tất cả các trang ảnh hiện có không?")) {
+        pages = [];
+        selectedPageIndex = -1;
+        renderPagesList();
+        updateFilterControls();
+      }
+    });
+
+    // =========================================================
+    // FILTER CONTROLS SYNC
+    // =========================================================
+    function updateFilterControls() {
+      if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) {
+        // Disabled or default
+        filterPresetBtns.forEach(b => b.classList.toggle("active", b.dataset.preset === "original"));
+        brightnessInput.value = 0;
+        contrastInput.value = 0;
+        sharpenCheckbox.checked = false;
+        brightnessValText.textContent = "0%";
+        contrastValText.textContent = "0%";
+        return;
+      }
+
+      const cur = pages[selectedPageIndex];
+      filterPresetBtns.forEach(b => {
+        b.classList.toggle("active", b.dataset.preset === (cur.filter || "original"));
+      });
+      brightnessInput.value = cur.brightness || 0;
+      contrastInput.value = cur.contrast || 0;
+      sharpenCheckbox.checked = !!cur.sharpen;
+      brightnessValText.textContent = `${cur.brightness || 0}%`;
+      contrastValText.textContent = `${cur.contrast || 0}%`;
+    }
+
+    // Filter preset click
+    filterPresetBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
+        const preset = btn.dataset.preset;
+        pages[selectedPageIndex].filter = preset;
+        renderPagesList();
+        updateFilterControls();
+      });
+    });
+
+    // Slider inputs
+    brightnessInput.addEventListener("input", () => {
+      if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
+      pages[selectedPageIndex].brightness = Number(brightnessInput.value);
+      brightnessValText.textContent = `${brightnessInput.value}%`;
+      renderPagesList();
+    });
+
+    contrastInput.addEventListener("input", () => {
+      if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
+      pages[selectedPageIndex].contrast = Number(contrastInput.value);
+      contrastValText.textContent = `${contrastInput.value}%`;
+      renderPagesList();
+    });
+
+    sharpenCheckbox.addEventListener("change", () => {
+      if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
+      pages[selectedPageIndex].sharpen = sharpenCheckbox.checked;
+      renderPagesList();
+    });
+
+    btnResetFilters.addEventListener("click", () => {
+      if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
+      pages[selectedPageIndex].filter = "original";
+      pages[selectedPageIndex].brightness = 0;
+      pages[selectedPageIndex].contrast = 0;
+      pages[selectedPageIndex].sharpen = false;
+      renderPagesList();
+      updateFilterControls();
+    });
+
+    // Apply to all pages
+    btnApplyAllPages.addEventListener("click", () => {
+      if (pages.length === 0 || selectedPageIndex < 0) return;
+      const cur = pages[selectedPageIndex];
+      pages.forEach(p => {
+        p.filter = cur.filter;
+        p.brightness = cur.brightness;
+        p.contrast = cur.contrast;
+        p.sharpen = cur.sharpen;
+      });
+      renderPagesList();
+      alert(`Đã áp dụng bộ lọc "${cur.filter}" và thông số chỉnh sáng/tương phản cho tất cả ${pages.length} trang!`);
+    });
+
+    // =========================================================
+    // EXPORT PDF WITH JSPDF
+    // =========================================================
+    btnExportPDF.addEventListener("click", async () => {
+      if (pages.length === 0) {
+        alert("Vui lòng tải lên ít nhất 1 hình ảnh trước khi xuất PDF!");
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      if (!jsPDF) {
+        alert("Không thể nạp thư viện jsPDF. Vui lòng kiểm tra kết nối mạng!");
+        return;
+      }
+
+      // Show progress overlay
+      progressOverlay.classList.add("active");
+      progressTitle.textContent = "Đang xử lý & tạo PDF...";
+      progressSub.textContent = `Chuẩn bị xuất 0 / ${pages.length} trang...`;
+      progressBarFill.style.width = "0%";
+      progressPercentText.textContent = "0%";
+
+      // Allow DOM to update
+      await new Promise(r => setTimeout(r, 100));
+
+      try {
+        const pageFormat = pdfPageFormat.value; // 'a4', 'a3', 'a5', 'letter', 'fit'
+        const orientationChoice = pdfOrientation.value; // 'auto', 'portrait', 'landscape'
+        const marginMm = Number(pdfMargin.value || 0);
+        const quality = Number(pdfQuality.value || 0.9);
+
+        // Standard Page dimensions in mm (Portrait)
+        const formatDimensions = {
+          a4: [210, 297],
+          a3: [297, 420],
+          a5: [148, 210],
+          letter: [215.9, 279.4]
+        };
+
+        let pdf = null;
+
+        for (let i = 0; i < pages.length; i++) {
+          const p = pages[i];
+
+          // Update progress
+          const percent = Math.round(((i + 1) / pages.length) * 100);
+          progressBarFill.style.width = percent + "%";
+          progressPercentText.textContent = percent + "%";
+          progressSub.textContent = `Đang tối ưu & vẽ trang ${i + 1} / ${pages.length}...`;
+          await new Promise(r => setTimeout(r, 40));
+
+          // 1. Process image canvas
+          const processedCanvas = applyFilterToCanvas(p);
+          const imgW = processedCanvas.width;
+          const imgH = processedCanvas.height;
+          const isImgLandscape = imgW > imgH;
+
+          // 2. Determine Page Dimensions & Orientation
+          let pageW, pageH, orientation;
+
+          if (pageFormat === "fit") {
+            // Fit page size directly to image pixels converted to mm (72 DPI or scaled)
+            const pxToMm = 0.264583;
+            pageW = imgW * pxToMm;
+            pageH = imgH * pxToMm;
+            orientation = isImgLandscape ? "landscape" : "portrait";
+          } else {
+            const standardDim = formatDimensions[pageFormat] || formatDimensions.a4;
+            if (orientationChoice === "portrait") {
+              orientation = "portrait";
+              pageW = standardDim[0];
+              pageH = standardDim[1];
+            } else if (orientationChoice === "landscape") {
+              orientation = "landscape";
+              pageW = standardDim[1];
+              pageH = standardDim[0];
+            } else {
+              // Auto orientation matching image aspect ratio
+              if (isImgLandscape) {
+                orientation = "landscape";
+                pageW = standardDim[1];
+                pageH = standardDim[0];
+              } else {
+                orientation = "portrait";
+                pageW = standardDim[0];
+                pageH = standardDim[1];
+              }
+            }
+          }
+
+          // 3. Initialize PDF on first page or add page
+          if (i === 0) {
+            pdf = new jsPDF({
+              orientation: orientation,
+              unit: "mm",
+              format: pageFormat === "fit" ? [pageW, pageH] : (pageFormat || "a4")
+            });
+          } else {
+            pdf.addPage(pageFormat === "fit" ? [pageW, pageH] : (pageFormat || "a4"), orientation);
+          }
+
+          // 4. Calculate content placement inside page with margins
+          const usableW = Math.max(10, pageW - marginMm * 2);
+          const usableH = Math.max(10, pageH - marginMm * 2);
+
+          let drawW, drawH, drawX, drawY;
+
+          if (pageFormat === "fit") {
+            drawW = pageW;
+            drawH = pageH;
+            drawX = 0;
+            drawY = 0;
+          } else {
+            // Scale proportionally to fit usable bounds
+            const imgAspect = imgW / imgH;
+            const usableAspect = usableW / usableH;
+
+            if (imgAspect > usableAspect) {
+              drawW = usableW;
+              drawH = usableW / imgAspect;
+            } else {
+              drawH = usableH;
+              drawW = usableH * imgAspect;
+            }
+
+            // Center image on page
+            drawX = marginMm + (usableW - drawW) / 2;
+            drawY = marginMm + (usableH - drawH) / 2;
+          }
+
+          // 5. Add image to PDF
+          const imgDataUrl = processedCanvas.toDataURL("image/jpeg", quality);
+          pdf.addImage(imgDataUrl, "JPEG", drawX, drawY, drawW, drawH, undefined, "FAST");
+        }
+
+        // Save PDF
+        progressTitle.textContent = "Hoàn tất xuất file!";
+        progressSub.textContent = "Đang tải file PDF xuống máy...";
+        await new Promise(r => setTimeout(r, 200));
+
+        let filename = (pdfFileName.value || "").trim();
+        if (!filename.toLowerCase().endsWith(".pdf")) {
+          filename += ".pdf";
+        }
+        pdf.save(filename);
+
+        setTimeout(() => {
+          progressOverlay.classList.remove("active");
+        }, 800);
+
+      } catch (err) {
+        alert("Lỗi trong quá trình tạo PDF: " + err.message);
+        progressOverlay.classList.remove("active");
+      }
+    });
+  </script>
+</body>
+</html>
