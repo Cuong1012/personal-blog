@@ -2,9 +2,9 @@
 <html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chuyển Ảnh Sang PDF (Image to PDF Converter) - cuongtv.</title>
-  <meta name="description" content="Công cụ chuyển đổi nhiều hình ảnh thành file PDF chất lượng cao, tích hợp bộ lọc làm sạch nền scan tài liệu, trắng đen và tùy chỉnh khổ giấy A4/A3." />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Chuyển Ảnh Sang PDF & Quét Tài Liệu - cuongtv.</title>
+  <meta name="description" content="Công cụ chuyển đổi ảnh thành PDF chất lượng cao, cắt 4 góc nắn thẳng phối cảnh tài liệu, chụp từ máy ảnh camera, tích hợp bộ lọc quét CamScanner." />
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
 
   <!-- Fonts & Icons -->
@@ -16,7 +16,7 @@
   <!-- Base Styles -->
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- jsPDF Library (Client-Side PDF Generator) -->
+  <!-- jsPDF Library -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
@@ -47,7 +47,7 @@
     .converter-desc {
       font-size: 0.95rem;
       color: var(--text-muted);
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -71,7 +71,7 @@
       background: var(--bg-card);
       border: 2px dashed var(--border-color);
       border-radius: var(--radius-lg);
-      padding: 40px 20px;
+      padding: 36px 20px;
       text-align: center;
       cursor: pointer;
       transition: var(--transition);
@@ -87,9 +87,9 @@
     }
 
     .dropzone-icon {
-      font-size: 3rem;
+      font-size: 2.8rem;
       color: var(--primary);
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: inline-block;
       transition: var(--transition);
     }
@@ -144,7 +144,7 @@
     /* Pages Grid */
     .pages-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
       gap: 16px;
       margin-bottom: 24px;
     }
@@ -184,8 +184,23 @@
       color: var(--text-muted);
     }
 
+    .page-card-badges {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .crop-badge {
+      font-size: 0.68rem;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      font-weight: 700;
+    }
+
     .page-card-preview {
-      height: 180px;
+      height: 190px;
       background: #e2e8f0;
       display: flex;
       align-items: center;
@@ -212,10 +227,10 @@
       display: flex;
       align-items: center;
       justify-content: space-around;
-      padding: 6px 8px;
+      padding: 6px 6px;
       background: var(--bg-surface);
       border-top: 1px solid var(--border-color);
-      gap: 4px;
+      gap: 3px;
     }
 
     .page-action-btn {
@@ -415,6 +430,141 @@
       display: block;
     }
 
+    /* =========================================================
+       4-CORNER PERSPECTIVE CROP MODAL
+       ========================================================= */
+    .crop-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      user-select: none;
+    }
+
+    .crop-modal.active {
+      display: flex;
+    }
+
+    .crop-modal-container {
+      width: 100%;
+      max-width: 1060px;
+      height: 94vh;
+      max-height: 880px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .crop-modal-header {
+      padding: 14px 20px;
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .crop-modal-body {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #020617;
+      padding: 10px;
+      touch-action: none;
+    }
+
+    .crop-stage {
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .crop-stage canvas {
+      display: block;
+    }
+
+    .crop-mask-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    /* Draggable Handles */
+    .crop-handle {
+      position: absolute;
+      width: 44px;
+      height: 44px;
+      margin-left: -22px;
+      margin-top: -22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      touch-action: none;
+      z-index: 20;
+    }
+
+    .crop-handle:active {
+      cursor: grabbing;
+    }
+
+    .handle-pin {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #10b981;
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.8), 0 2px 6px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      pointer-events: none;
+    }
+
+    .crop-handle:hover .handle-pin,
+    .crop-handle.dragging .handle-pin {
+      transform: scale(1.35);
+      background: #3b82f6;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.9);
+    }
+
+    .handle-label {
+      position: absolute;
+      top: -14px;
+      left: 24px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      color: #ffffff;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 1px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .crop-modal-footer {
+      padding: 12px 20px;
+      background: #1e293b;
+      border-top: 1px solid #334155;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
     /* Progress Modal */
     .progress-overlay {
       position: fixed;
@@ -424,7 +574,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 9999;
+      z-index: 10001;
     }
 
     .progress-overlay.active {
@@ -477,12 +627,9 @@
       </nav>
 
       <div class="nav-actions">
-        <!-- Private Portal Link -->
         <a href="private.html" class="icon-btn" title="Khu vực quản trị riêng tư">
           <i class="fa-solid fa-vault"></i>
         </a>
-
-        <!-- Theme Toggle -->
         <button id="themeToggle" class="icon-btn theme-toggle" title="Chuyển chế độ Sáng / Tối">
           <i class="fa-regular fa-moon dark-icon"></i>
           <i class="fa-regular fa-sun light-icon"></i>
@@ -499,7 +646,7 @@
         Chuyển Ảnh Sang PDF &amp; Quét Tài Liệu
       </h1>
       <p class="converter-desc">
-        Chuyển đổi tức thì hàng loạt hình ảnh thành tài liệu PDF chuẩn. Tích hợp bộ lọc quét tài liệu (CamScanner) làm trắng nền giấy, khử bóng mờ, làm đậm nét chữ và tối ưu in ấn — hoàn toàn xử lý ngay trên trình duyệt của bạn!
+        Chuyển đổi hình ảnh thành tài liệu PDF chuẩn. Hỗ trợ <strong>chụp ảnh bằng camera</strong>, <strong>cắt 4 góc nắn thẳng phối cảnh</strong> (CamScanner) và áp bộ lọc làm trắng nền giấy — 100% xử lý an toàn ngay trên trình duyệt của bạn!
       </p>
     </div>
 
@@ -510,17 +657,21 @@
         <!-- DROPZONE -->
         <div class="dropzone-area" id="dropzoneArea">
           <input type="file" id="fileInput" multiple accept="image/*" style="display: none;" />
+          <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display: none;" />
           <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
           <div class="dropzone-text">
             <h3>Kéo thả ảnh vào đây hoặc bấm để chọn ảnh</h3>
-            <p>Hỗ trợ JPG, PNG, WEBP, GIF, SVG, BMP (Hoặc bấm <strong>Ctrl + V</strong> để dán ảnh chụp màn hình)</p>
+            <p>Hỗ trợ JPG, PNG, WEBP, GIF, BMP hoặc nhấn <strong>Ctrl + V</strong> để dán ảnh chụp màn hình</p>
           </div>
           <div class="dropzone-actions">
             <button type="button" class="btn btn-primary" id="btnSelectFiles">
               <i class="fa-solid fa-plus"></i> Chọn Ảnh Từ Máy
             </button>
+            <button type="button" class="btn btn-secondary" id="btnCameraCapture" style="color: #059669; border-color: #059669; font-weight: 700;" title="Chụp ảnh tài liệu trực tiếp từ Camera điện thoại">
+              <i class="fa-solid fa-camera"></i> Chụp Bằng Camera
+            </button>
             <button type="button" class="btn btn-secondary" id="btnPasteClipboard" title="Dán ảnh từ Clipboard (Ctrl+V)">
-              <i class="fa-regular fa-paste"></i> Dán Ảnh Clipboard
+              <i class="fa-regular fa-paste"></i> Dán Clipboard
             </button>
           </div>
         </div>
@@ -548,7 +699,7 @@
           <div class="empty-state" style="grid-column: 1 / -1;" id="emptyPagesNotice">
             <i class="fa-regular fa-images"></i>
             <h4>Chưa có hình ảnh nào</h4>
-            <p>Hãy tải ảnh lên hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
+            <p>Hãy tải ảnh lên, chụp từ camera hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
           </div>
         </div>
       </div>
@@ -685,6 +836,72 @@
     </div>
   </main>
 
+  <!-- =========================================================
+       MODAL CẮT 4 GÓC TÀI LIỆU (PERSPECTIVE CROP)
+       ========================================================= -->
+  <div class="crop-modal" id="cropModal" aria-hidden="true">
+    <div class="crop-modal-container">
+      <div class="crop-modal-header">
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-crop-simple" style="color: #10b981;"></i> Cắt 4 Góc &amp; Nắn Thẳng Tài Liệu
+          </h3>
+          <p style="font-size: 0.8rem; color: #94a3b8; margin: 2px 0 0;">
+            Chạm hoặc kéo 4 điểm neo tròn vào 4 góc mép của tờ giấy tài liệu.
+          </p>
+        </div>
+        <button type="button" class="modal-close-btn" id="btnCloseCropModal" style="color: #fff; font-size: 1.8rem; background: none; border: none; cursor: pointer;">&times;</button>
+      </div>
+
+      <div class="crop-modal-body" id="cropModalBody">
+        <div class="crop-stage" id="cropStage">
+          <!-- Canvas drawing base image -->
+          <canvas id="cropBaseCanvas"></canvas>
+          <!-- Canvas drawing mask & quad outline -->
+          <canvas id="cropMaskCanvas" class="crop-mask-canvas"></canvas>
+
+          <!-- 4 draggable handles -->
+          <div class="crop-handle" id="handleTL" data-corner="0" title="Góc trên - trái">
+            <span class="handle-pin"></span>
+            <span class="handle-label">1. Trên-Trái</span>
+          </div>
+          <div class="crop-handle" id="handleTR" data-corner="1" title="Góc trên - phải">
+            <span class="handle-pin"></span>
+            <span class="handle-label">2. Trên-Phải</span>
+          </div>
+          <div class="crop-handle" id="handleBR" data-corner="2" title="Góc dưới - phải">
+            <span class="handle-pin"></span>
+            <span class="handle-label">3. Dưới-Phải</span>
+          </div>
+          <div class="crop-handle" id="handleBL" data-corner="3" title="Góc dưới - trái">
+            <span class="handle-pin"></span>
+            <span class="handle-label">4. Dưới-Trái</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="crop-modal-footer">
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-sm btn-secondary" id="btnResetCropFull" style="color: #fff; border-color: #475569; background: #1e293b;">
+            <i class="fa-solid fa-expand"></i> Toàn Khung
+          </button>
+          <button type="button" class="btn btn-sm btn-secondary" id="btnInsetCrop" style="color: #fff; border-color: #475569; background: #1e293b;">
+            <i class="fa-solid fa-compress"></i> Thu Gọn Mép (90%)
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="button" class="btn btn-secondary" id="btnCancelCrop" style="color: #94a3b8; border-color: #475569; background: transparent;">
+            Hủy Bỏ
+          </button>
+          <button type="button" class="btn btn-primary" id="btnApplyPerspectiveWarp" style="background: linear-gradient(135deg, #10b981, #059669); border: none; font-weight: 700; padding: 8px 20px;">
+            <i class="fa-solid fa-check"></i> Cắt &amp; Nắn Phẳng Ngay
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- PROGRESS OVERLAY -->
   <div class="progress-overlay" id="progressOverlay">
     <div class="progress-card">
@@ -719,27 +936,15 @@
     }
 
     // STATE
-    // Each page item:
-    // {
-    //   id: string,
-    //   name: string,
-    //   originalImage: HTMLImageElement,
-    //   width: number,
-    //   height: number,
-    //   rotation: number (0, 90, 180, 270),
-    //   filter: 'original' | 'scan' | 'grayscale' | 'threshold' | 'vivid' | 'clean',
-    //   brightness: number (-80 to 80),
-    //   contrast: number (-80 to 80),
-    //   sharpen: boolean,
-    //   cachedDataUrl: string
-    // }
     let pages = [];
     let selectedPageIndex = -1;
 
     // DOM References
     const dropzoneArea = document.getElementById("dropzoneArea");
     const fileInput = document.getElementById("fileInput");
+    const cameraInput = document.getElementById("cameraInput");
     const btnSelectFiles = document.getElementById("btnSelectFiles");
+    const btnCameraCapture = document.getElementById("btnCameraCapture");
     const btnPasteClipboard = document.getElementById("btnPasteClipboard");
     const pagesGrid = document.getElementById("pagesGrid");
     const pagesCountText = document.getElementById("pagesCountText");
@@ -765,6 +970,24 @@
     const pdfQuality = document.getElementById("pdfQuality");
     const pdfFileName = document.getElementById("pdfFileName");
 
+    // Crop Modal Elements
+    const cropModal = document.getElementById("cropModal");
+    const cropModalBody = document.getElementById("cropModalBody");
+    const cropStage = document.getElementById("cropStage");
+    const cropBaseCanvas = document.getElementById("cropBaseCanvas");
+    const cropMaskCanvas = document.getElementById("cropMaskCanvas");
+    const btnCloseCropModal = document.getElementById("btnCloseCropModal");
+    const btnCancelCrop = document.getElementById("btnCancelCrop");
+    const btnResetCropFull = document.getElementById("btnResetCropFull");
+    const btnInsetCrop = document.getElementById("btnInsetCrop");
+    const btnApplyPerspectiveWarp = document.getElementById("btnApplyPerspectiveWarp");
+    const handles = [
+      document.getElementById("handleTL"),
+      document.getElementById("handleTR"),
+      document.getElementById("handleBR"),
+      document.getElementById("handleBL")
+    ];
+
     // Progress Modal
     const progressOverlay = document.getElementById("progressOverlay");
     const progressBarFill = document.getElementById("progressBarFill");
@@ -778,11 +1001,16 @@
     pdfFileName.value = `Tai_Lieu_Scan_${dateStr}.pdf`;
 
     // =========================================================
-    // FILE UPLOADING & CLIPBOARD PASTE
+    // FILE UPLOADING & CAMERA CAPTURE
     // =========================================================
     btnSelectFiles.addEventListener("click", (e) => {
       e.stopPropagation();
       fileInput.click();
+    });
+
+    btnCameraCapture.addEventListener("click", (e) => {
+      e.stopPropagation();
+      cameraInput.click();
     });
 
     dropzoneArea.addEventListener("click", () => fileInput.click());
@@ -808,6 +1036,14 @@
       if (fileInput.files && fileInput.files.length > 0) {
         handleFiles(fileInput.files);
         fileInput.value = "";
+      }
+    });
+
+    cameraInput.addEventListener("change", () => {
+      if (cameraInput.files && cameraInput.files.length > 0) {
+        const file = cameraInput.files[0];
+        handleFiles([file], true); // true = trigger auto crop prompt
+        cameraInput.value = "";
       }
     });
 
@@ -855,7 +1091,7 @@
     });
 
     // Handle files list
-    function handleFiles(fileList) {
+    function handleFiles(fileList, openCropForFirst = false) {
       const validFiles = Array.from(fileList).filter(f => f.type.startsWith("image/"));
       if (validFiles.length === 0) {
         alert("Vui lòng chỉ chọn các tệp hình ảnh (JPG, PNG, WEBP, GIF...)!");
@@ -863,6 +1099,8 @@
       }
 
       let loadedCount = 0;
+      const startIdx = pages.length;
+
       validFiles.forEach((file) => {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -872,14 +1110,15 @@
               id: "p_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6),
               name: file.name,
               originalImage: img,
+              activeImage: img,
+              isCropped: false,
               width: img.naturalWidth,
               height: img.naturalHeight,
               rotation: 0,
               filter: "original",
               brightness: 0,
               contrast: 0,
-              sharpen: false,
-              cachedDataUrl: null
+              sharpen: false
             };
             pages.push(newPage);
             loadedCount++;
@@ -887,6 +1126,11 @@
               if (selectedPageIndex === -1) selectedPageIndex = 0;
               renderPagesList();
               updateFilterControls();
+
+              // If shot from camera, open crop modal right away!
+              if (openCropForFirst) {
+                openCropModal(startIdx);
+              }
             }
           };
           img.src = e.target.result;
@@ -896,35 +1140,389 @@
     }
 
     // =========================================================
+    // 4-CORNER PERSPECTIVE CROP & DE-SKEW
+    // =========================================================
+    let currentCropPageIndex = -1;
+    let cropImg = null;
+    let stageScale = 1;
+    let stageOffsetX = 0;
+    let stageOffsetY = 0;
+    let stageW = 0;
+    let stageH = 0;
+    // Corners in stage coordinates: [{x, y}, {x, y}, {x, y}, {x, y}] (TL, TR, BR, BL)
+    let stageCorners = [];
+    let activeDragHandleIdx = -1;
+
+    window.openCropModal = function(pageIdx) {
+      if (!pages[pageIdx]) return;
+      currentCropPageIndex = pageIdx;
+      const page = pages[pageIdx];
+      // Crop operates on the raw originalImage
+      cropImg = page.originalImage;
+
+      cropModal.classList.add("active");
+      initCropStage();
+    };
+
+    function closeCropModal() {
+      cropModal.classList.remove("active");
+      currentCropPageIndex = -1;
+      cropImg = null;
+      activeDragHandleIdx = -1;
+    }
+
+    btnCloseCropModal.addEventListener("click", closeCropModal);
+    btnCancelCrop.addEventListener("click", closeCropModal);
+
+    function initCropStage() {
+      if (!cropImg) return;
+
+      const containerW = cropModalBody.clientWidth - 20;
+      const containerH = cropModalBody.clientHeight - 20;
+
+      const imgW = cropImg.naturalWidth;
+      const imgH = cropImg.naturalHeight;
+
+      // Fit image into modal view
+      const scaleW = containerW / imgW;
+      const scaleH = containerH / imgH;
+      stageScale = Math.min(scaleW, scaleH, 1.0);
+
+      stageW = Math.round(imgW * stageScale);
+      stageH = Math.round(imgH * stageScale);
+
+      cropStage.style.width = stageW + "px";
+      cropStage.style.height = stageH + "px";
+
+      cropBaseCanvas.width = stageW;
+      cropBaseCanvas.height = stageH;
+      const bCtx = cropBaseCanvas.getContext("2d");
+      bCtx.drawImage(cropImg, 0, 0, stageW, stageH);
+
+      cropMaskCanvas.width = stageW;
+      cropMaskCanvas.height = stageH;
+
+      // Default corners: 5% inset
+      setCropCornersInset(0.06);
+    }
+
+    function setCropCornersInset(insetFactor) {
+      const padX = stageW * insetFactor;
+      const padY = stageH * insetFactor;
+
+      stageCorners = [
+        { x: padX, y: padY },                       // 0: TL
+        { x: stageW - padX, y: padY },              // 1: TR
+        { x: stageW - padX, y: stageH - padY },     // 2: BR
+        { x: padX, y: stageH - padY }               // 3: BL
+      ];
+
+      updateHandlesPosition();
+      drawCropMask();
+    }
+
+    btnResetCropFull.addEventListener("click", () => setCropCornersInset(0.01));
+    btnInsetCrop.addEventListener("click", () => setCropCornersInset(0.08));
+
+    function updateHandlesPosition() {
+      handles.forEach((h, idx) => {
+        const pt = stageCorners[idx];
+        h.style.left = pt.x + "px";
+        h.style.top = pt.y + "px";
+      });
+    }
+
+    function drawCropMask() {
+      const ctx = cropMaskCanvas.getContext("2d");
+      ctx.clearRect(0, 0, stageW, stageH);
+
+      // Dark overlay over whole canvas
+      ctx.fillStyle = "rgba(0, 0, 0, 0.55)";
+      ctx.fillRect(0, 0, stageW, stageH);
+
+      // Cut out quadrilateral
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.beginPath();
+      ctx.moveTo(stageCorners[0].x, stageCorners[0].y);
+      ctx.lineTo(stageCorners[1].x, stageCorners[1].y);
+      ctx.lineTo(stageCorners[2].x, stageCorners[2].y);
+      ctx.lineTo(stageCorners[3].x, stageCorners[3].y);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+
+      // Draw quadrilateral border line
+      ctx.strokeStyle = "#10b981";
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(stageCorners[0].x, stageCorners[0].y);
+      ctx.lineTo(stageCorners[1].x, stageCorners[1].y);
+      ctx.lineTo(stageCorners[2].x, stageCorners[2].y);
+      ctx.lineTo(stageCorners[3].x, stageCorners[3].y);
+      ctx.closePath();
+      ctx.stroke();
+
+      // Draw guide diagonals lightly
+      ctx.strokeStyle = "rgba(16, 185, 129, 0.35)";
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(stageCorners[0].x, stageCorners[0].y);
+      ctx.lineTo(stageCorners[2].x, stageCorners[2].y);
+      ctx.moveTo(stageCorners[1].x, stageCorners[1].y);
+      ctx.lineTo(stageCorners[3].x, stageCorners[3].y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    // Handles Drag Handling (Touch & Mouse)
+    handles.forEach((h, idx) => {
+      // Mouse
+      h.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activeDragHandleIdx = idx;
+        h.classList.add("dragging");
+      });
+
+      // Touch
+      h.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        activeDragHandleIdx = idx;
+        h.classList.add("dragging");
+      }, { passive: false });
+    });
+
+    function handleMove(clientX, clientY) {
+      if (activeDragHandleIdx === -1) return;
+      const rect = cropStage.getBoundingClientRect();
+      let x = clientX - rect.left;
+      let y = clientY - rect.top;
+
+      // Clamp within stage
+      x = Math.max(0, Math.min(stageW, x));
+      y = Math.max(0, Math.min(stageH, y));
+
+      stageCorners[activeDragHandleIdx] = { x, y };
+      updateHandlesPosition();
+      drawCropMask();
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      if (activeDragHandleIdx !== -1) {
+        handleMove(e.clientX, e.clientY);
+      }
+    });
+
+    window.addEventListener("mouseup", () => {
+      if (activeDragHandleIdx !== -1) {
+        handles[activeDragHandleIdx].classList.remove("dragging");
+        activeDragHandleIdx = -1;
+      }
+    });
+
+    window.addEventListener("touchmove", (e) => {
+      if (activeDragHandleIdx !== -1 && e.touches.length > 0) {
+        e.preventDefault();
+        handleMove(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, { passive: false });
+
+    window.addEventListener("touchend", () => {
+      if (activeDragHandleIdx !== -1) {
+        handles[activeDragHandleIdx].classList.remove("dragging");
+        activeDragHandleIdx = -1;
+      }
+    });
+
+    // =========================================================
+    // PERSPECTIVE TRANSFORM (HOMOGRAPHY WARPING)
+    // =========================================================
+    function getHomography(src, dst) {
+      let A = [];
+      let b = [];
+      for (let i = 0; i < 4; i++) {
+        let u = dst[i].x, v = dst[i].y;
+        let x = src[i].x, y = src[i].y;
+        A.push([u, v, 1, 0, 0, 0, -u * x, -v * x]);
+        b.push(x);
+        A.push([0, 0, 0, u, v, 1, -u * y, -v * y]);
+        b.push(y);
+      }
+
+      let n = 8;
+      for (let i = 0; i < n; i++) {
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) maxRow = k;
+        }
+        let temp = A[i]; A[i] = A[maxRow]; A[maxRow] = temp;
+        let t = b[i]; b[i] = b[maxRow]; b[maxRow] = t;
+
+        for (let k = i + 1; k < n; k++) {
+          let c = -A[k][i] / A[i][i];
+          for (let j = i; j < n; j++) {
+            if (i === j) A[k][j] = 0;
+            else A[k][j] += c * A[i][j];
+          }
+          b[k] += c * b[i];
+        }
+      }
+
+      let h = new Array(8);
+      for (let i = n - 1; i >= 0; i--) {
+        let sum = 0;
+        for (let j = i + 1; j < n; j++) sum += A[i][j] * h[j];
+        h[i] = (b[i] - sum) / A[i][i];
+      }
+
+      return {
+        h0: h[0], h1: h[1], h2: h[2],
+        h3: h[3], h4: h[4], h5: h[5],
+        h6: h[6], h7: h[7]
+      };
+    }
+
+    btnApplyPerspectiveWarp.addEventListener("click", () => {
+      if (currentCropPageIndex === -1 || !pages[currentCropPageIndex]) return;
+      const page = pages[currentCropPageIndex];
+      const img = page.originalImage;
+      const imgW = img.naturalWidth;
+      const imgH = img.naturalHeight;
+
+      // Convert stage corners to original image coordinates
+      const origCorners = stageCorners.map(pt => ({
+        x: pt.x / stageScale,
+        y: pt.y / stageScale
+      }));
+
+      // Compute destination rectangle dimensions
+      const topW = Math.hypot(origCorners[1].x - origCorners[0].x, origCorners[1].y - origCorners[0].y);
+      const botW = Math.hypot(origCorners[2].x - origCorners[3].x, origCorners[2].y - origCorners[3].y);
+      let outW = Math.round(Math.max(topW, botW));
+
+      const leftH = Math.hypot(origCorners[3].x - origCorners[0].x, origCorners[3].y - origCorners[0].y);
+      const rightH = Math.hypot(origCorners[2].x - origCorners[1].x, origCorners[2].y - origCorners[1].y);
+      let outH = Math.round(Math.max(leftH, rightH));
+
+      // Limit max dimension to 2400 for speed & crisp print quality
+      const maxDim = 2400;
+      if (outW > maxDim || outH > maxDim) {
+        const factor = maxDim / Math.max(outW, outH);
+        outW = Math.round(outW * factor);
+        outH = Math.round(outH * factor);
+      }
+
+      const dstCorners = [
+        { x: 0, y: 0 },
+        { x: outW, y: 0 },
+        { x: outW, y: outH },
+        { x: 0, y: outH }
+      ];
+
+      // Inverse Homography: maps dst -> origCorners
+      const H = getHomography(origCorners, dstCorners);
+
+      // Source Canvas
+      const srcCanvas = document.createElement("canvas");
+      srcCanvas.width = imgW;
+      srcCanvas.height = imgH;
+      const srcCtx = srcCanvas.getContext("2d");
+      srcCtx.drawImage(img, 0, 0);
+      const srcImgData = srcCtx.getImageData(0, 0, imgW, imgH);
+      const sData = srcImgData.data;
+
+      // Destination Canvas
+      const dstCanvas = document.createElement("canvas");
+      dstCanvas.width = outW;
+      dstCanvas.height = outH;
+      const dstCtx = dstCanvas.getContext("2d");
+      const dstImgData = dstCtx.createImageData(outW, outH);
+      const dData = dstImgData.data;
+
+      // Pixel sampling with bilinear interpolation
+      for (let y = 0; y < outH; y++) {
+        const rowOffset = y * outW * 4;
+        for (let x = 0; x < outW; x++) {
+          const denom = H.h6 * x + H.h7 * y + 1;
+          const sx = (H.h0 * x + H.h1 * y + H.h2) / denom;
+          const sy = (H.h3 * x + H.h4 * y + H.h5) / denom;
+
+          if (sx >= 0 && sx < imgW - 1 && sy >= 0 && sy < imgH - 1) {
+            const x0 = Math.floor(sx);
+            const y0 = Math.floor(sy);
+            const x1 = x0 + 1;
+            const y1 = y0 + 1;
+            const dx = sx - x0;
+            const dy = sy - y0;
+
+            const w00 = (1 - dx) * (1 - dy);
+            const w01 = dx * (1 - dy);
+            const w10 = (1 - dx) * dy;
+            const w11 = dx * dy;
+
+            const idx00 = (y0 * imgW + x0) * 4;
+            const idx01 = (y0 * imgW + x1) * 4;
+            const idx10 = (y1 * imgW + x0) * 4;
+            const idx11 = (y1 * imgW + x1) * 4;
+
+            const dstIdx = rowOffset + x * 4;
+            dData[dstIdx]     = w00 * sData[idx00]     + w01 * sData[idx01]     + w10 * sData[idx10]     + w11 * sData[idx11];
+            dData[dstIdx + 1] = w00 * sData[idx00 + 1] + w01 * sData[idx01 + 1] + w10 * sData[idx10 + 1] + w11 * sData[idx11 + 1];
+            dData[dstIdx + 2] = w00 * sData[idx00 + 2] + w01 * sData[idx01 + 2] + w10 * sData[idx10 + 2] + w11 * sData[idx11 + 2];
+            dData[dstIdx + 3] = 255;
+          }
+        }
+      }
+
+      dstCtx.putImageData(dstImgData, 0, 0);
+
+      // Create new warped Image
+      const warpedImg = new Image();
+      warpedImg.onload = () => {
+        page.activeImage = warpedImg;
+        page.isCropped = true;
+        renderPagesList();
+        closeCropModal();
+      };
+      warpedImg.src = dstCanvas.toDataURL("image/png");
+    });
+
+    window.resetCrop = function(idx) {
+      if (!pages[idx]) return;
+      pages[idx].activeImage = pages[idx].originalImage;
+      pages[idx].isCropped = false;
+      renderPagesList();
+    };
+
+    // =========================================================
     // IMAGE FILTER & CANVAS PROCESSING
     // =========================================================
-    function applyFilterToCanvas(page, targetWidth, targetHeight) {
-      const img = page.originalImage;
+    function applyFilterToCanvas(page) {
+      const img = page.activeImage || page.originalImage;
       const rotation = (page.rotation || 0) % 360;
       const isSwapped = rotation === 90 || rotation === 270;
 
       const srcW = img.naturalWidth;
       const srcH = img.naturalHeight;
 
-      // Create offscreen canvas
       const canvas = document.createElement("canvas");
       canvas.width = isSwapped ? srcH : srcW;
       canvas.height = isSwapped ? srcW : srcH;
       const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-      // Apply rotation
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.rotate((rotation * Math.PI) / 180);
       ctx.drawImage(img, -srcW / 2, -srcH / 2, srcW, srcH);
       ctx.restore();
 
-      // If original and no sliders, return straight
       if (page.filter === "original" && page.brightness === 0 && page.contrast === 0 && !page.sharpen) {
         return canvas;
       }
 
-      // Pixel Manipulation
       const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imgData.data;
       const len = data.length;
@@ -932,8 +1530,6 @@
       const filter = page.filter || "original";
       const bOffset = Number(page.brightness || 0);
       const cVal = Number(page.contrast || 0);
-
-      // Contrast factor formula
       const contrastFactor = (259 * (cVal + 255)) / (255 * (259 - cVal));
 
       for (let i = 0; i < len; i += 4) {
@@ -941,30 +1537,24 @@
         let g = data[i + 1];
         let b = data[i + 2];
 
-        // 1. Filter Preset Transform
         if (filter === "scan") {
-          // Document CamScanner filter: Grayscale + dynamic stretch + whitening background
           let gray = 0.299 * r + 0.587 * g + 0.114 * b;
-          // Apply contrast stretch
           let stretched = (gray - 128) * 1.6 + 128;
           if (stretched > 185) {
-            r = g = b = 255; // White paper
+            r = g = b = 255;
           } else if (stretched < 75) {
-            r = g = b = Math.max(0, stretched * 0.7); // Dark ink
+            r = g = b = Math.max(0, stretched * 0.7);
           } else {
             r = g = b = Math.min(255, Math.max(0, stretched));
           }
         } else if (filter === "grayscale") {
-          // Standard Grayscale
           let gray = 0.299 * r + 0.587 * g + 0.114 * b;
           r = g = b = gray;
         } else if (filter === "threshold") {
-          // Pure Binary Black and White
           let gray = 0.299 * r + 0.587 * g + 0.114 * b;
           let val = (gray + bOffset) > 130 ? 255 : 0;
           r = g = b = val;
         } else if (filter === "vivid") {
-          // Magic Color: Keep stamps/signatures colorful, whiten pale gray paper
           let maxC = Math.max(r, g, b);
           let minC = Math.min(r, g, b);
           let diff = maxC - minC;
@@ -976,7 +1566,6 @@
             b = Math.min(255, Math.max(0, (b - 128) * 1.25 + 128));
           }
         } else if (filter === "clean") {
-          // Brighten background paper
           let gray = 0.299 * r + 0.587 * g + 0.114 * b;
           if (gray > 170) {
             r = g = b = 255;
@@ -987,7 +1576,6 @@
           }
         }
 
-        // 2. Sliders adjustment (Brightness & Contrast)
         if (filter !== "threshold") {
           if (bOffset !== 0) {
             r += bOffset;
@@ -1008,7 +1596,6 @@
 
       ctx.putImageData(imgData, 0, 0);
 
-      // 3. Sharpening filter if enabled
       if (page.sharpen) {
         applySharpenKernel(ctx, canvas.width, canvas.height);
       }
@@ -1016,17 +1603,12 @@
       return canvas;
     }
 
-    // 3x3 Convolution Sharpening
     function applySharpenKernel(ctx, w, h) {
       const srcData = ctx.getImageData(0, 0, w, h);
       const dstData = ctx.createImageData(w, h);
       const s = srcData.data;
       const d = dstData.data;
 
-      // Sharpen kernel
-      // [ 0, -0.5,  0]
-      // [-0.5, 3, -0.5]
-      // [ 0, -0.5,  0]
       for (let y = 1; y < h - 1; y++) {
         for (let x = 1; x < w - 1; x++) {
           const idx = (y * w + x) * 4;
@@ -1057,7 +1639,7 @@
           <div class="empty-state" style="grid-column: 1 / -1;">
             <i class="fa-regular fa-images"></i>
             <h4>Chưa có hình ảnh nào</h4>
-            <p>Hãy tải ảnh lên hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
+            <p>Hãy tải ảnh lên, chụp từ camera hoặc dán từ clipboard để bắt đầu tạo tài liệu PDF.</p>
           </div>
         `;
         selectedPageIndex = -1;
@@ -1079,7 +1661,10 @@
         header.className = "page-card-header";
         header.innerHTML = `
           <span><i class="fa-regular fa-file"></i> Trang ${idx + 1}</span>
-          <span style="font-size: 0.7rem; font-weight: 500; opacity: 0.8;">${page.rotation}°</span>
+          <div class="page-card-badges">
+            ${page.isCropped ? `<span class="crop-badge" title="Đã cắt 4 góc"><i class="fa-solid fa-crop"></i> Đã cắt</span>` : ""}
+            <span style="font-size: 0.7rem; font-weight: 500; opacity: 0.8;">${page.rotation}°</span>
+          </div>
         `;
         card.appendChild(header);
 
@@ -1088,7 +1673,6 @@
         preview.className = "page-card-preview";
         preview.title = "Bấm để chọn trang này và điều chỉnh bộ lọc";
 
-        // Render filtered canvas thumbnail
         const processedCanvas = applyFilterToCanvas(page);
         const thumb = document.createElement("img");
         thumb.src = processedCanvas.toDataURL("image/jpeg", 0.7);
@@ -1108,6 +1692,14 @@
           <button type="button" class="page-action-btn" title="Di chuyển lên trước" onclick="movePage(${idx}, -1)" ${idx === 0 ? "disabled style='opacity:0.3;cursor:default;'" : ""}>
             <i class="fa-solid fa-arrow-left"></i>
           </button>
+          <button type="button" class="page-action-btn" title="Cắt 4 góc &amp; nắn thẳng tài liệu" onclick="openCropModal(${idx})" style="color: #8b5cf6;">
+            <i class="fa-solid fa-crop-simple"></i>
+          </button>
+          ${page.isCropped ? `
+            <button type="button" class="page-action-btn" title="Khôi phục ảnh gốc chưa cắt" onclick="resetCrop(${idx})" style="color: #f59e0b;">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          ` : ""}
           <button type="button" class="page-action-btn" title="Xoay 90 độ" onclick="rotatePage(${idx})">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
@@ -1173,7 +1765,6 @@
     // =========================================================
     function updateFilterControls() {
       if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) {
-        // Disabled or default
         filterPresetBtns.forEach(b => b.classList.toggle("active", b.dataset.preset === "original"));
         brightnessInput.value = 0;
         contrastInput.value = 0;
@@ -1194,7 +1785,6 @@
       contrastValText.textContent = `${cur.contrast || 0}%`;
     }
 
-    // Filter preset click
     filterPresetBtns.forEach(btn => {
       btn.addEventListener("click", () => {
         if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
@@ -1205,7 +1795,6 @@
       });
     });
 
-    // Slider inputs
     brightnessInput.addEventListener("input", () => {
       if (selectedPageIndex < 0 || selectedPageIndex >= pages.length) return;
       pages[selectedPageIndex].brightness = Number(brightnessInput.value);
@@ -1236,7 +1825,6 @@
       updateFilterControls();
     });
 
-    // Apply to all pages
     btnApplyAllPages.addEventListener("click", () => {
       if (pages.length === 0 || selectedPageIndex < 0) return;
       const cur = pages[selectedPageIndex];
@@ -1265,23 +1853,20 @@
         return;
       }
 
-      // Show progress overlay
       progressOverlay.classList.add("active");
       progressTitle.textContent = "Đang xử lý & tạo PDF...";
       progressSub.textContent = `Chuẩn bị xuất 0 / ${pages.length} trang...`;
       progressBarFill.style.width = "0%";
       progressPercentText.textContent = "0%";
 
-      // Allow DOM to update
       await new Promise(r => setTimeout(r, 100));
 
       try {
-        const pageFormat = pdfPageFormat.value; // 'a4', 'a3', 'a5', 'letter', 'fit'
-        const orientationChoice = pdfOrientation.value; // 'auto', 'portrait', 'landscape'
+        const pageFormat = pdfPageFormat.value;
+        const orientationChoice = pdfOrientation.value;
         const marginMm = Number(pdfMargin.value || 0);
         const quality = Number(pdfQuality.value || 0.9);
 
-        // Standard Page dimensions in mm (Portrait)
         const formatDimensions = {
           a4: [210, 297],
           a3: [297, 420],
@@ -1293,25 +1878,20 @@
 
         for (let i = 0; i < pages.length; i++) {
           const p = pages[i];
-
-          // Update progress
           const percent = Math.round(((i + 1) / pages.length) * 100);
           progressBarFill.style.width = percent + "%";
           progressPercentText.textContent = percent + "%";
           progressSub.textContent = `Đang tối ưu & vẽ trang ${i + 1} / ${pages.length}...`;
           await new Promise(r => setTimeout(r, 40));
 
-          // 1. Process image canvas
           const processedCanvas = applyFilterToCanvas(p);
           const imgW = processedCanvas.width;
           const imgH = processedCanvas.height;
           const isImgLandscape = imgW > imgH;
 
-          // 2. Determine Page Dimensions & Orientation
           let pageW, pageH, orientation;
 
           if (pageFormat === "fit") {
-            // Fit page size directly to image pixels converted to mm (72 DPI or scaled)
             const pxToMm = 0.264583;
             pageW = imgW * pxToMm;
             pageH = imgH * pxToMm;
@@ -1327,7 +1907,6 @@
               pageW = standardDim[1];
               pageH = standardDim[0];
             } else {
-              // Auto orientation matching image aspect ratio
               if (isImgLandscape) {
                 orientation = "landscape";
                 pageW = standardDim[1];
@@ -1340,7 +1919,6 @@
             }
           }
 
-          // 3. Initialize PDF on first page or add page
           if (i === 0) {
             pdf = new jsPDF({
               orientation: orientation,
@@ -1351,7 +1929,6 @@
             pdf.addPage(pageFormat === "fit" ? [pageW, pageH] : (pageFormat || "a4"), orientation);
           }
 
-          // 4. Calculate content placement inside page with margins
           const usableW = Math.max(10, pageW - marginMm * 2);
           const usableH = Math.max(10, pageH - marginMm * 2);
 
@@ -1363,7 +1940,6 @@
             drawX = 0;
             drawY = 0;
           } else {
-            // Scale proportionally to fit usable bounds
             const imgAspect = imgW / imgH;
             const usableAspect = usableW / usableH;
 
@@ -1375,17 +1951,14 @@
               drawW = usableH * imgAspect;
             }
 
-            // Center image on page
             drawX = marginMm + (usableW - drawW) / 2;
             drawY = marginMm + (usableH - drawH) / 2;
           }
 
-          // 5. Add image to PDF
           const imgDataUrl = processedCanvas.toDataURL("image/jpeg", quality);
           pdf.addImage(imgDataUrl, "JPEG", drawX, drawY, drawW, drawH, undefined, "FAST");
         }
 
-        // Save PDF
         progressTitle.textContent = "Hoàn tất xuất file!";
         progressSub.textContent = "Đang tải file PDF xuống máy...";
         await new Promise(r => setTimeout(r, 200));
