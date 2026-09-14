@@ -52,6 +52,15 @@ function setupFilesSheetIfEmpty(sheet) {
   }
 }
 
+// Khởi tạo sheet Mật Khẩu nếu trống
+function setupPasswordsSheetIfEmpty(sheet) {
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(["ID", "Chủ tài khoản", "Dịch vụ", "Mã danh mục", "Tên danh mục", "Tên đăng nhập", "Mật khẩu", "Mã PIN", "Chu kỳ đổi (tháng)", "Ngày đổi gần nhất", "Lịch sử đổi (JSON)", "Ghi chú", "Thời gian cập nhật"]);
+    sheet.getRange("A1:M1").setFontWeight("bold").setBackground("#fef3c7");
+    sheet.setFrozenRows(1);
+  }
+}
+
 // Định dạng dung lượng tệp đọc dễ hiểu
 function formatBytes(bytes) {
   if (bytes === 0) return "0 Bytes";
@@ -126,6 +135,61 @@ function doGet(e) {
       }
       files.reverse();
       result.files = files;
+    }
+
+    // 3. Lấy danh sách Mật khẩu
+    if (type === "all" || type === "passwords") {
+      var pwdSheet = ss.getSheetByName("Passwords");
+      var passwords = [];
+      if (pwdSheet) {
+        setupPasswordsSheetIfEmpty(pwdSheet);
+        var lastPwdRow = pwdSheet.getLastRow();
+        if (lastPwdRow > 1) {
+          var pwdData = pwdSheet.getRange(2, 1, lastPwdRow - 1, 13).getValues();
+          for (var p = 0; p < pwdData.length; p++) {
+            var pr = pwdData[p];
+            if (pr[0]) {
+              var histArr = [];
+              try {
+                if (pr[10]) histArr = JSON.parse(pr[10]);
+              } catch (eH) {}
+              passwords.push({
+                id: String(pr[0]),
+                owner: String(pr[1] || ""),
+                service: String(pr[2] || ""),
+                category: String(pr[3] || "other"),
+                categoryName: String(pr[4] || "Khác"),
+                username: String(pr[5] || ""),
+                password: String(pr[6] || ""),
+                pin: String(pr[7] || ""),
+                rotationMonths: pr[8] !== "" ? Number(pr[8]) : 6,
+                lastChanged: String(pr[9] || ""),
+                history: histArr,
+                note: String(pr[11] || ""),
+                updatedAt: String(pr[12] || "")
+              });
+            }
+          }
+        }
+      }
+      result.passwords = passwords;
+
+      // Danh mục mật khẩu
+      var catSheet = ss.getSheetByName("PasswordCategories");
+      if (catSheet && catSheet.getLastRow() > 1) {
+        var catData = catSheet.getRange(2, 1, catSheet.getLastRow() - 1, 3).getValues();
+        var catList = [];
+        for (var c = 0; c < catData.length; c++) {
+          if (catData[c][0]) {
+            catList.push({
+              id: String(catData[c][0]),
+              name: String(catData[c][1]),
+              icon: String(catData[c][2] || "fa-solid fa-folder")
+            });
+          }
+        }
+        result.passwordCategories = catList;
+      }
     }
     
     return ContentService.createTextOutput(JSON.stringify(result))
@@ -390,6 +454,65 @@ function doPost(e) {
       return ContentService.createTextOutput(JSON.stringify({
         status: "success",
         message: "Đã đồng bộ toàn bộ ghi chú lên Google Sheet thành công!"
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ==========================================
+    // TÁC VỤ 4: ĐỒNG BỘ MẬT KHẨU (LƯU VÀO SHEET "Passwords")
+    // ==========================================
+    if (action === "sync_passwords") {
+      var allPasswords = postData.passwords || [];
+      var pwdSheet = ss.getSheetByName("Passwords");
+      if (!pwdSheet) {
+        pwdSheet = ss.insertSheet("Passwords");
+      }
+      pwdSheet.clearContents();
+      setupPasswordsSheetIfEmpty(pwdSheet);
+
+      if (allPasswords.length > 0) {
+        var pwdRows = [];
+        for (var k = 0; k < allPasswords.length; k++) {
+          var item = allPasswords[k];
+          pwdRows.push([
+            item.id,
+            item.owner || "",
+            item.service || "",
+            item.category || "other",
+            item.categoryName || "",
+            item.username || "",
+            item.password || "",
+            item.pin || "",
+            item.rotationMonths !== undefined ? item.rotationMonths : 6,
+            item.lastChanged || "",
+            JSON.stringify(item.history || []),
+            item.note || "",
+            new Date().toISOString()
+          ]);
+        }
+        pwdSheet.getRange(2, 1, pwdRows.length, 13).setValues(pwdRows);
+      }
+
+      // Đồng bộ danh mục mật khẩu nếu có
+      if (postData.categories && postData.categories.length > 0) {
+        var catSheet = ss.getSheetByName("PasswordCategories");
+        if (!catSheet) {
+          catSheet = ss.insertSheet("PasswordCategories");
+        }
+        catSheet.clearContents();
+        catSheet.appendRow(["ID", "Tên danh mục", "Icon"]);
+        catSheet.getRange("A1:C1").setFontWeight("bold").setBackground("#e0e7ff");
+        catSheet.setFrozenRows(1);
+        var catRows = [];
+        for (var cc = 0; cc < postData.categories.length; cc++) {
+          var catItem = postData.categories[cc];
+          catRows.push([catItem.id, catItem.name, catItem.icon || "fa-solid fa-folder"]);
+        }
+        catSheet.getRange(2, 1, catRows.length, 3).setValues(catRows);
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        message: "Đã đồng bộ " + allPasswords.length + " tài khoản lên Google Sheets!"
       })).setMimeType(ContentService.MimeType.JSON);
     }
     

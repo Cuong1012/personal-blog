@@ -1024,6 +1024,158 @@
   margin-top: 10px;
 }
 
+/* ==========================================
+   DẠNG 1 HÀNG NGANG GỌN GÀNG (COMPACT LIST VIEW)
+   ========================================== */
+.pwd-vault-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.pwd-list-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 2px;
+}
+
+.pwd-row-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  gap: 12px;
+  transition: var(--transition);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.pwd-row-card:hover {
+  border-color: var(--primary);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.pwd-row-card.expired {
+  border-left: 4px solid var(--danger);
+}
+
+.pwd-row-card.expiring {
+  border-left: 4px solid #f59e0b;
+}
+
+.pwd-row-card.safe {
+  border-left: 4px solid #10b981;
+}
+
+.pwd-row-service {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 210px;
+  flex: 1.2;
+  overflow: hidden;
+}
+
+.pwd-row-service-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.pwd-row-service-info {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pwd-row-service-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pwd-row-service-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pwd-row-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  gap: 6px;
+  min-width: 170px;
+  flex: 1.1;
+  overflow: hidden;
+}
+
+.pwd-row-field-val {
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+
+.pwd-row-status {
+  min-width: 150px;
+  flex: 0.9;
+  display: flex;
+  align-items: center;
+}
+
+.pwd-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 992px) {
+  .pwd-vault-list {
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .pwd-list-header, .pwd-row-card {
+    min-width: 800px;
+  }
+}
+
 .pwd-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);

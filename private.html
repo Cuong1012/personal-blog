@@ -384,14 +384,20 @@
           <button type="button" id="openManageCatBtn" class="btn btn-secondary" title="Thêm mới, sửa hoặc xóa danh mục mật khẩu">
             <i class="fa-solid fa-tags"></i> Quản Lý Danh Mục
           </button>
+          <button id="syncPwdCloudBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;" title="Đồng bộ danh sách mật khẩu lên Google Drive / Sheets cá nhân">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Đồng Bộ Drive
+          </button>
+          <button id="pullPwdCloudBtn" class="btn btn-secondary" style="color: #2563eb; border-color: #2563eb; font-weight: 600;" title="Tải danh sách mật khẩu từ Google Sheets về">
+            <i class="fa-solid fa-rotate"></i> Tải Từ Drive
+          </button>
           <button id="exportPwdExcelBtn" class="btn btn-secondary" style="color: #107c41; border-color: #107c41; font-weight: 600;">
             <i class="fa-solid fa-file-excel"></i> Xuất Excel
           </button>
           <button id="exportPwdJsonBtn" class="btn btn-secondary" title="Sao lưu toàn bộ két mật khẩu dạng file JSON">
-            <i class="fa-solid fa-cloud-arrow-down"></i> Sao Lưu
+            <i class="fa-solid fa-download"></i> Sao Lưu
           </button>
           <button id="importPwdJsonBtn" class="btn btn-secondary" title="Phục hồi dữ liệu từ file JSON">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Khôi Phục
+            <i class="fa-solid fa-upload"></i> Khôi Phục
           </button>
           <input type="file" id="importPwdJsonInput" accept=".json" style="display: none;" />
         </div>
@@ -481,13 +487,23 @@
           </div>
         </div>
 
-        <div style="font-size: 0.95rem; color: var(--text-muted); white-space: nowrap;">
-          Hiển thị: <strong id="pwdFilteredCount" style="color: var(--primary);">0</strong> tài khoản
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="font-size: 0.92rem; color: var(--text-muted); white-space: nowrap;">
+            Hiển thị: <strong id="pwdFilteredCount" style="color: var(--primary);">0</strong> tài khoản
+          </div>
+          <div style="display: flex; background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 2px; gap: 2px;">
+            <button type="button" id="btnPwdViewList" class="btn btn-sm btn-secondary" style="padding: 4px 10px; border: none; font-size: 0.8rem; background: var(--primary); color: #fff;" title="Dạng 1 hàng ngang gọn gàng (Mặc định)">
+              <i class="fa-solid fa-list"></i> Dòng
+            </button>
+            <button type="button" id="btnPwdViewGrid" class="btn btn-sm btn-secondary" style="padding: 4px 10px; border: none; font-size: 0.8rem; background: transparent; color: var(--text-muted);" title="Dạng thẻ khối lớn">
+              <i class="fa-solid fa-table-cells-large"></i> Thẻ
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Password Cards Grid -->
-      <div class="pwd-vault-grid" id="pwdCardsGrid">
+      <!-- Password Cards / List Container -->
+      <div class="pwd-vault-list" id="pwdCardsGrid">
         <!-- Rendered by JS -->
       </div>
     </section>
@@ -2166,6 +2182,7 @@
     let pwdCatFilter = "all";
     let pwdStatusFilter = "all";
     let pwdSortMode = "updated-desc";
+    let pwdViewMode = localStorage.getItem("devlog_pwd_view_mode") || "list"; // "list" (1 hàng ngang) hoặc "grid" (thẻ)
 
     let visiblePasswordsMap = {};
     let visiblePinsMap = {};
@@ -2186,8 +2203,13 @@
     const filterPwdStatusSelect = document.getElementById("filterPwdStatusSelect");
     const sortPwdSelect = document.getElementById("sortPwdSelect");
 
+    const btnPwdViewList = document.getElementById("btnPwdViewList");
+    const btnPwdViewGrid = document.getElementById("btnPwdViewGrid");
+
     const openAddPwdBtn = document.getElementById("openAddPwdBtn");
     const openManageCatBtn = document.getElementById("openManageCatBtn");
+    const syncPwdCloudBtn = document.getElementById("syncPwdCloudBtn");
+    const pullPwdCloudBtn = document.getElementById("pullPwdCloudBtn");
     const exportPwdExcelBtn = document.getElementById("exportPwdExcelBtn");
     const exportPwdJsonBtn = document.getElementById("exportPwdJsonBtn");
     const importPwdJsonBtn = document.getElementById("importPwdJsonBtn");
@@ -2610,6 +2632,23 @@
 
       if (pwdFilteredCount) pwdFilteredCount.textContent = list.length;
 
+      // Cập nhật trạng thái nút chuyển đổi chế độ xem
+      if (btnPwdViewList && btnPwdViewGrid) {
+        if (pwdViewMode === "list") {
+          btnPwdViewList.style.background = "var(--primary)";
+          btnPwdViewList.style.color = "#fff";
+          btnPwdViewGrid.style.background = "transparent";
+          btnPwdViewGrid.style.color = "var(--text-muted)";
+          pwdCardsGrid.className = "pwd-vault-list";
+        } else {
+          btnPwdViewGrid.style.background = "var(--primary)";
+          btnPwdViewGrid.style.color = "#fff";
+          btnPwdViewList.style.background = "transparent";
+          btnPwdViewList.style.color = "var(--text-muted)";
+          pwdCardsGrid.className = "pwd-vault-grid";
+        }
+      }
+
       if (list.length === 0) {
         pwdCardsGrid.innerHTML = `
           <div style="grid-column: 1 / -1; text-align: center; padding: 48px 20px; color: var(--text-muted); background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-color);">
@@ -2621,119 +2660,233 @@
         return;
       }
 
-      pwdCardsGrid.innerHTML = list.map(item => {
-        const visual = getServiceVisual(item.service, item.category);
-        const catInfo = getCategoryInfo(item.category);
-        const rot = getPwdRotationStatus(item);
-        const isPwdVisible = Boolean(visiblePasswordsMap[item.id]);
-        const isPinVisible = Boolean(visiblePinsMap[item.id]);
-        const historyCount = item.history ? item.history.length : 0;
+      if (pwdViewMode === "list") {
+        // ==========================================
+        // DẠNG 1 HÀNG NGANG GỌN GÀNG (1 HÀNG / TÀI KHOẢN)
+        // ==========================================
+        const headerHtml = `
+          <div class="pwd-list-header">
+            <div style="min-width: 210px; flex: 1.2;">Dịch vụ &amp; Chủ tài khoản</div>
+            <div style="min-width: 170px; flex: 1.1;">Tên đăng nhập</div>
+            <div style="min-width: 190px; flex: 1.1;">Mật khẩu</div>
+            <div style="min-width: 150px; flex: 0.9;">Chu kỳ đổi</div>
+            <div style="flex-shrink: 0; min-width: 135px; text-align: right;">Thao tác</div>
+          </div>
+        `;
 
-        const maskedPwd = isPwdVisible ? escapeHtml(item.password || "") : "••••••••••••";
-        const maskedPin = isPinVisible ? escapeHtml(item.pin || "") : "••••••";
+        const rowsHtml = list.map(item => {
+          const visual = getServiceVisual(item.service, item.category);
+          const catInfo = getCategoryInfo(item.category);
+          const rot = getPwdRotationStatus(item);
+          const isPwdVisible = Boolean(visiblePasswordsMap[item.id]);
+          const isPinVisible = Boolean(visiblePinsMap[item.id]);
+          const historyCount = item.history ? item.history.length : 0;
 
-        let formattedLastChanged = "—";
-        if (item.lastChanged) {
-          const d = new Date(item.lastChanged);
-          if (!isNaN(d.getTime())) {
-            formattedLastChanged = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+          const maskedPwd = isPwdVisible ? escapeHtml(item.password || "") : "••••••••••••";
+
+          let formattedLastChanged = "—";
+          if (item.lastChanged) {
+            const d = new Date(item.lastChanged);
+            if (!isNaN(d.getTime())) {
+              formattedLastChanged = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
           }
-        }
 
-        return `
-          <div class="pwd-card ${rot.badgeClass}">
-            <div class="pwd-card-header">
-              <div class="pwd-service-info">
-                <div class="pwd-service-icon ${visual.class}">
+          return `
+            <div class="pwd-row-card ${rot.badgeClass}">
+              <!-- Cột 1: Dịch vụ & Chủ TK -->
+              <div class="pwd-row-service">
+                <div class="pwd-row-service-icon ${visual.class}">
                   <i class="${visual.icon}"></i>
                 </div>
-                <div>
-                  <h3 class="pwd-service-name">${escapeHtml(item.service)}</h3>
-                  <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                    <span class="pwd-owner-tag"><i class="fa-solid fa-user"></i> ${escapeHtml(item.owner || "Cá nhân")}</span>
-                    <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${escapeHtml(catInfo.name)}</span>
+                <div class="pwd-row-service-info">
+                  <div class="pwd-row-service-title" title="${escapeHtml(item.service)}">
+                    ${escapeHtml(item.service)}
+                    ${item.note ? `<i class="fa-regular fa-note-sticky" title="${escapeHtml(item.note)}" style="color: var(--primary); font-size: 0.82rem; cursor: help; margin-left: 2px;"></i>` : ''}
+                  </div>
+                  <div class="pwd-row-service-meta">
+                    <span class="pwd-owner-tag" style="font-size: 0.72rem; padding: 1px 7px;">
+                      <i class="fa-solid fa-user" style="font-size: 0.65rem;"></i> ${escapeHtml(item.owner || "Cá nhân")}
+                    </span>
+                    <span style="font-size: 0.74rem; color: var(--text-muted);">${escapeHtml(catInfo.name)}</span>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Fields -->
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <!-- Username Row -->
-              <div class="pwd-field-row">
-                <span class="pwd-field-label"><i class="fa-regular fa-user"></i> Tên ĐN:</span>
-                <span class="pwd-field-val" title="${escapeHtml(item.username)}">${escapeHtml(item.username)}</span>
-                <div class="pwd-field-actions">
-                  <button type="button" class="pwd-icon-btn" title="Sao chép tên đăng nhập" onclick="copyToClipboard('${escapeHtml(item.username)}', 'tên đăng nhập')">
-                    <i class="fa-regular fa-copy"></i>
-                  </button>
+              <!-- Cột 2: Tên đăng nhập -->
+              <div class="pwd-row-field" title="Tên đăng nhập: ${escapeHtml(item.username)}">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden;">
+                  <i class="fa-regular fa-user" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                  <span class="pwd-row-field-val">${escapeHtml(item.username)}</span>
                 </div>
+                <button type="button" class="pwd-icon-btn" title="Sao chép tên đăng nhập" onclick="copyToClipboard('${escapeHtml(item.username)}', 'tên đăng nhập')">
+                  <i class="fa-regular fa-copy"></i>
+                </button>
               </div>
 
-              <!-- Password Row -->
-              <div class="pwd-field-row">
-                <span class="pwd-field-label"><i class="fa-solid fa-lock"></i> Mật khẩu:</span>
-                <span class="pwd-field-val" style="color: ${isPwdVisible ? 'var(--primary)' : 'inherit'};">${maskedPwd}</span>
-                <div class="pwd-field-actions">
+              <!-- Cột 3: Mật khẩu & PIN -->
+              <div class="pwd-row-field" title="Mật khẩu">
+                <div style="display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden;">
+                  <i class="fa-solid fa-lock" style="color: var(--text-muted); font-size: 0.78rem;"></i>
+                  <span class="pwd-row-field-val" style="color: ${isPwdVisible ? 'var(--primary)' : 'inherit'};">${maskedPwd}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 2px;">
                   <button type="button" class="pwd-icon-btn" title="${isPwdVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}" onclick="togglePasswordVisibility('${item.id}')">
                     <i class="fa-regular ${isPwdVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
                   </button>
                   <button type="button" class="pwd-icon-btn" title="Sao chép mật khẩu" onclick="copyToClipboard('${escapeHtml(item.password)}', 'mật khẩu')">
                     <i class="fa-regular fa-copy"></i>
                   </button>
+                  ${item.pin ? `
+                    <button type="button" class="pwd-icon-btn" style="color: #059669; font-size: 0.72rem; font-weight: 700; padding: 2px 5px; border-radius: 4px; background: rgba(16, 185, 129, 0.12);" title="Mã PIN: ${isPinVisible ? escapeHtml(item.pin) : '••••'} (Bấm để copy PIN)" onclick="copyToClipboard('${escapeHtml(item.pin)}', 'mã PIN')">
+                      PIN
+                    </button>
+                  ` : ''}
                 </div>
               </div>
 
-              <!-- PIN Row (if present) -->
-              ${item.pin ? `
-                <div class="pwd-field-row">
-                  <span class="pwd-field-label"><i class="fa-solid fa-key"></i> Mã PIN/OTP:</span>
-                  <span class="pwd-field-val" style="color: ${isPinVisible ? '#059669' : 'inherit'};">${maskedPin}</span>
-                  <div class="pwd-field-actions">
-                    <button type="button" class="pwd-icon-btn" title="${isPinVisible ? 'Ẩn PIN' : 'Hiện PIN'}" onclick="togglePinVisibility('${item.id}')">
-                      <i class="fa-regular ${isPinVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
-                    </button>
-                    <button type="button" class="pwd-icon-btn" title="Sao chép mã PIN" onclick="copyToClipboard('${escapeHtml(item.pin)}', 'mã PIN')">
-                      <i class="fa-regular fa-copy"></i>
-                    </button>
-                  </div>
-                </div>
-              ` : ''}
-            </div>
-
-            <!-- Rotation / Expiry Status Badge -->
-            <div class="pwd-expiry-badge ${rot.badgeClass}">
-              <i class="${rot.icon}"></i>
-              <div style="flex: 1;">
-                <div>${rot.text}</div>
-                <div style="font-size: 0.73rem; opacity: 0.85; margin-top: 2px;">Đổi ngày: <strong>${formattedLastChanged}</strong> (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})</div>
+              <!-- Cột 4: Chu kỳ & Hạn đổi -->
+              <div class="pwd-row-status" title="Đổi ngày: ${formattedLastChanged} (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})">
+                <span class="pwd-status-pill ${rot.badgeClass}">
+                  <i class="${rot.icon}"></i> ${rot.text}
+                </span>
               </div>
-            </div>
 
-            <!-- Notes if present -->
-            ${item.note ? `
-              <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-hover); padding: 8px 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--border-color); line-height: 1.4;">
-                <i class="fa-regular fa-note-sticky" style="margin-right: 4px;"></i> ${escapeHtml(item.note)}
-              </div>
-            ` : ''}
-
-            <!-- Card Footer -->
-            <div class="pwd-card-footer">
-              <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
-                <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${historyCount})
-              </button>
-              <div style="display: flex; gap: 6px;">
-                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="editPasswordAccount('${item.id}')">
-                  <i class="fa-solid fa-pen-to-square"></i> Sửa / Đổi MK
+              <!-- Cột 5: Thao tác -->
+              <div class="pwd-row-actions">
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
+                  <i class="fa-solid fa-clock-rotate-left"></i> ${historyCount}
                 </button>
-                <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.8rem; padding: 5px 10px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 4px 8px;" onclick="editPasswordAccount('${item.id}')" title="Sửa thông tin / Đổi mật khẩu">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </button>
+                <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 4px 8px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
                   <i class="fa-solid fa-trash"></i>
                 </button>
               </div>
             </div>
-          </div>
-        `;
-      }).join("");
+          `;
+        }).join("");
+
+        pwdCardsGrid.innerHTML = headerHtml + rowsHtml;
+      } else {
+        // ==========================================
+        // DẠNG THẺ KHỐI LỚN (CARD GRID VIEW)
+        // ==========================================
+        pwdCardsGrid.innerHTML = list.map(item => {
+          const visual = getServiceVisual(item.service, item.category);
+          const catInfo = getCategoryInfo(item.category);
+          const rot = getPwdRotationStatus(item);
+          const isPwdVisible = Boolean(visiblePasswordsMap[item.id]);
+          const isPinVisible = Boolean(visiblePinsMap[item.id]);
+          const historyCount = item.history ? item.history.length : 0;
+
+          const maskedPwd = isPwdVisible ? escapeHtml(item.password || "") : "••••••••••••";
+          const maskedPin = isPinVisible ? escapeHtml(item.pin || "") : "••••••";
+
+          let formattedLastChanged = "—";
+          if (item.lastChanged) {
+            const d = new Date(item.lastChanged);
+            if (!isNaN(d.getTime())) {
+              formattedLastChanged = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
+          }
+
+          return `
+            <div class="pwd-card ${rot.badgeClass}">
+              <div class="pwd-card-header">
+                <div class="pwd-service-info">
+                  <div class="pwd-service-icon ${visual.class}">
+                    <i class="${visual.icon}"></i>
+                  </div>
+                  <div>
+                    <h3 class="pwd-service-name">${escapeHtml(item.service)}</h3>
+                    <div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                      <span class="pwd-owner-tag"><i class="fa-solid fa-user"></i> ${escapeHtml(item.owner || "Cá nhân")}</span>
+                      <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">${escapeHtml(catInfo.name)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Fields -->
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <!-- Username Row -->
+                <div class="pwd-field-row">
+                  <span class="pwd-field-label"><i class="fa-regular fa-user"></i> Tên ĐN:</span>
+                  <span class="pwd-field-val" title="${escapeHtml(item.username)}">${escapeHtml(item.username)}</span>
+                  <div class="pwd-field-actions">
+                    <button type="button" class="pwd-icon-btn" title="Sao chép tên đăng nhập" onclick="copyToClipboard('${escapeHtml(item.username)}', 'tên đăng nhập')">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Password Row -->
+                <div class="pwd-field-row">
+                  <span class="pwd-field-label"><i class="fa-solid fa-lock"></i> Mật khẩu:</span>
+                  <span class="pwd-field-val" style="color: ${isPwdVisible ? 'var(--primary)' : 'inherit'};">${maskedPwd}</span>
+                  <div class="pwd-field-actions">
+                    <button type="button" class="pwd-icon-btn" title="${isPwdVisible ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}" onclick="togglePasswordVisibility('${item.id}')">
+                      <i class="fa-regular ${isPwdVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                    </button>
+                    <button type="button" class="pwd-icon-btn" title="Sao chép mật khẩu" onclick="copyToClipboard('${escapeHtml(item.password)}', 'mật khẩu')">
+                      <i class="fa-regular fa-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- PIN Row (if present) -->
+                ${item.pin ? `
+                  <div class="pwd-field-row">
+                    <span class="pwd-field-label"><i class="fa-solid fa-key"></i> Mã PIN/OTP:</span>
+                    <span class="pwd-field-val" style="color: ${isPinVisible ? '#059669' : 'inherit'};">${maskedPin}</span>
+                    <div class="pwd-field-actions">
+                      <button type="button" class="pwd-icon-btn" title="${isPinVisible ? 'Ẩn PIN' : 'Hiện PIN'}" onclick="togglePinVisibility('${item.id}')">
+                        <i class="fa-regular ${isPinVisible ? 'fa-eye-slash' : 'fa-eye'}"></i>
+                      </button>
+                      <button type="button" class="pwd-icon-btn" title="Sao chép mã PIN" onclick="copyToClipboard('${escapeHtml(item.pin)}', 'mã PIN')">
+                        <i class="fa-regular fa-copy"></i>
+                      </button>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+
+              <!-- Rotation / Expiry Status Badge -->
+              <div class="pwd-expiry-badge ${rot.badgeClass}">
+                <i class="${rot.icon}"></i>
+                <div style="flex: 1;">
+                  <div>${rot.text}</div>
+                  <div style="font-size: 0.73rem; opacity: 0.85; margin-top: 2px;">Đổi ngày: <strong>${formattedLastChanged}</strong> (Chu kỳ: ${item.rotationMonths ? item.rotationMonths + ' tháng' : 'Không bắt buộc'})</div>
+                </div>
+              </div>
+
+              <!-- Notes if present -->
+              ${item.note ? `
+                <div style="font-size: 0.82rem; color: var(--text-muted); background: var(--bg-hover); padding: 8px 12px; border-radius: var(--radius-sm); border-left: 3px solid var(--border-color); line-height: 1.4;">
+                  <i class="fa-regular fa-note-sticky" style="margin-right: 4px;"></i> ${escapeHtml(item.note)}
+                </div>
+              ` : ''}
+
+              <!-- Card Footer -->
+              <div class="pwd-card-footer">
+                <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="openPwdHistory('${item.id}')" title="Xem lịch sử các mật khẩu cũ từng đổi">
+                  <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử (${historyCount})
+                </button>
+                <div style="display: flex; gap: 6px;">
+                  <button type="button" class="btn btn-secondary btn-sm" style="font-size: 0.8rem; padding: 5px 10px;" onclick="editPasswordAccount('${item.id}')">
+                    <i class="fa-solid fa-pen-to-square"></i> Sửa / Đổi MK
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" style="font-size: 0.8rem; padding: 5px 10px; background: rgba(239, 68, 68, 0.12); color: #dc2626; border: 1px solid rgba(239, 68, 68, 0.25);" onclick="deletePasswordAccount('${item.id}')" title="Xóa tài khoản">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+      }
     }
 
     // Toggle Visibility
@@ -3070,6 +3223,105 @@
       renderPasswords();
     });
 
+    // View Switcher wiring
+    if (btnPwdViewList) {
+      btnPwdViewList.addEventListener("click", () => {
+        pwdViewMode = "list";
+        localStorage.setItem("devlog_pwd_view_mode", "list");
+        renderPasswords();
+      });
+    }
+
+    if (btnPwdViewGrid) {
+      btnPwdViewGrid.addEventListener("click", () => {
+        pwdViewMode = "grid";
+        localStorage.setItem("devlog_pwd_view_mode", "grid");
+        renderPasswords();
+      });
+    }
+
+    // Google Drive Sync wiring
+    if (syncPwdCloudBtn) {
+      syncPwdCloudBtn.addEventListener("click", async () => {
+        if (!DevLogAuth.isCloudConnected()) {
+          alert("Bạn chưa kết nối Google Drive / Sheets. Hãy thiết lập đường link Web App Apps Script để đồng bộ online!");
+          cloudConfigModal.classList.add("active");
+          return;
+        }
+
+        const origHtml = syncPwdCloudBtn.innerHTML;
+        syncPwdCloudBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang đồng bộ...`;
+        syncPwdCloudBtn.disabled = true;
+
+        try {
+          const res = await DevLogAuth.syncPasswordsToCloud(familyPasswords, passwordCategories);
+          if (res.success) {
+            showToast("Đã đồng bộ toàn bộ mật khẩu lên Google Sheets thành công!");
+            syncPwdCloudBtn.innerHTML = `<i class="fa-solid fa-check"></i> Đã đồng bộ`;
+            setTimeout(() => {
+              syncPwdCloudBtn.innerHTML = origHtml;
+              syncPwdCloudBtn.disabled = false;
+            }, 2500);
+          } else {
+            alert("Lỗi khi đồng bộ lên Google Sheets: " + res.message);
+            syncPwdCloudBtn.innerHTML = origHtml;
+            syncPwdCloudBtn.disabled = false;
+          }
+        } catch (err) {
+          alert("Lỗi kết nối: " + err.message);
+          syncPwdCloudBtn.innerHTML = origHtml;
+          syncPwdCloudBtn.disabled = false;
+        }
+      });
+    }
+
+    if (pullPwdCloudBtn) {
+      pullPwdCloudBtn.addEventListener("click", async () => {
+        if (!DevLogAuth.isCloudConnected()) {
+          alert("Bạn chưa kết nối Google Drive / Sheets. Hãy thiết lập đường link Web App Apps Script để tải dữ liệu!");
+          cloudConfigModal.classList.add("active");
+          return;
+        }
+
+        const origHtml = pullPwdCloudBtn.innerHTML;
+        pullPwdCloudBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang tải...`;
+        pullPwdCloudBtn.disabled = true;
+
+        try {
+          const res = await DevLogAuth.fetchPasswordsFromCloud();
+          if (res.success) {
+            const cloudPwds = res.passwords || [];
+            const cloudCats = res.categories || [];
+
+            if (cloudPwds.length === 0) {
+              showToast("Chưa có dữ liệu mật khẩu nào trên Google Sheets.");
+            } else {
+              if (confirm(`Tìm thấy ${cloudPwds.length} tài khoản từ Google Sheets.\n\nBạn có muốn cập nhật vào máy này không?`)) {
+                familyPasswords = cloudPwds;
+                saveFamilyPasswords(familyPasswords);
+
+                if (cloudCats.length > 0) {
+                  passwordCategories = cloudCats;
+                  savePasswordCategories(passwordCategories);
+                  updateCategoryDropdowns();
+                }
+
+                renderPasswords();
+                showToast(`Đã tải thành công ${cloudPwds.length} tài khoản từ Google Sheets!`);
+              }
+            }
+          } else {
+            alert("Lỗi tải từ Google Sheets: " + res.message);
+          }
+        } catch (err) {
+          alert("Lỗi kết nối: " + err.message);
+        } finally {
+          pullPwdCloudBtn.innerHTML = origHtml;
+          pullPwdCloudBtn.disabled = false;
+        }
+      });
+    }
+
     // Excel Export
     exportPwdExcelBtn.addEventListener("click", () => {
       if (familyPasswords.length === 0) {
@@ -3267,6 +3519,16 @@
           files = res.files;
           renderNotes();
           renderFiles();
+          if (res.passwords && res.passwords.length > 0 && familyPasswords.length === 0) {
+            familyPasswords = res.passwords;
+            saveFamilyPasswords(familyPasswords);
+            if (res.passwordCategories && res.passwordCategories.length > 0) {
+              passwordCategories = res.passwordCategories;
+              savePasswordCategories(passwordCategories);
+              updateCategoryDropdowns();
+            }
+            renderPasswords();
+          }
         }
       });
     }

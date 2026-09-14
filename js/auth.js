@@ -167,7 +167,13 @@ async function fetchAllFromCloud() {
       if (Array.isArray(result.files)) {
         saveUploadedFiles(result.files);
       }
-      return { success: true, notes: result.data || [], files: result.files || [] };
+      return {
+        success: true,
+        notes: result.data || [],
+        files: result.files || [],
+        passwords: result.passwords || [],
+        passwordCategories: result.passwordCategories || []
+      };
     }
     return { success: false, message: result.message || "Lỗi đọc dữ liệu từ Google Drive" };
   } catch (error) {
@@ -338,6 +344,60 @@ async function ocrImageWithGoogleDrive(fileOrBlob, lang = "vi") {
   }
 }
 
+/**
+ * Sync passwords and categories to Google Sheets
+ */
+async function syncPasswordsToCloud(passwords, categories) {
+  const url = getCloudApiUrl();
+  if (!url) {
+    return { success: false, message: "Chưa cấu hình URL Google Apps Script!" };
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({
+        action: "sync_passwords",
+        passwords: passwords || [],
+        categories: categories || []
+      })
+    });
+    const result = await response.json();
+    if (result.status === "success") {
+      return { success: true, message: result.message };
+    }
+    return { success: false, message: result.message || "Lỗi khi đồng bộ mật khẩu lên Google Sheets" };
+  } catch (err) {
+    return { success: false, message: "Lỗi kết nối khi đồng bộ mật khẩu: " + err.message };
+  }
+}
+
+/**
+ * Fetch passwords and categories from Google Sheets
+ */
+async function fetchPasswordsFromCloud() {
+  const url = getCloudApiUrl();
+  if (!url) {
+    return { success: false, message: "Chưa cấu hình URL Google Apps Script!" };
+  }
+
+  try {
+    const response = await fetch(url + (url.includes("?") ? "&" : "?") + "type=passwords");
+    const result = await response.json();
+    if (result.status === "success") {
+      return {
+        success: true,
+        passwords: result.passwords || [],
+        categories: result.passwordCategories || []
+      };
+    }
+    return { success: false, message: result.message || "Lỗi khi lấy mật khẩu từ Google Sheets" };
+  } catch (err) {
+    return { success: false, message: "Lỗi kết nối khi tải mật khẩu: " + err.message };
+  }
+}
+
 // Export for application use
 window.DevLogAuth = {
   isAuthenticated,
@@ -359,5 +419,7 @@ window.DevLogAuth = {
   deleteNoteFromCloud,
   uploadFileToDrive,
   deleteFileFromDrive,
-  ocrImageWithGoogleDrive
+  ocrImageWithGoogleDrive,
+  syncPasswordsToCloud,
+  fetchPasswordsFromCloud
 };
