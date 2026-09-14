@@ -951,11 +951,12 @@
           Thêm danh mục mới hoặc xóa bớt danh mục để dễ dàng phân loại và lọc tài khoản theo nhu cầu của bạn.
         </p>
 
-        <!-- Form thêm danh mục mới -->
+        <!-- Form thêm / sửa danh mục -->
         <form id="addCategoryForm" style="background: var(--bg-surface); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-color); margin-bottom: 20px;">
-          <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;">
+          <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main); margin-bottom: 10px;" id="catFormTitle">
             <i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Thêm danh mục mới:
           </div>
+          <input type="hidden" id="editCatIdInput" value="" />
           <div style="display: grid; grid-template-columns: 1fr 140px; gap: 10px; margin-bottom: 10px;">
             <input type="text" id="newCatNameInput" placeholder="Tên danh mục (vd: Game Steam, Công việc...)" required style="font-size: 0.88rem;" />
             <select id="newCatIconSelect" style="font-size: 0.88rem; cursor: pointer;">
@@ -975,9 +976,14 @@
               <option value="fa-solid fa-key">🔑 Khác</option>
             </select>
           </div>
-          <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; justify-content: center;">
-            <i class="fa-solid fa-plus"></i> Thêm Vào Danh Mục
-          </button>
+          <div style="display: flex; gap: 8px;">
+            <button type="submit" id="btnSubmitCat" class="btn btn-primary btn-sm" style="flex: 1; justify-content: center;">
+              <i class="fa-solid fa-plus"></i> Thêm Vào Danh Mục
+            </button>
+            <button type="button" id="btnCancelEditCat" class="btn btn-secondary btn-sm" style="display: none; justify-content: center;">
+              Hủy Sửa
+            </button>
+          </div>
         </form>
 
         <!-- Danh sách danh mục hiện có -->
@@ -2297,24 +2303,44 @@
       }
     ];
 
+    function formatUsername(val) {
+      if (val === undefined || val === null) return "";
+      let s = String(val).trim();
+      // Nếu là số điện thoại hoặc mã định danh 9 chữ số bị mất số 0 đầu (ví dụ: 378126446 -> 0378126446)
+      if (/^[35789]\d{8}$/.test(s)) {
+        s = "0" + s;
+      }
+      return s;
+    }
+
+    function normalizePasswordItem(item) {
+      if (!item) return item;
+      item.username = formatUsername(item.username);
+      if (item.pin !== undefined && item.pin !== null) {
+        item.pin = String(item.pin).trim();
+      }
+      return item;
+    }
+
     function getFamilyPasswords() {
       const data = localStorage.getItem(FAMILY_PASSWORDS_KEY);
       if (!data) {
         localStorage.setItem(FAMILY_PASSWORDS_KEY, JSON.stringify(DEFAULT_FAMILY_PASSWORDS));
-        return DEFAULT_FAMILY_PASSWORDS;
+        return DEFAULT_FAMILY_PASSWORDS.map(normalizePasswordItem);
       }
       try {
         const parsed = JSON.parse(data);
-        return Array.isArray(parsed) ? parsed : DEFAULT_FAMILY_PASSWORDS;
+        return Array.isArray(parsed) ? parsed.map(normalizePasswordItem) : DEFAULT_FAMILY_PASSWORDS.map(normalizePasswordItem);
       } catch (e) {
-        return DEFAULT_FAMILY_PASSWORDS;
+        return DEFAULT_FAMILY_PASSWORDS.map(normalizePasswordItem);
       }
     }
 
     function saveFamilyPasswords(list) {
-      localStorage.setItem(FAMILY_PASSWORDS_KEY, JSON.stringify(list));
-      familyPasswords = list;
-      if (pwdCountBadge) pwdCountBadge.textContent = list.length;
+      const normalized = (list || []).map(normalizePasswordItem);
+      localStorage.setItem(FAMILY_PASSWORDS_KEY, JSON.stringify(normalized));
+      familyPasswords = normalized;
+      if (pwdCountBadge) pwdCountBadge.textContent = normalized.length;
     }
 
     let familyPasswords = getFamilyPasswords();
@@ -2401,6 +2427,10 @@
     const newCatIconSelect = document.getElementById("newCatIconSelect");
     const categoriesListContainer = document.getElementById("categoriesListContainer");
     const catCountText = document.getElementById("catCountText");
+    const catFormTitle = document.getElementById("catFormTitle");
+    const editCatIdInput = document.getElementById("editCatIdInput");
+    const btnSubmitCat = document.getElementById("btnSubmitCat");
+    const btnCancelEditCat = document.getElementById("btnCancelEditCat");
 
     let currentHistoryActiveItem = null;
     let isHistoryCurrentVisible = false;
@@ -2604,19 +2634,47 @@
                   <div style="font-size: 0.76rem; color: var(--text-muted);">${count} tài khoản đang dùng</div>
                 </div>
               </div>
-              <div>
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button type="button" class="btn btn-sm" style="padding: 4px 10px; font-size: 0.78rem; color: var(--primary); background: var(--primary-light); border: 1px solid rgba(59, 130, 246, 0.3);" onclick="editCategory('${cat.id}')" title="Sửa tên hoặc icon danh mục này">
+                  <i class="fa-solid fa-pen"></i> Sửa
+                </button>
                 ${!isDefaultOther ? `
                   <button type="button" class="btn btn-sm" style="padding: 4px 10px; font-size: 0.78rem; color: #dc2626; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);" onclick="deleteCategory('${cat.id}')" title="Xóa danh mục này">
                     <i class="fa-solid fa-trash"></i> Xóa
                   </button>
                 ` : `
-                  <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic;">Mặc định</span>
+                  <span style="font-size: 0.75rem; color: var(--text-muted); font-style: italic; margin-left: 4px;">Mặc định</span>
                 `}
               </div>
             </div>
           `;
         }).join("");
       }
+    }
+
+    window.editCategory = function(catId) {
+      const cat = passwordCategories.find(c => c.id === catId);
+      if (!cat) return;
+      if (editCatIdInput) editCatIdInput.value = cat.id;
+      if (newCatNameInput) newCatNameInput.value = cat.name;
+      if (newCatIconSelect) newCatIconSelect.value = cat.icon || "fa-solid fa-tag";
+      if (catFormTitle) catFormTitle.innerHTML = `<i class="fa-solid fa-pen-to-square" style="color: var(--primary);"></i> Chỉnh sửa danh mục "${escapeHtml(cat.name)}":`;
+      if (btnSubmitCat) btnSubmitCat.innerHTML = `<i class="fa-solid fa-check"></i> Lưu Cập Nhật`;
+      if (btnCancelEditCat) btnCancelEditCat.style.display = "inline-flex";
+      if (newCatNameInput) newCatNameInput.focus();
+    };
+
+    function resetCategoryForm() {
+      if (editCatIdInput) editCatIdInput.value = "";
+      if (newCatNameInput) newCatNameInput.value = "";
+      if (newCatIconSelect) newCatIconSelect.value = "fa-solid fa-tag";
+      if (catFormTitle) catFormTitle.innerHTML = `<i class="fa-solid fa-plus-circle" style="color: var(--primary);"></i> Thêm danh mục mới:`;
+      if (btnSubmitCat) btnSubmitCat.innerHTML = `<i class="fa-solid fa-plus"></i> Thêm Vào Danh Mục`;
+      if (btnCancelEditCat) btnCancelEditCat.style.display = "none";
+    }
+
+    if (btnCancelEditCat) {
+      btnCancelEditCat.addEventListener("click", resetCategoryForm);
     }
 
     window.deleteCategory = function(catId) {
@@ -2645,15 +2703,17 @@
       passwordCategories = passwordCategories.filter(c => c.id !== catId);
       savePasswordCategories(passwordCategories);
       showToast(`Đã xóa danh mục "${targetCat.name}".`);
+      resetCategoryForm();
     };
 
     function openCategoriesModal() {
+      resetCategoryForm();
       updateCategoryDropdowns();
-      if (newCatNameInput) newCatNameInput.value = "";
       if (pwdCategoriesModal) pwdCategoriesModal.classList.add("active");
     }
 
     function closeCategoriesModal() {
+      resetCategoryForm();
       if (pwdCategoriesModal) pwdCategoriesModal.classList.remove("active");
     }
 
@@ -2666,20 +2726,38 @@
     if (addCategoryForm) {
       addCategoryForm.addEventListener("submit", (e) => {
         e.preventDefault();
+        const editId = editCatIdInput ? editCatIdInput.value : "";
         const name = newCatNameInput.value.trim();
         const icon = newCatIconSelect.value;
         if (!name) return;
 
-        if (passwordCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-          alert(`Danh mục "${name}" đã tồn tại!`);
-          return;
-        }
+        if (editId) {
+          // Editing existing category
+          const cat = passwordCategories.find(c => c.id === editId);
+          if (cat) {
+            if (passwordCategories.some(c => c.id !== editId && c.name.toLowerCase() === name.toLowerCase())) {
+              alert(`Danh mục "${name}" đã tồn tại! Vui lòng chọn tên khác.`);
+              return;
+            }
+            cat.name = name;
+            cat.icon = icon;
+            savePasswordCategories(passwordCategories);
+            showToast(`Đã cập nhật danh mục "${name}" thành công!`);
+            resetCategoryForm();
+          }
+        } else {
+          // Adding new category
+          if (passwordCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+            alert(`Danh mục "${name}" đã tồn tại!`);
+            return;
+          }
 
-        const id = "cat_" + Date.now();
-        passwordCategories.push({ id, name, icon });
-        savePasswordCategories(passwordCategories);
-        newCatNameInput.value = "";
-        showToast(`Đã thêm danh mục "${name}"!`);
+          const id = "cat_" + Date.now();
+          passwordCategories.push({ id, name, icon });
+          savePasswordCategories(passwordCategories);
+          showToast(`Đã thêm danh mục "${name}" thành công!`);
+          resetCategoryForm();
+        }
       });
     }
 
@@ -3124,7 +3202,7 @@
       const owner = pwdOwnerInput.value.trim();
       const category = pwdCategorySelect.value;
       const service = pwdServiceInput.value.trim();
-      const username = pwdUsernameInput.value.trim();
+      const username = formatUsername(pwdUsernameInput.value.trim());
       const pin = pwdPinInput.value.trim();
       const password = pwdPasswordInput.value.trim();
       const rotationMonths = Number(pwdRotationSelect.value);
@@ -3516,6 +3594,20 @@
 
           const wb = XLSX.utils.book_new();
           const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+          // Định dạng cột Tên đăng nhập (cột E, index 4) và Mã PIN (cột G, index 6) dạng Text để Excel không nuốt số 0
+          for (let R = 1; R < wsData.length; R++) {
+            const userCellRef = XLSX.utils.encode_cell({ r: R, c: 4 });
+            if (ws[userCellRef]) {
+              ws[userCellRef].t = 's';
+              ws[userCellRef].z = '@';
+            }
+            const pinCellRef = XLSX.utils.encode_cell({ r: R, c: 6 });
+            if (ws[pinCellRef]) {
+              ws[pinCellRef].t = 's';
+              ws[pinCellRef].z = '@';
+            }
+          }
 
           ws["!cols"] = [
             { wch: 6 },

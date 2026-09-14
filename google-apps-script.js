@@ -58,6 +58,7 @@ function setupPasswordsSheetIfEmpty(sheet) {
     sheet.appendRow(["ID", "Chủ tài khoản", "Dịch vụ", "Mã danh mục", "Tên danh mục", "Tên đăng nhập", "Mật khẩu", "Mã PIN", "Chu kỳ đổi (tháng)", "Ngày đổi gần nhất", "Lịch sử đổi (JSON)", "Ghi chú", "Thời gian cập nhật"]);
     sheet.getRange("A1:M1").setFontWeight("bold").setBackground("#fef3c7");
     sheet.setFrozenRows(1);
+    sheet.getRange("A:M").setNumberFormat("@");
   }
 }
 
@@ -145,7 +146,7 @@ function doGet(e) {
         setupPasswordsSheetIfEmpty(pwdSheet);
         var lastPwdRow = pwdSheet.getLastRow();
         if (lastPwdRow > 1) {
-          var pwdData = pwdSheet.getRange(2, 1, lastPwdRow - 1, 13).getValues();
+          var pwdData = pwdSheet.getRange(2, 1, lastPwdRow - 1, 13).getDisplayValues();
           for (var p = 0; p < pwdData.length; p++) {
             var pr = pwdData[p];
             if (pr[0]) {
@@ -153,15 +154,19 @@ function doGet(e) {
               try {
                 if (pr[10]) histArr = JSON.parse(pr[10]);
               } catch (eH) {}
+              var u = String(pr[5] || "").trim();
+              if (/^[35789]\d{8}$/.test(u)) {
+                u = "0" + u;
+              }
               passwords.push({
                 id: String(pr[0]),
                 owner: String(pr[1] || ""),
                 service: String(pr[2] || ""),
                 category: String(pr[3] || "other"),
                 categoryName: String(pr[4] || "Khác"),
-                username: String(pr[5] || ""),
+                username: u,
                 password: String(pr[6] || ""),
-                pin: String(pr[7] || ""),
+                pin: String(pr[7] || "").trim(),
                 rotationMonths: pr[8] !== "" ? Number(pr[8]) : 6,
                 lastChanged: String(pr[9] || ""),
                 history: histArr,
@@ -473,15 +478,20 @@ function doPost(e) {
         var pwdRows = [];
         for (var k = 0; k < allPasswords.length; k++) {
           var item = allPasswords[k];
+          var u = String(item.username || "").trim();
+          if (/^[35789]\d{8}$/.test(u)) {
+            u = "0" + u;
+          }
+          var pinVal = item.pin !== undefined && item.pin !== null ? String(item.pin).trim() : "";
           pwdRows.push([
             item.id,
             item.owner || "",
             item.service || "",
             item.category || "other",
             item.categoryName || "",
-            item.username || "",
+            u,
             item.password || "",
-            item.pin || "",
+            pinVal,
             item.rotationMonths !== undefined ? item.rotationMonths : 6,
             item.lastChanged || "",
             JSON.stringify(item.history || []),
@@ -489,7 +499,9 @@ function doPost(e) {
             new Date().toISOString()
           ]);
         }
-        pwdSheet.getRange(2, 1, pwdRows.length, 13).setValues(pwdRows);
+        var targetRange = pwdSheet.getRange(2, 1, pwdRows.length, 13);
+        targetRange.setNumberFormat("@");
+        targetRange.setValues(pwdRows);
       }
 
       // Đồng bộ danh mục mật khẩu nếu có
