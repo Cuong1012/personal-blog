@@ -119,48 +119,40 @@
       </div>
     </section>
 
-    <!-- INTERACTIVE SERVICES & TOOLS HUB (HORIZONTAL STACKED CARDS) -->
-    <section class="hub-section" id="services">
-      <div class="container">
-        <div class="section-header">
-          <div>
-            <h2 class="section-title">Hệ Sinh Thái & Tiện Ích Trực Tuyến</h2>
-            <p class="section-subtitle">Duyệt nhanh tiện ích theo dạng thẻ ngang xếp chồng — không cần cuộn dọc</p>
-          </div>
+    <!-- HORIZONTAL SCROLL PINNED SECTION (CUỘN CHUỘT XUỐNG CHẠY NGANG) -->
+    <section class="horizontal-scroll-section" id="services">
+      <div class="sticky-pin-container">
+        <div class="pin-content">
+          <!-- Section Header -->
+          <div class="section-header" style="margin-bottom: 14px;">
+            <div>
+              <div class="badge" style="margin-bottom: 6px; font-size: 0.82rem;">
+                <i class="fa-solid fa-arrows-left-right"></i> Trượt ngang theo con lăn chuột
+              </div>
+              <h2 class="section-title" style="font-size: 2rem;">Hệ Sinh Thái & Tiện Ích Trực Tuyến</h2>
+              <p class="section-subtitle" style="font-size: 0.95rem;">Khi cuộn chuột xuống, các thẻ dịch vụ sẽ lướt ngang mượt mà trong cùng một khung nhìn</p>
+            </div>
 
-          <!-- View Mode Toggle & Category Filter Tabs -->
-          <div class="hub-toolbar">
+            <!-- Category Filter Tabs -->
             <div class="hub-tabs" id="hubTabs">
               <button class="hub-tab-btn active" data-category="all"><i class="fa-solid fa-layer-group"></i> Tất cả</button>
               <button class="hub-tab-btn" data-category="server"><i class="fa-solid fa-server"></i> Home Server</button>
               <button class="hub-tab-btn" data-category="tools"><i class="fa-solid fa-toolbox"></i> Tiện ích Media</button>
               <button class="hub-tab-btn" data-category="private"><i class="fa-solid fa-shield-halved"></i> Bảo mật</button>
             </div>
-
-            <div class="view-mode-toggle" id="viewModeToggle">
-              <button class="view-mode-btn active" id="btnDeckMode" title="Hiệu ứng thẻ xếp chồng ngang">
-                <i class="fa-solid fa-layer-group"></i> Thẻ ngang
-              </button>
-              <button class="view-mode-btn" id="btnGridMode" title="Dạng lưới truyền thống">
-                <i class="fa-solid fa-table-cells-large"></i> Dạng lưới
-              </button>
-            </div>
           </div>
-        </div>
 
-        <!-- HORIZONTAL STACKED CARD DECK WRAPPER -->
-        <div class="hub-deck-wrapper deck-mode" id="hubDeckWrapper">
-          <button class="deck-nav-btn prev" id="deckPrevBtn" aria-label="Thẻ trước" title="Thẻ trước (hoặc phím Mũi tên trái)">
-            <i class="fa-solid fa-chevron-left"></i>
-          </button>
-          
-          <button class="deck-nav-btn next" id="deckNextBtn" aria-label="Thẻ kế tiếp" title="Thẻ sau (hoặc phím Mũi tên phải)">
-            <i class="fa-solid fa-chevron-right"></i>
-          </button>
+          <!-- HORIZONTAL CARDS TRACK VIEWPORT -->
+          <div class="horizontal-viewport" id="horizontalViewport">
+            <button class="track-nav-btn prev" id="trackPrevBtn" aria-label="Thẻ trước" title="Cuộn sang trái">
+              <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            
+            <button class="track-nav-btn next" id="trackNextBtn" aria-label="Thẻ sau" title="Cuộn sang phải">
+              <i class="fa-solid fa-chevron-right"></i>
+            </button>
 
-          <div class="hub-deck-stage" id="hubDeckStage">
-            <!-- Hub Cards Grid / Deck -->
-            <div class="hub-grid" id="hubGrid">
+            <div class="horizontal-track" id="horizontalTrack">
               <!-- CARD 1: HOME SERVER -->
               <article class="hub-card card-server" data-category="server" data-title="Home Server Dell OptiPlex 7040">
                 <div class="hub-card-top">
@@ -285,16 +277,21 @@
             </div>
           </div>
 
-          <!-- Deck Bottom Pagination & Indicators -->
-          <div class="deck-indicators" id="deckIndicators">
-            <div class="deck-dots" id="deckDots"></div>
-            <div class="deck-status-label" id="deckStatusLabel">
-              <span id="deckCurrentIndex">1</span> / <span id="deckTotalCards">5</span>: <strong id="deckCardTitle">Home Server Dell OptiPlex 7040</strong>
+          <!-- Bottom Scroll Progress & Status Hint -->
+          <div class="horizontal-scroll-footer">
+            <div class="scroll-track-progress">
+              <div class="scroll-progress-fill" id="scrollProgressFill"></div>
+            </div>
+            <div class="scroll-status-badge" id="scrollStatusBadge">
+              <i class="fa-solid fa-computer-mouse pulse-icon"></i>
+              <span id="scrollCurrentCardText">Thẻ 1 / 5: Home Server Dell OptiPlex 7040</span>
+              <span class="scroll-hint">• Kéo chuột xuống để xem tiếp ➔</span>
             </div>
           </div>
         </div>
       </div>
     </section>
+
 
 
     <!-- ABOUT SECTION -->
