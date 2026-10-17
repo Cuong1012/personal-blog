@@ -29,13 +29,11 @@
       <nav class="nav-menu" id="navMenu">
         <ul class="nav-list">
           <li><a href="#home" class="nav-link active">Trang chủ</a></li>
-          <li><a href="#articles" class="nav-link">Bài viết</a></li>
-          <li><a href="#about" class="nav-link">Về tôi</a></li>
           <li><a href="server.html" class="nav-link" style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-server"></i> Home Server</a></li>
-          <li><a href="form.html" class="nav-link" style="color:var(--primary); font-weight:700;"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
-          <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Xem ảnh Clipboard</a></li>
           <li><a href="image-to-pdf.html" class="nav-link" style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Ảnh sang PDF</a></li>
-          <li><a href="#newsletter" class="nav-link">Đăng ký</a></li>
+          <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Xem Clipboard</a></li>
+          <li><a href="form.html" class="nav-link" style="color:var(--primary); font-weight:700;"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
+          <li><a href="#about" class="nav-link">Về tôi</a></li>
         </ul>
       </nav>
 
@@ -60,31 +58,40 @@
   </header>
 
   <main>
-    <!-- HERO SECTION -->
+    <!-- HERO SECTION WITH AMBIENT PARTICLES & ANIMATION -->
     <section class="hero-section" id="home">
-      <div class="container hero-container">
+      <div class="ambient-glow-wrapper" aria-hidden="true">
+        <div class="ambient-blob blob-1"></div>
+        <div class="ambient-blob blob-2"></div>
+      </div>
+
+      <div class="container hero-container" style="position: relative; z-index: 2;">
         <div class="hero-content">
-          <div class="badge hero-badge">
-            <span class="pulse-dot"></span> Xin chào, chào mừng bạn ghé thăm!
+          <div class="hero-live-pill" id="heroLivePill">
+            <span class="pulse-live"></span>
+            <span id="heroServerText">Home Server: 192.168.31.100 • Đang trực tuyến</span>
           </div>
+
           <h1 class="hero-title">
-            Nơi tôi chia sẻ về <span class="gradient-text">Lập trình</span>, Công nghệ và Cuộc sống.
+            Không gian số kết nối<br />
+            <span class="gradient-text" id="typingText">Home Server & IoT</span><span class="typing-cursor">|</span>
           </h1>
           <p class="hero-desc">
-            Không gian lưu trữ những trải nghiệm học tập, ghi chép kỹ thuật, các dự án nhỏ và những suy ngẫm mỗi ngày trên hành trình phát triển bản thân.
+            Cổng điều khiển máy chủ gia đình Dell OptiPlex, bộ công cụ xử lý tài liệu ảnh sang PDF quét camera, clipboard và hệ sinh thái số hóa cá nhân.
           </p>
+
           <div class="hero-cta">
-            <a href="#articles" class="btn btn-primary">
-              <i class="fa-solid fa-book-open"></i> Đọc bài viết mới nhất
+            <a href="server.html" class="btn btn-primary" style="background: #10b981; border-color: #10b981;">
+              <i class="fa-solid fa-server"></i> Home Server (192.168.31.100)
             </a>
             <a href="image-to-pdf.html" class="btn btn-secondary" style="border-color: #ef4444; color: #ef4444;">
               <i class="fa-solid fa-file-pdf"></i> Chuyển Ảnh sang PDF
             </a>
+            <a href="clipboard.html" class="btn btn-secondary" style="border-color: #3b82f6; color: #3b82f6;">
+              <i class="fa-regular fa-image"></i> Xem ảnh Clipboard
+            </a>
             <a href="form.html" class="btn btn-secondary" style="border-color: var(--primary); color: var(--primary);">
               <i class="fa-solid fa-id-card"></i> Khai báo thông tin
-            </a>
-            <a href="#about" class="btn btn-secondary">
-              <i class="fa-regular fa-user"></i> Về tác giả
             </a>
           </div>
         </div>
@@ -99,12 +106,12 @@
             </div>
             <div class="avatar-info">
               <h3>Trịnh Việt Cường</h3>
-              <p>IT Petrolimex</p>
+              <p>IT Petrolimex & Smart Home</p>
               <div class="social-pills">
                 <a href="https://github.com/Cuong1012" target="_blank" rel="noopener" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                <a href="https://linkedin.com" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-                <a href="https://twitter.com" target="_blank" rel="noopener" aria-label="X / Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                <a href="mailto:contact@example.com" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+                <a href="server.html" title="Home Server"><i class="fa-solid fa-server"></i></a>
+                <a href="image-to-pdf.html" title="Công cụ Scanner"><i class="fa-solid fa-file-pdf"></i></a>
+                <a href="login.html" title="Khu vực riêng tư"><i class="fa-solid fa-lock"></i></a>
               </div>
             </div>
           </div>
@@ -112,43 +119,147 @@
       </div>
     </section>
 
-    <!-- ARTICLES SECTION -->
-    <section class="articles-section" id="articles">
+    <!-- INTERACTIVE SERVICES & TOOLS HUB (THAY THẾ BÀI VIẾT) -->
+    <section class="hub-section" id="services">
       <div class="container">
         <div class="section-header">
           <div>
-            <h2 class="section-title">Bài viết gần đây</h2>
-            <p class="section-subtitle">Khám phá các bài viết kỹ thuật, cẩm nang và ghi chép thực tế</p>
+            <h2 class="section-title">Hệ Sinh Thái & Tiện Ích Trực Tuyến</h2>
+            <p class="section-subtitle">Truy cập tức thì các máy chủ, công cụ xử lý tài liệu và tiện ích thông minh</p>
           </div>
 
-          <!-- Search Bar -->
-          <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="searchInput" placeholder="Tìm kiếm bài viết theo từ khóa..." autocomplete="off" />
-            <button id="clearSearchBtn" class="clear-search-btn" title="Xóa tìm kiếm">&times;</button>
+          <!-- Category Filter Tabs -->
+          <div class="hub-tabs" id="hubTabs">
+            <button class="hub-tab-btn active" data-category="all"><i class="fa-solid fa-layer-group"></i> Tất cả</button>
+            <button class="hub-tab-btn" data-category="server"><i class="fa-solid fa-server"></i> Home Server</button>
+            <button class="hub-tab-btn" data-category="tools"><i class="fa-solid fa-toolbox"></i> Tiện ích Media</button>
+            <button class="hub-tab-btn" data-category="private"><i class="fa-solid fa-shield-halved"></i> Bảo mật</button>
           </div>
         </div>
 
-        <!-- Filter Categories -->
-        <div class="categories-filter" id="categoriesFilter">
-          <button class="filter-btn active" data-category="all">Tất cả</button>
-          <button class="filter-btn" data-category="dev">Lập trình & Tech</button>
-          <button class="filter-btn" data-category="frontend">Frontend & UI</button>
-          <button class="filter-btn" data-category="ai">AI & Công cụ</button>
-          <button class="filter-btn" data-category="life">Góc đời sống</button>
-        </div>
+        <!-- Hub Cards Grid -->
+        <div class="hub-grid" id="hubGrid">
+          <!-- CARD 1: HOME SERVER -->
+          <article class="hub-card card-server" data-category="server">
+            <div class="hub-card-top">
+              <div class="hub-card-icon icon-server">
+                <i class="fa-solid fa-server"></i>
+              </div>
+              <span class="hub-card-badge badge-server">🟢 Trực tuyến 24/7</span>
+            </div>
+            <h3 class="hub-card-title">Home Server Dell OptiPlex 7040</h3>
+            <p class="hub-card-desc">
+              Máy chủ gia đình: theo dõi vi xử lý CPU, bộ nhớ RAM, nhiệt độ phần cứng, Home Assistant, ổ cứng NAS & đèn chiếu sáng WLED.
+            </p>
+            <div class="hub-card-tags">
+              <span class="hub-tag"><i class="fa-solid fa-network-wired"></i> 192.168.31.100</span>
+              <span class="hub-tag" id="hubTunnelTag"><i class="fa-solid fa-cloud"></i> Cloudflare Tunnel</span>
+              <span class="hub-tag"><i class="fa-solid fa-microchip"></i> Telemetry</span>
+            </div>
+            <div class="hub-card-actions">
+              <a href="server.html" class="hub-card-btn server-btn">
+                <i class="fa-solid fa-gauge-high"></i> Mở Dashboard
+              </a>
+              <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="hub-card-btn secondary" title="Mở Home Assistant">
+                <i class="fa-solid fa-house-signal"></i> Home Assistant
+              </a>
+            </div>
+          </article>
 
-        <!-- Posts Grid -->
-        <div class="posts-grid" id="postsGrid">
-          <!-- Rendered dynamically by JavaScript -->
-        </div>
+          <!-- CARD 2: IMAGE TO PDF SCANNER -->
+          <article class="hub-card" data-category="tools">
+            <div class="hub-card-top">
+              <div class="hub-card-icon icon-pdf">
+                <i class="fa-solid fa-file-pdf"></i>
+              </div>
+              <span class="hub-card-badge badge-pdf">Máy quét tài liệu</span>
+            </div>
+            <h3 class="hub-card-title">Bộ Chuyển Ảnh Sang PDF (Scanner)</h3>
+            <p class="hub-card-desc">
+              Quét tài liệu từ camera trực tiếp hoặc tải ảnh hàng loạt, tự động căn chỉnh phối cảnh 4 góc, bộ lọc làm sạch nền và giữ nguyên màu con dấu đỏ.
+            </p>
+            <div class="hub-card-tags">
+              <span class="hub-tag"><i class="fa-solid fa-camera"></i> Camera Scan</span>
+              <span class="hub-tag"><i class="fa-solid fa-stamp"></i> Giữ dấu đỏ</span>
+              <span class="hub-tag"><i class="fa-solid fa-crop-simple"></i> Cắt góc 4 điểm</span>
+            </div>
+            <div class="hub-card-actions">
+              <a href="image-to-pdf.html" class="hub-card-btn primary">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Sử dụng ngay
+              </a>
+            </div>
+          </article>
 
-        <!-- Empty State (when search has no results) -->
-        <div class="empty-state" id="emptyState" style="display: none;">
-          <i class="fa-regular fa-folder-open empty-icon"></i>
-          <h3>Không tìm thấy bài viết phù hợp</h3>
-          <p>Thử tìm kiếm với từ khóa khác hoặc chọn xem "Tất cả" danh mục nhé.</p>
-          <button class="btn btn-secondary reset-filter-btn" id="resetFilterBtn">Xem tất cả bài viết</button>
+          <!-- CARD 3: CLIPBOARD VIEWER -->
+          <article class="hub-card" data-category="tools">
+            <div class="hub-card-top">
+              <div class="hub-card-icon icon-clip">
+                <i class="fa-regular fa-image"></i>
+              </div>
+              <span class="hub-card-badge badge-clip">Tức thì (Ctrl+V)</span>
+            </div>
+            <h3 class="hub-card-title">Xem & Trích Xuất Ảnh Clipboard</h3>
+            <p class="hub-card-desc">
+              Chỉ cần bấm Ctrl + V để xem ngay hình ảnh chụp màn hình từ bộ nhớ tạm, hỗ trợ zoom chi tiết từng pixel và tải xuống máy tính nhanh gọn.
+            </p>
+            <div class="hub-card-tags">
+              <span class="hub-tag"><i class="fa-solid fa-paste"></i> Phím tắt Ctrl+V</span>
+              <span class="hub-tag"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom chi tiết</span>
+              <span class="hub-tag"><i class="fa-solid fa-download"></i> Tải PNG</span>
+            </div>
+            <div class="hub-card-actions">
+              <a href="clipboard.html" class="hub-card-btn primary">
+                <i class="fa-solid fa-eye"></i> Mở Clipboard
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 4: FORM DECLARATION -->
+          <article class="hub-card" data-category="tools">
+            <div class="hub-card-top">
+              <div class="hub-card-icon icon-form">
+                <i class="fa-solid fa-id-card"></i>
+              </div>
+              <span class="hub-card-badge badge-form">Biểu mẫu trực tuyến</span>
+            </div>
+            <h3 class="hub-card-title">Biểu Mẫu Khai Báo Hồ Sơ</h3>
+            <p class="hub-card-desc">
+              Cổng khai báo hồ sơ thông tin trực tuyến chuẩn hóa: kiểm tra hợp lệ dữ liệu tự động, lưu trữ bảo mật và xuất báo cáo tiện lợi.
+            </p>
+            <div class="hub-card-tags">
+              <span class="hub-tag"><i class="fa-solid fa-check-double"></i> Validate</span>
+              <span class="hub-tag"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</span>
+            </div>
+            <div class="hub-card-actions">
+              <a href="form.html" class="hub-card-btn primary">
+                <i class="fa-solid fa-arrow-right"></i> Vào biểu mẫu
+              </a>
+            </div>
+          </article>
+
+          <!-- CARD 5: PRIVATE VAULT & IOT BRIDGE -->
+          <article class="hub-card" data-category="private">
+            <div class="hub-card-top">
+              <div class="hub-card-icon icon-vault">
+                <i class="fa-solid fa-lock"></i>
+              </div>
+              <span class="hub-card-badge badge-vault">Bảo mật cao</span>
+            </div>
+            <h3 class="hub-card-title">Khu Vực Riêng Tư & Smart Home</h3>
+            <p class="hub-card-desc">
+              Bảng điều khiển công tắc thông minh Sonoff/eWeLink, phát âm thanh loa Google Home Cast TTS, máy lạnh Panasonic và quản lý thiết bị gia đình.
+            </p>
+            <div class="hub-card-tags">
+              <span class="hub-tag"><i class="fa-solid fa-shield"></i> Mã hóa</span>
+              <span class="hub-tag"><i class="fa-solid fa-lightbulb"></i> eWeLink IoT</span>
+              <span class="hub-tag"><i class="fa-solid fa-volume-high"></i> Google Cast</span>
+            </div>
+            <div class="hub-card-actions">
+              <a href="login.html" class="hub-card-btn primary">
+                <i class="fa-solid fa-key"></i> Đăng nhập quản trị
+              </a>
+            </div>
+          </article>
         </div>
       </div>
     </section>
@@ -157,96 +268,49 @@
     <section class="about-section" id="about">
       <div class="container about-container">
         <div class="about-content">
-          <span class="badge">Đôi lời về tác giả</span>
-          <h2 class="section-title">Xin chào, mình là một người đam mê công nghệ & sáng tạo.</h2>
+          <span class="badge">Về người xây dựng</span>
+          <h2 class="section-title">Xin chào, mình là Trịnh Việt Cường.</h2>
           <p class="about-text">
-            Chào mừng bạn đến với góc nhỏ trên Internet của mình! Mình bắt đầu viết blog nhằm lưu giữ lại những kiến thức đã học, các bài học kinh nghiệm trong quá trình xây dựng sản phẩm và chia sẻ cùng cộng đồng.
+            Đây là không gian web cá nhân kết nối toàn bộ hệ sinh thái thiết bị, máy chủ gia đình và các công cụ tiện ích hỗ trợ công việc hằng ngày.
           </p>
           <p class="about-text">
-            Tại blog này, bạn sẽ tìm thấy các bài viết về Web Development, cách tối ưu hiệu năng, những công cụ AI mới nhất hỗ trợ công việc và những góc nhìn nhẹ nhàng về cuộc sống.
+            Trang được triển khai hoàn toàn tự động trên nền tảng GitHub Pages kết hợp Cloudflare Tunnel và Home Server Dell OptiPlex nội bộ mạng LAN 192.168.31.100.
           </p>
 
           <div class="tech-stack">
-            <h4>Công nghệ mình yêu thích:</h4>
+            <h4>Công nghệ & Nền tảng vận hành:</h4>
             <div class="tech-badges">
-              <span class="tech-tag"><i class="fa-brands fa-html5"></i> HTML5/CSS3</span>
-              <span class="tech-tag"><i class="fa-brands fa-js"></i> JavaScript</span>
-              <span class="tech-tag"><i class="fa-brands fa-react"></i> React / Next.js</span>
-              <span class="tech-tag"><i class="fa-brands fa-node-js"></i> Node.js</span>
-              <span class="tech-tag"><i class="fa-brands fa-git-alt"></i> Git & GitHub</span>
-              <span class="tech-tag"><i class="fa-solid fa-wand-magic-sparkles"></i> GenAI</span>
+              <span class="tech-tag"><i class="fa-solid fa-server"></i> Dell OptiPlex (LAN 192.168.31.100)</span>
+              <span class="tech-tag"><i class="fa-solid fa-cloud"></i> Cloudflare Quick Tunnel</span>
+              <span class="tech-tag"><i class="fa-brands fa-git-alt"></i> GitHub Actions & Pages</span>
+              <span class="tech-tag"><i class="fa-brands fa-node-js"></i> Node.js & PowerShell Sync</span>
+              <span class="tech-tag"><i class="fa-brands fa-html5"></i> Modern CSS View Transitions</span>
             </div>
           </div>
         </div>
 
         <div class="stats-box">
           <div class="stat-card">
+            <div class="stat-num">24/7</div>
+            <div class="stat-label">Thời gian Uptime Server</div>
+          </div>
+          <div class="stat-card">
             <div class="stat-num">5+</div>
-            <div class="stat-label">Năm kinh nghiệm</div>
+            <div class="stat-label">Dịch vụ & Tiện ích số</div>
           </div>
           <div class="stat-card">
-            <div class="stat-num">50+</div>
-            <div class="stat-label">Bài viết chia sẻ</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">10k+</div>
-            <div class="stat-label">Lượt người đọc</div>
+            <div class="stat-num">&lt; 1s</div>
+            <div class="stat-label">Thời gian tải trang</div>
           </div>
           <div class="stat-card">
             <div class="stat-num">100%</div>
-            <div class="stat-label">Đam mê & Tâm huyết</div>
+            <div class="stat-label">Tự động hóa đồng bộ</div>
           </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- NEWSLETTER SECTION -->
-    <section class="newsletter-section" id="newsletter">
-      <div class="container">
-        <div class="newsletter-card">
-          <div class="newsletter-icon">
-            <i class="fa-regular fa-paper-plane"></i>
-          </div>
-          <h2 class="newsletter-title">Nhận thông báo khi có bài viết mới</h2>
-          <p class="newsletter-desc">
-            Không spam! Chỉ gửi những bài viết chất lượng cao về công nghệ, lập trình và kinh nghiệm thực tiễn định kỳ hàng tháng.
-          </p>
-          <form class="newsletter-form" id="newsletterForm">
-            <div class="input-group">
-              <input type="email" id="newsletterEmail" placeholder="Nhập địa chỉ email của bạn..." required />
-              <button type="submit" class="btn btn-primary">
-                Đăng ký ngay <i class="fa-solid fa-arrow-right"></i>
-              </button>
-            </div>
-          </form>
-          <div class="form-feedback" id="formFeedback"></div>
         </div>
       </div>
     </section>
   </main>
 
-  <!-- MODAL ĐỌC BÀI VIẾT CHI TIẾT -->
-  <div class="article-modal" id="articleModal" aria-hidden="true" role="dialog">
-    <div class="modal-backdrop" id="modalBackdrop"></div>
-    <div class="modal-container">
-      <button class="modal-close-btn" id="modalCloseBtn" aria-label="Đóng bài viết">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-
-      <article class="modal-body" id="modalBody">
-        <!-- Content will be injected by JavaScript -->
-      </article>
-
-      <div class="modal-footer">
-        <button class="btn btn-secondary" id="modalShareBtn">
-          <i class="fa-solid fa-share-nodes"></i> Chia sẻ bài viết
-        </button>
-        <button class="btn btn-primary" id="modalDoneBtn">
-          <i class="fa-solid fa-check"></i> Đóng bài viết
-        </button>
-      </div>
-    </div>
-  </div>
 
   <!-- FOOTER -->
   <footer class="footer">
