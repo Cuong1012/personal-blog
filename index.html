@@ -119,150 +119,183 @@
       </div>
     </section>
 
-    <!-- INTERACTIVE SERVICES & TOOLS HUB (THAY THẾ BÀI VIẾT) -->
+    <!-- INTERACTIVE SERVICES & TOOLS HUB (HORIZONTAL STACKED CARDS) -->
     <section class="hub-section" id="services">
       <div class="container">
         <div class="section-header">
           <div>
             <h2 class="section-title">Hệ Sinh Thái & Tiện Ích Trực Tuyến</h2>
-            <p class="section-subtitle">Truy cập tức thì các máy chủ, công cụ xử lý tài liệu và tiện ích thông minh</p>
+            <p class="section-subtitle">Duyệt nhanh tiện ích theo dạng thẻ ngang xếp chồng — không cần cuộn dọc</p>
           </div>
 
-          <!-- Category Filter Tabs -->
-          <div class="hub-tabs" id="hubTabs">
-            <button class="hub-tab-btn active" data-category="all"><i class="fa-solid fa-layer-group"></i> Tất cả</button>
-            <button class="hub-tab-btn" data-category="server"><i class="fa-solid fa-server"></i> Home Server</button>
-            <button class="hub-tab-btn" data-category="tools"><i class="fa-solid fa-toolbox"></i> Tiện ích Media</button>
-            <button class="hub-tab-btn" data-category="private"><i class="fa-solid fa-shield-halved"></i> Bảo mật</button>
+          <!-- View Mode Toggle & Category Filter Tabs -->
+          <div class="hub-toolbar">
+            <div class="hub-tabs" id="hubTabs">
+              <button class="hub-tab-btn active" data-category="all"><i class="fa-solid fa-layer-group"></i> Tất cả</button>
+              <button class="hub-tab-btn" data-category="server"><i class="fa-solid fa-server"></i> Home Server</button>
+              <button class="hub-tab-btn" data-category="tools"><i class="fa-solid fa-toolbox"></i> Tiện ích Media</button>
+              <button class="hub-tab-btn" data-category="private"><i class="fa-solid fa-shield-halved"></i> Bảo mật</button>
+            </div>
+
+            <div class="view-mode-toggle" id="viewModeToggle">
+              <button class="view-mode-btn active" id="btnDeckMode" title="Hiệu ứng thẻ xếp chồng ngang">
+                <i class="fa-solid fa-layer-group"></i> Thẻ ngang
+              </button>
+              <button class="view-mode-btn" id="btnGridMode" title="Dạng lưới truyền thống">
+                <i class="fa-solid fa-table-cells-large"></i> Dạng lưới
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- Hub Cards Grid -->
-        <div class="hub-grid" id="hubGrid">
-          <!-- CARD 1: HOME SERVER -->
-          <article class="hub-card card-server" data-category="server">
-            <div class="hub-card-top">
-              <div class="hub-card-icon icon-server">
-                <i class="fa-solid fa-server"></i>
-              </div>
-              <span class="hub-card-badge badge-server">🟢 Trực tuyến 24/7</span>
-            </div>
-            <h3 class="hub-card-title">Home Server Dell OptiPlex 7040</h3>
-            <p class="hub-card-desc">
-              Máy chủ gia đình: theo dõi vi xử lý CPU, bộ nhớ RAM, nhiệt độ phần cứng, Home Assistant, ổ cứng NAS & đèn chiếu sáng WLED.
-            </p>
-            <div class="hub-card-tags">
-              <span class="hub-tag"><i class="fa-solid fa-network-wired"></i> 192.168.31.100</span>
-              <span class="hub-tag" id="hubTunnelTag"><i class="fa-solid fa-cloud"></i> Cloudflare Tunnel</span>
-              <span class="hub-tag"><i class="fa-solid fa-microchip"></i> Telemetry</span>
-            </div>
-            <div class="hub-card-actions">
-              <a href="server.html" class="hub-card-btn server-btn">
-                <i class="fa-solid fa-gauge-high"></i> Mở Dashboard
-              </a>
-              <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="hub-card-btn secondary" title="Mở Home Assistant">
-                <i class="fa-solid fa-house-signal"></i> Home Assistant
-              </a>
-            </div>
-          </article>
+        <!-- HORIZONTAL STACKED CARD DECK WRAPPER -->
+        <div class="hub-deck-wrapper deck-mode" id="hubDeckWrapper">
+          <button class="deck-nav-btn prev" id="deckPrevBtn" aria-label="Thẻ trước" title="Thẻ trước (hoặc phím Mũi tên trái)">
+            <i class="fa-solid fa-chevron-left"></i>
+          </button>
+          
+          <button class="deck-nav-btn next" id="deckNextBtn" aria-label="Thẻ kế tiếp" title="Thẻ sau (hoặc phím Mũi tên phải)">
+            <i class="fa-solid fa-chevron-right"></i>
+          </button>
 
-          <!-- CARD 2: IMAGE TO PDF SCANNER -->
-          <article class="hub-card" data-category="tools">
-            <div class="hub-card-top">
-              <div class="hub-card-icon icon-pdf">
-                <i class="fa-solid fa-file-pdf"></i>
-              </div>
-              <span class="hub-card-badge badge-pdf">Máy quét tài liệu</span>
-            </div>
-            <h3 class="hub-card-title">Bộ Chuyển Ảnh Sang PDF (Scanner)</h3>
-            <p class="hub-card-desc">
-              Quét tài liệu từ camera trực tiếp hoặc tải ảnh hàng loạt, tự động căn chỉnh phối cảnh 4 góc, bộ lọc làm sạch nền và giữ nguyên màu con dấu đỏ.
-            </p>
-            <div class="hub-card-tags">
-              <span class="hub-tag"><i class="fa-solid fa-camera"></i> Camera Scan</span>
-              <span class="hub-tag"><i class="fa-solid fa-stamp"></i> Giữ dấu đỏ</span>
-              <span class="hub-tag"><i class="fa-solid fa-crop-simple"></i> Cắt góc 4 điểm</span>
-            </div>
-            <div class="hub-card-actions">
-              <a href="image-to-pdf.html" class="hub-card-btn primary">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> Sử dụng ngay
-              </a>
-            </div>
-          </article>
+          <div class="hub-deck-stage" id="hubDeckStage">
+            <!-- Hub Cards Grid / Deck -->
+            <div class="hub-grid" id="hubGrid">
+              <!-- CARD 1: HOME SERVER -->
+              <article class="hub-card card-server" data-category="server" data-title="Home Server Dell OptiPlex 7040">
+                <div class="hub-card-top">
+                  <div class="hub-card-icon icon-server">
+                    <i class="fa-solid fa-server"></i>
+                  </div>
+                  <span class="hub-card-badge badge-server">🟢 Trực tuyến 24/7</span>
+                </div>
+                <h3 class="hub-card-title">Home Server Dell OptiPlex 7040</h3>
+                <p class="hub-card-desc">
+                  Máy chủ gia đình: theo dõi vi xử lý CPU, bộ nhớ RAM, nhiệt độ phần cứng, Home Assistant, ổ cứng NAS & đèn chiếu sáng WLED.
+                </p>
+                <div class="hub-card-tags">
+                  <span class="hub-tag"><i class="fa-solid fa-network-wired"></i> 192.168.31.100</span>
+                  <span class="hub-tag" id="hubTunnelTag"><i class="fa-solid fa-cloud"></i> Cloudflare Tunnel</span>
+                  <span class="hub-tag"><i class="fa-solid fa-microchip"></i> Telemetry</span>
+                </div>
+                <div class="hub-card-actions">
+                  <a href="server.html" class="hub-card-btn server-btn">
+                    <i class="fa-solid fa-gauge-high"></i> Mở Dashboard
+                  </a>
+                  <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="hub-card-btn secondary" title="Mở Home Assistant">
+                    <i class="fa-solid fa-house-signal"></i> Home Assistant
+                  </a>
+                </div>
+              </article>
 
-          <!-- CARD 3: CLIPBOARD VIEWER -->
-          <article class="hub-card" data-category="tools">
-            <div class="hub-card-top">
-              <div class="hub-card-icon icon-clip">
-                <i class="fa-regular fa-image"></i>
-              </div>
-              <span class="hub-card-badge badge-clip">Tức thì (Ctrl+V)</span>
-            </div>
-            <h3 class="hub-card-title">Xem & Trích Xuất Ảnh Clipboard</h3>
-            <p class="hub-card-desc">
-              Chỉ cần bấm Ctrl + V để xem ngay hình ảnh chụp màn hình từ bộ nhớ tạm, hỗ trợ zoom chi tiết từng pixel và tải xuống máy tính nhanh gọn.
-            </p>
-            <div class="hub-card-tags">
-              <span class="hub-tag"><i class="fa-solid fa-paste"></i> Phím tắt Ctrl+V</span>
-              <span class="hub-tag"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom chi tiết</span>
-              <span class="hub-tag"><i class="fa-solid fa-download"></i> Tải PNG</span>
-            </div>
-            <div class="hub-card-actions">
-              <a href="clipboard.html" class="hub-card-btn primary">
-                <i class="fa-solid fa-eye"></i> Mở Clipboard
-              </a>
-            </div>
-          </article>
+              <!-- CARD 2: IMAGE TO PDF SCANNER -->
+              <article class="hub-card" data-category="tools" data-title="Bộ Chuyển Ảnh Sang PDF (Scanner)">
+                <div class="hub-card-top">
+                  <div class="hub-card-icon icon-pdf">
+                    <i class="fa-solid fa-file-pdf"></i>
+                  </div>
+                  <span class="hub-card-badge badge-pdf">Máy quét tài liệu</span>
+                </div>
+                <h3 class="hub-card-title">Bộ Chuyển Ảnh Sang PDF (Scanner)</h3>
+                <p class="hub-card-desc">
+                  Quét tài liệu từ camera trực tiếp hoặc tải ảnh hàng loạt, tự động căn chỉnh phối cảnh 4 góc, bộ lọc làm sạch nền và giữ nguyên màu con dấu đỏ.
+                </p>
+                <div class="hub-card-tags">
+                  <span class="hub-tag"><i class="fa-solid fa-camera"></i> Camera Scan</span>
+                  <span class="hub-tag"><i class="fa-solid fa-stamp"></i> Giữ dấu đỏ</span>
+                  <span class="hub-tag"><i class="fa-solid fa-crop-simple"></i> Cắt góc 4 điểm</span>
+                </div>
+                <div class="hub-card-actions">
+                  <a href="image-to-pdf.html" class="hub-card-btn primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Sử dụng ngay
+                  </a>
+                </div>
+              </article>
 
-          <!-- CARD 4: FORM DECLARATION -->
-          <article class="hub-card" data-category="tools">
-            <div class="hub-card-top">
-              <div class="hub-card-icon icon-form">
-                <i class="fa-solid fa-id-card"></i>
-              </div>
-              <span class="hub-card-badge badge-form">Biểu mẫu trực tuyến</span>
-            </div>
-            <h3 class="hub-card-title">Biểu Mẫu Khai Báo Hồ Sơ</h3>
-            <p class="hub-card-desc">
-              Cổng khai báo hồ sơ thông tin trực tuyến chuẩn hóa: kiểm tra hợp lệ dữ liệu tự động, lưu trữ bảo mật và xuất báo cáo tiện lợi.
-            </p>
-            <div class="hub-card-tags">
-              <span class="hub-tag"><i class="fa-solid fa-check-double"></i> Validate</span>
-              <span class="hub-tag"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</span>
-            </div>
-            <div class="hub-card-actions">
-              <a href="form.html" class="hub-card-btn primary">
-                <i class="fa-solid fa-arrow-right"></i> Vào biểu mẫu
-              </a>
-            </div>
-          </article>
+              <!-- CARD 3: CLIPBOARD VIEWER -->
+              <article class="hub-card" data-category="tools" data-title="Xem & Trích Xuất Ảnh Clipboard">
+                <div class="hub-card-top">
+                  <div class="hub-card-icon icon-clip">
+                    <i class="fa-regular fa-image"></i>
+                  </div>
+                  <span class="hub-card-badge badge-clip">Tức thì (Ctrl+V)</span>
+                </div>
+                <h3 class="hub-card-title">Xem & Trích Xuất Ảnh Clipboard</h3>
+                <p class="hub-card-desc">
+                  Chỉ cần bấm Ctrl + V để xem ngay hình ảnh chụp màn hình từ bộ nhớ tạm, hỗ trợ zoom chi tiết từng pixel và tải xuống máy tính nhanh gọn.
+                </p>
+                <div class="hub-card-tags">
+                  <span class="hub-tag"><i class="fa-solid fa-paste"></i> Phím tắt Ctrl+V</span>
+                  <span class="hub-tag"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom chi tiết</span>
+                  <span class="hub-tag"><i class="fa-solid fa-download"></i> Tải PNG</span>
+                </div>
+                <div class="hub-card-actions">
+                  <a href="clipboard.html" class="hub-card-btn primary">
+                    <i class="fa-solid fa-eye"></i> Mở Clipboard
+                  </a>
+                </div>
+              </article>
 
-          <!-- CARD 5: PRIVATE VAULT & IOT BRIDGE -->
-          <article class="hub-card" data-category="private">
-            <div class="hub-card-top">
-              <div class="hub-card-icon icon-vault">
-                <i class="fa-solid fa-lock"></i>
-              </div>
-              <span class="hub-card-badge badge-vault">Bảo mật cao</span>
+              <!-- CARD 4: FORM DECLARATION -->
+              <article class="hub-card" data-category="tools" data-title="Biểu Mẫu Khai Báo Hồ Sơ">
+                <div class="hub-card-top">
+                  <div class="hub-card-icon icon-form">
+                    <i class="fa-solid fa-id-card"></i>
+                  </div>
+                  <span class="hub-card-badge badge-form">Biểu mẫu trực tuyến</span>
+                </div>
+                <h3 class="hub-card-title">Biểu Mẫu Khai Báo Hồ Sơ</h3>
+                <p class="hub-card-desc">
+                  Cổng khai báo hồ sơ thông tin trực tuyến chuẩn hóa: kiểm tra hợp lệ dữ liệu tự động, lưu trữ bảo mật và xuất báo cáo tiện lợi.
+                </p>
+                <div class="hub-card-tags">
+                  <span class="hub-tag"><i class="fa-solid fa-check-double"></i> Validate</span>
+                  <span class="hub-tag"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</span>
+                </div>
+                <div class="hub-card-actions">
+                  <a href="form.html" class="hub-card-btn primary">
+                    <i class="fa-solid fa-arrow-right"></i> Vào biểu mẫu
+                  </a>
+                </div>
+              </article>
+
+              <!-- CARD 5: PRIVATE VAULT & IOT BRIDGE -->
+              <article class="hub-card" data-category="private" data-title="Khu Vực Riêng Tư & Smart Home">
+                <div class="hub-card-top">
+                  <div class="hub-card-icon icon-vault">
+                    <i class="fa-solid fa-lock"></i>
+                  </div>
+                  <span class="hub-card-badge badge-vault">Bảo mật cao</span>
+                </div>
+                <h3 class="hub-card-title">Khu Vực Riêng Tư & Smart Home</h3>
+                <p class="hub-card-desc">
+                  Bảng điều khiển công tắc thông minh Sonoff/eWeLink, phát âm thanh loa Google Home Cast TTS, máy lạnh Panasonic và quản lý thiết bị gia đình.
+                </p>
+                <div class="hub-card-tags">
+                  <span class="hub-tag"><i class="fa-solid fa-shield"></i> Mã hóa</span>
+                  <span class="hub-tag"><i class="fa-solid fa-lightbulb"></i> eWeLink IoT</span>
+                  <span class="hub-tag"><i class="fa-solid fa-volume-high"></i> Google Cast</span>
+                </div>
+                <div class="hub-card-actions">
+                  <a href="login.html" class="hub-card-btn primary">
+                    <i class="fa-solid fa-key"></i> Đăng nhập quản trị
+                  </a>
+                </div>
+              </article>
             </div>
-            <h3 class="hub-card-title">Khu Vực Riêng Tư & Smart Home</h3>
-            <p class="hub-card-desc">
-              Bảng điều khiển công tắc thông minh Sonoff/eWeLink, phát âm thanh loa Google Home Cast TTS, máy lạnh Panasonic và quản lý thiết bị gia đình.
-            </p>
-            <div class="hub-card-tags">
-              <span class="hub-tag"><i class="fa-solid fa-shield"></i> Mã hóa</span>
-              <span class="hub-tag"><i class="fa-solid fa-lightbulb"></i> eWeLink IoT</span>
-              <span class="hub-tag"><i class="fa-solid fa-volume-high"></i> Google Cast</span>
+          </div>
+
+          <!-- Deck Bottom Pagination & Indicators -->
+          <div class="deck-indicators" id="deckIndicators">
+            <div class="deck-dots" id="deckDots"></div>
+            <div class="deck-status-label" id="deckStatusLabel">
+              <span id="deckCurrentIndex">1</span> / <span id="deckTotalCards">5</span>: <strong id="deckCardTitle">Home Server Dell OptiPlex 7040</strong>
             </div>
-            <div class="hub-card-actions">
-              <a href="login.html" class="hub-card-btn primary">
-                <i class="fa-solid fa-key"></i> Đăng nhập quản trị
-              </a>
-            </div>
-          </article>
+          </div>
         </div>
       </div>
     </section>
+
 
     <!-- ABOUT SECTION -->
     <section class="about-section" id="about">

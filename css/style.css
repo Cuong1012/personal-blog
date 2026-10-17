@@ -596,7 +596,50 @@ button, input {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-bottom: 36px;
+}
+
+.hub-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+}
+
+.view-mode-btn {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.view-mode-btn:hover {
+  color: var(--primary);
+}
+
+.view-mode-btn.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
 .hub-tab-btn {
@@ -627,13 +670,237 @@ button, input {
   box-shadow: 0 4px 14px var(--primary-glow);
 }
 
-/* Hub Grid */
-.hub-grid {
+/* ========================================================
+   HORIZONTAL STACKED CARD DECK (COVERFLOW MODE)
+   ======================================================== */
+.hub-deck-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  perspective: 1400px;
+}
+
+.hub-deck-stage {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  padding: 20px 0;
+}
+
+/* Deck Mode Behavior */
+.deck-mode .hub-grid {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.deck-mode .hub-card {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 440px;
+  min-height: 410px;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease, filter 0.4s ease, box-shadow 0.4s ease;
+  user-select: none;
+  cursor: pointer;
+}
+
+/* Layer: Active Front Card */
+.deck-mode .hub-card.card-active {
+  z-index: 20;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotateY(0deg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.28), 0 0 0 2px var(--primary);
+  filter: blur(0px);
+  pointer-events: auto;
+  cursor: default;
+}
+
+[data-theme="dark"] .deck-mode .hub-card.card-active {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75), 0 0 0 2px var(--primary);
+}
+
+/* Layer: Next Card +1 (Stacked Right) */
+.deck-mode .hub-card.card-next-1 {
+  z-index: 15;
+  opacity: 0.85;
+  transform: translate(calc(-50% + 155px), -50%) scale(0.9) rotateY(-8deg);
+  filter: blur(0.3px);
+}
+.deck-mode .hub-card.card-next-1:hover {
+  opacity: 0.95;
+  transform: translate(calc(-50% + 165px), -50%) scale(0.92) rotateY(-4deg);
+}
+
+/* Layer: Next Card +2 (Stacked Far Right) */
+.deck-mode .hub-card.card-next-2 {
+  z-index: 10;
+  opacity: 0.55;
+  transform: translate(calc(-50% + 295px), -50%) scale(0.8) rotateY(-14deg);
+  filter: blur(0.8px);
+}
+.deck-mode .hub-card.card-next-2:hover {
+  opacity: 0.75;
+  transform: translate(calc(-50% + 305px), -50%) scale(0.82) rotateY(-10deg);
+}
+
+/* Layer: Prev Card -1 (Stacked Left) */
+.deck-mode .hub-card.card-prev-1 {
+  z-index: 15;
+  opacity: 0.85;
+  transform: translate(calc(-50% - 155px), -50%) scale(0.9) rotateY(8deg);
+  filter: blur(0.3px);
+}
+.deck-mode .hub-card.card-prev-1:hover {
+  opacity: 0.95;
+  transform: translate(calc(-50% - 165px), -50%) scale(0.92) rotateY(4deg);
+}
+
+/* Layer: Prev Card -2 (Stacked Far Left) */
+.deck-mode .hub-card.card-prev-2 {
+  z-index: 10;
+  opacity: 0.55;
+  transform: translate(calc(-50% - 295px), -50%) scale(0.8) rotateY(14deg);
+  filter: blur(0.8px);
+}
+.deck-mode .hub-card.card-prev-2:hover {
+  opacity: 0.75;
+  transform: translate(calc(-50% - 305px), -50%) scale(0.82) rotateY(10deg);
+}
+
+/* Hidden Cards beyond visible stack */
+.deck-mode .hub-card.card-hidden {
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.65);
+}
+
+/* Navigation Arrows */
+.deck-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-surface-glass);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 30;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-lg);
+  transition: var(--transition);
+}
+
+.deck-nav-btn:hover {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 4px 16px var(--primary-glow);
+}
+
+.deck-nav-btn.prev {
+  left: -12px;
+}
+
+.deck-nav-btn.next {
+  right: -12px;
+}
+
+/* Deck Indicators & Dots */
+.deck-indicators {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.deck-dots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--border-color);
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.deck-dot:hover {
+  background: var(--primary-hover);
+}
+
+.deck-dot.active {
+  width: 32px;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.deck-status-label {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ========================================================
+   GRID MODE (FALLBACK / USER TOGGLE)
+   ======================================================== */
+.grid-mode .hub-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 28px;
 }
 
+.grid-mode .hub-deck-stage {
+  height: auto;
+  display: block;
+  padding: 0;
+}
+
+.grid-mode .deck-nav-btn,
+.grid-mode .deck-indicators {
+  display: none !important;
+}
+
+.grid-mode .hub-card {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+  max-width: 100%;
+  pointer-events: auto !important;
+}
+
+/* Common Hub Card styling */
 .hub-card {
   position: relative;
   background: var(--bg-card);
@@ -643,11 +910,11 @@ button, input {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow-sm);
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease;
   overflow: hidden;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
 
 .hub-card::before {
   content: '';
@@ -1236,4 +1503,38 @@ button, input {
     flex-direction: column;
     text-align: center;
   }
+
+  /* Deck Mode Mobile Adjustments */
+  .hub-deck-stage {
+    height: 490px;
+  }
+  .deck-mode .hub-card {
+    max-width: 88vw;
+    min-height: 430px;
+    padding: 22px 18px;
+  }
+  .deck-mode .hub-card.card-next-1 {
+    transform: translate(calc(-50% + 40px), -50%) scale(0.92) rotateY(-4deg);
+    opacity: 0.55;
+  }
+  .deck-mode .hub-card.card-next-2 {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .deck-mode .hub-card.card-prev-1 {
+    transform: translate(calc(-50% - 40px), -50%) scale(0.92) rotateY(4deg);
+    opacity: 0.55;
+  }
+  .deck-mode .hub-card.card-prev-2 {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .deck-nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  .deck-nav-btn.prev { left: -6px; }
+  .deck-nav-btn.next { right: -6px; }
 }
+

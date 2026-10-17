@@ -1,6 +1,7 @@
 /**
  * CUONGTV - PERSONAL PORTAL & HOME SERVER HUB
- * Manages Theme toggle, Dynamic Hero Typing, Live Server Polling, Hub Filtering & 3D Tilt.
+ * Features: Horizontal Stacked Card Deck (Coverflow), Grid Mode Toggle,
+ * Dynamic Typing, Live Server Polling, Theme Toggle & Keyboard/Touch Gestures.
  */
 
 // ==========================================
@@ -80,12 +81,12 @@ function typeLoop() {
   let delay = isDeleting ? 40 : 80;
 
   if (!isDeleting && charIndex === currentPhrase.length) {
-    delay = 2000; // Pause at full word
+    delay = 2000;
     isDeleting = true;
   } else if (isDeleting && charIndex === 0) {
     isDeleting = false;
     phraseIndex = (phraseIndex + 1) % TYPING_PHRASES.length;
-    delay = 400; // Pause before typing next word
+    delay = 400;
   }
 
   setTimeout(typeLoop, delay);
@@ -117,67 +118,240 @@ async function checkLiveServer() {
 }
 
 // ==========================================
-// 5. INTERACTIVE HUB TABS FILTER
+// 5. HORIZONTAL STACKED CARD DECK (COVERFLOW)
+// ==========================================
+const hubDeckWrapper = document.getElementById("hubDeckWrapper");
+const allHubCards = Array.from(document.querySelectorAll(".hub-card"));
+const deckPrevBtn = document.getElementById("deckPrevBtn");
+const deckNextBtn = document.getElementById("deckNextBtn");
+const deckDotsContainer = document.getElementById("deckDots");
+const deckCurrentIndexEl = document.getElementById("deckCurrentIndex");
+const deckTotalCardsEl = document.getElementById("deckTotalCards");
+const deckCardTitleEl = document.getElementById("deckCardTitle");
+const btnDeckMode = document.getElementById("btnDeckMode");
+const btnGridMode = document.getElementById("btnGridMode");
+
+let currentCategory = "all";
+let visibleCards = [...allHubCards];
+let activeDeckIndex = 0;
+let isDeckMode = true;
+
+// Build pagination dots
+function renderDeckDots() {
+  if (!deckDotsContainer) return;
+  deckDotsContainer.innerHTML = "";
+  visibleCards.forEach((card, idx) => {
+    const dot = document.createElement("button");
+    dot.className = `deck-dot ${idx === activeDeckIndex ? "active" : ""}`;
+    dot.setAttribute("aria-label", `Xem thẻ ${idx + 1}`);
+    dot.addEventListener("click", () => {
+      activeDeckIndex = idx;
+      updateDeckPositions();
+    });
+    deckDotsContainer.appendChild(dot);
+  });
+}
+
+// Position cards horizontally in 3D perspective
+function updateDeckPositions() {
+  if (!isDeckMode) return;
+
+  if (visibleCards.length === 0) return;
+
+  if (activeDeckIndex >= visibleCards.length) {
+    activeDeckIndex = 0;
+  }
+
+  // Update card classes
+  allHubCards.forEach(card => {
+    const visibleIdx = visibleCards.indexOf(card);
+
+    // Remove all deck state classes
+    card.classList.remove(
+      "card-active",
+      "card-next-1",
+      "card-next-2",
+      "card-prev-1",
+      "card-prev-2",
+      "card-hidden"
+    );
+
+    if (visibleIdx === -1) {
+      card.style.display = "none";
+      return;
+    }
+
+    card.style.display = "flex";
+    const delta = visibleIdx - activeDeckIndex;
+
+    if (delta === 0) {
+      card.classList.add("card-active");
+    } else if (delta === 1) {
+      card.classList.add("card-next-1");
+    } else if (delta === 2) {
+      card.classList.add("card-next-2");
+    } else if (delta === -1) {
+      card.classList.add("card-prev-1");
+    } else if (delta === -2) {
+      card.classList.add("card-prev-2");
+    } else {
+      card.classList.add("card-hidden");
+    }
+  });
+
+  // Update Dots
+  if (deckDotsContainer) {
+    const dots = deckDotsContainer.querySelectorAll(".deck-dot");
+    dots.forEach((dot, idx) => {
+      dot.classList.toggle("active", idx === activeDeckIndex);
+    });
+  }
+
+  // Update Label
+  if (deckCurrentIndexEl) deckCurrentIndexEl.textContent = activeDeckIndex + 1;
+  if (deckTotalCardsEl) deckTotalCardsEl.textContent = visibleCards.length;
+  if (deckCardTitleEl && visibleCards[activeDeckIndex]) {
+    deckCardTitleEl.textContent = visibleCards[activeDeckIndex].getAttribute("data-title") || "";
+  }
+}
+
+// Next / Previous Navigation
+function nextCard() {
+  if (visibleCards.length <= 1) return;
+  activeDeckIndex = (activeDeckIndex + 1) % visibleCards.length;
+  updateDeckPositions();
+}
+
+function prevCard() {
+  if (visibleCards.length <= 1) return;
+  activeDeckIndex = (activeDeckIndex - 1 + visibleCards.length) % visibleCards.length;
+  updateDeckPositions();
+}
+
+if (deckNextBtn) deckNextBtn.addEventListener("click", nextCard);
+if (deckPrevBtn) deckPrevBtn.addEventListener("click", prevCard);
+
+// Click directly on stacked cards to bring them to front
+allHubCards.forEach(card => {
+  card.addEventListener("click", (e) => {
+    if (!isDeckMode) return;
+
+    // If clicking an action link/button inside the active card, let it trigger
+    if (e.target.closest("a") || e.target.closest("button")) {
+      return;
+    }
+
+    const cardIdx = visibleCards.indexOf(card);
+    if (cardIdx !== -1 && cardIdx !== activeDeckIndex) {
+      e.preventDefault();
+      activeDeckIndex = cardIdx;
+      updateDeckPositions();
+    }
+  });
+});
+
+// Keyboard Navigation (ArrowLeft / ArrowRight)
+window.addEventListener("keydown", (e) => {
+  if (!isDeckMode) return;
+  if (e.key === "ArrowRight") {
+    nextCard();
+  } else if (e.key === "ArrowLeft") {
+    prevCard();
+  }
+});
+
+// Touch Swipe on Deck Stage
+let touchStartX = 0;
+let touchEndX = 0;
+const deckStage = document.getElementById("hubDeckStage");
+
+if (deckStage) {
+  deckStage.addEventListener("touchstart", (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  deckStage.addEventListener("touchend", (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  }, { passive: true });
+}
+
+function handleSwipe() {
+  const diffX = touchEndX - touchStartX;
+  if (Math.abs(diffX) > 40) {
+    if (diffX < 0) {
+      nextCard(); // Swiped left -> next
+    } else {
+      prevCard(); // Swiped right -> prev
+    }
+  }
+}
+
+// View Mode Toggle (Deck vs Grid)
+if (btnDeckMode && btnGridMode && hubDeckWrapper) {
+  btnDeckMode.addEventListener("click", () => {
+    isDeckMode = true;
+    hubDeckWrapper.classList.remove("grid-mode");
+    hubDeckWrapper.classList.add("deck-mode");
+    btnDeckMode.classList.add("active");
+    btnGridMode.classList.remove("active");
+    updateDeckPositions();
+  });
+
+  btnGridMode.addEventListener("click", () => {
+    isDeckMode = false;
+    hubDeckWrapper.classList.remove("deck-mode");
+    hubDeckWrapper.classList.add("grid-mode");
+    btnGridMode.classList.add("active");
+    btnDeckMode.classList.remove("active");
+
+    // In grid mode, display cards normally
+    allHubCards.forEach(card => {
+      const match = currentCategory === "all" || card.getAttribute("data-category") === currentCategory;
+      card.style.display = match ? "flex" : "none";
+      card.classList.remove(
+        "card-active",
+        "card-next-1",
+        "card-next-2",
+        "card-prev-1",
+        "card-prev-2",
+        "card-hidden"
+      );
+    });
+  });
+}
+
+// ==========================================
+// 6. CATEGORY FILTERING (DECK & GRID COMPATIBLE)
 // ==========================================
 const hubTabButtons = document.querySelectorAll(".hub-tab-btn");
-const hubCards = document.querySelectorAll(".hub-card");
 
 hubTabButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     hubTabButtons.forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
 
-    const category = btn.getAttribute("data-category");
+    currentCategory = btn.getAttribute("data-category");
 
-    hubCards.forEach(card => {
-      const cardCategory = card.getAttribute("data-category");
-      const shouldShow = category === "all" || cardCategory === category;
+    if (currentCategory === "all") {
+      visibleCards = [...allHubCards];
+    } else {
+      visibleCards = allHubCards.filter(card => card.getAttribute("data-category") === currentCategory);
+    }
 
-      if (shouldShow) {
-        card.style.display = "flex";
-        requestAnimationFrame(() => {
-          card.style.opacity = "1";
-          card.style.transform = "scale(1)";
-        });
-      } else {
-        card.style.opacity = "0";
-        card.style.transform = "scale(0.96)";
-        setTimeout(() => {
-          if (btn.classList.contains("active") && btn.getAttribute("data-category") !== "all" && card.getAttribute("data-category") !== btn.getAttribute("data-category")) {
-            card.style.display = "none";
-          }
-        }, 250);
-      }
-    });
+    activeDeckIndex = 0;
+    renderDeckDots();
+
+    if (isDeckMode) {
+      updateDeckPositions();
+    } else {
+      allHubCards.forEach(card => {
+        const match = currentCategory === "all" || card.getAttribute("data-category") === currentCategory;
+        card.style.display = match ? "flex" : "none";
+      });
+    }
   });
 });
-
-// ==========================================
-// 6. 3D TILT EFFECT ON CARDS (RESPECT REDUCED MOTION)
-// ==========================================
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-if (!prefersReducedMotion && window.innerWidth > 768) {
-  hubCards.forEach(card => {
-    card.addEventListener("mousemove", (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-
-      const rotateX = ((y - centerY) / centerY) * -5;
-      const rotateY = ((x - centerX) / centerX) * 5;
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-8px) scale(1.01)`;
-    });
-
-    card.addEventListener("mouseleave", () => {
-      card.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0) scale(1)";
-    });
-  });
-}
 
 // ==========================================
 // 7. INITIALIZE
@@ -186,4 +360,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initTheme();
   typeLoop();
   checkLiveServer();
+  renderDeckDots();
+  updateDeckPositions();
 });
