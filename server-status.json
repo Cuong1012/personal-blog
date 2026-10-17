@@ -1,17 +1,17 @@
-{
-  "lanIp": "192.168.31.100",
-  "cloudUrl": "https://nuts-denied-agreed-mike.trycloudflare.com",
-  "updatedAt": "2026-10-17T16:27:00+07:00",
-  "status": "online",
-  "serverName": "Dell OptiPlex 7040 Micro",
-  "services": {
-    "dashboard": "/server.html",
-    "homeAssistant": ":8123",
-    "nas": "/nas",
-    "uptimeKuma": ":3000",
-    "wled1": "http://192.168.31.200",
-    "wled2": "http://192.168.31.201",
-    "smb": "\\\\192.168.31.100\\NAS_Data",
-    "mariaDb": "192.168.31.100:3306"
-  }
+﻿{
+    "lanIp":  "192.168.31.100",
+    "cloudUrl":  "https://nuts-denied-agreed-mike.trycloudflare.com",
+    "updatedAt":  "2026-10-17T16:51:48+07:00",
+    "status":  "online",
+    "serverName":  "Dell OptiPlex 7040 Micro",
+    "services":  {
+                     "dashboard":  "/server.html",
+                     "homeAssistant":  ":8123",
+                     "nas":  "/nas",
+                     "uptimeKuma":  ":3000",
+                     "wled1":  "http://192.168.31.200",
+                     "wled2":  "http://192.168.31.201",
+                     "smb":  "\\\\192.168.31.100\\NAS_Data",
+                     "mariaDb":  "192.168.31.100:3306"
+                 }
 }
