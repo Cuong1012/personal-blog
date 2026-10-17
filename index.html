@@ -14,6 +14,13 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+  <!-- Preload Critical Parallax Assets for Instant 60/120Hz Silkiness -->
+  <link rel="preload" as="image" href="https://plugin-assets.open-design.ai/plugins/dreamcore-landing/image_1_vdzwae-464f73.webp" />
+  <link rel="preload" as="image" href="https://plugin-assets.open-design.ai/plugins/dreamcore-landing/curtain_left_znkmva-f9eb4c.webp" />
+  <link rel="preload" as="image" href="https://plugin-assets.open-design.ai/plugins/dreamcore-landing/curtain_right_paeyym-9fa947.webp" />
+  <link rel="preload" as="image" href="https://plugin-assets.open-design.ai/plugins/dreamcore-landing/image_2_gkcdlx-5f252f.webp" />
+  <link rel="preload" as="image" href="https://plugin-assets.open-design.ai/plugins/dreamcore-landing/bottom_clouds_xskut6-c56b42.webp" />
+
   <style>
     /* ========================================================
        GLOBAL & RESET
@@ -95,6 +102,8 @@
       width: 100%;
       height: 100%;
       will-change: transform, opacity;
+      transform: translateZ(0);
+      backface-visibility: hidden;
       user-select: none;
     }
 
@@ -585,7 +594,7 @@
     }
 
     /* ========================================================
-       ARC CARD SLIDER COMPONENT (z 12)
+       ARC CARD SLIDER COMPONENT (z 25)
        ======================================================== */
     .arc-card {
       position: absolute;
@@ -599,8 +608,10 @@
       justify-content: space-between;
       cursor: pointer;
       pointer-events: auto;
-      transition: box-shadow 0.3s ease, transform 0.2s ease;
+      transition: box-shadow 0.3s ease;
       will-change: transform, opacity;
+      transform: translateZ(0);
+      backface-visibility: hidden;
       backdrop-filter: blur(4px);
     }
     .arc-card:hover {
@@ -978,6 +989,7 @@
       <header class="nav-bar">
         <div class="nav-group">
           <a href="server.html" class="nav-link" style="color: #a7f3d0;"><i class="fa-solid fa-server"></i> Home Server</a>
+          <a href="/nas" class="nav-link nav-desktop-only"><i class="fa-solid fa-folder-tree"></i> NAS Data</a>
           <a href="image-to-pdf.html" class="nav-link nav-desktop-only">Scanner PDF</a>
           <a href="clipboard.html" class="nav-link nav-desktop-only">Clipboard</a>
         </div>
@@ -998,6 +1010,7 @@
 
         <div class="nav-group">
           <a href="#ecosystem" class="nav-link nav-desktop-only">Hệ sinh thái</a>
+          <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="nav-link nav-desktop-only" title="Home Assistant"><i class="fa-solid fa-house-signal"></i> HA</a>
           <a href="form.html" class="nav-link nav-desktop-only">Khai báo</a>
           <a href="login.html" class="nav-link"><i class="fa-solid fa-lock"></i> Vault</a>
         </div>
@@ -1202,6 +1215,28 @@
             <i class="fa-solid fa-key"></i> Đăng nhập quản trị
           </a>
         </article>
+
+        <!-- Card 6: FileBrowser NAS -->
+        <article class="eco-card">
+          <div class="eco-card-top">
+            <div class="eco-icon" style="background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">
+              <i class="fa-solid fa-folder-tree"></i>
+            </div>
+            <span class="eco-badge" style="background: rgba(14, 165, 233, 0.2); color: #0ea5e9;">NAS Storage</span>
+          </div>
+          <h3 class="eco-title">Ổ Cứng Mạng & Quản Lý File (NAS)</h3>
+          <p class="eco-desc">
+            FileBrowser Web UI quản lý kho dữ liệu NAS_Data dung lượng lớn, xem video, nghe nhạc, chia sẻ tệp tốc độ cao mạng nội bộ LAN.
+          </p>
+          <div class="eco-tags">
+            <span class="eco-tag"><i class="fa-solid fa-hard-drive"></i> NAS_Data</span>
+            <span class="eco-tag"><i class="fa-solid fa-share-nodes"></i> Chia sẻ tệp</span>
+            <span class="eco-tag"><i class="fa-solid fa-bolt"></i> 1Gbps LAN</span>
+          </div>
+          <a href="/nas" class="eco-btn eco-btn-primary" style="margin-top: auto;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở FileBrowser NAS
+          </a>
+        </article>
       </div>
 
       <!-- Footer -->
@@ -1239,7 +1274,6 @@
     const easeInOut = (t) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     const lerp = (a, b, t) => a + (b - a) * t;
     const clamp = (v, mn, mx) => Math.min(Math.max(v, mn), mx);
-    const isMobile = () => window.matchMedia('(max-width: 767px)').matches;
 
     // DOM Elements
     const container = document.getElementById('parallaxContainer');
@@ -1279,18 +1313,34 @@
     }
     buildArcCards();
 
-    // 3. Mouse Parallax Tracker
+    // 3. Ultra-Smooth Performance Optimization: Dimension Caching (Zero Layout Thrashing in RAF)
+    let totalScroll = 1;
+    let windowWidth = window.innerWidth;
+    let windowHeight = window.innerHeight;
+    let cachedIsMobile = windowWidth <= 767;
+
+    function onResize() {
+      windowWidth = window.innerWidth;
+      windowHeight = window.innerHeight;
+      cachedIsMobile = windowWidth <= 767;
+      totalScroll = Math.max(1, container.scrollHeight - windowHeight);
+    }
+    window.addEventListener('resize', onResize, { passive: true });
+    window.addEventListener('orientationchange', onResize, { passive: true });
+    onResize();
+
+    // 4. Mouse Parallax Tracker (Passive listener)
     let rawMouseX = 0;
     let rawMouseY = 0;
     let smoothMouseX = 0;
     let smoothMouseY = 0;
 
     window.addEventListener('mousemove', (e) => {
-      rawMouseX = (e.clientX / window.innerWidth) * 2 - 1;
-      rawMouseY = (e.clientY / window.innerHeight) * 2 - 1;
-    });
+      rawMouseX = (e.clientX / windowWidth) * 2 - 1;
+      rawMouseY = (e.clientY / windowHeight) * 2 - 1;
+    }, { passive: true });
 
-    // 4. Entrance Milestones
+    // 5. Entrance Milestones
     let entranceDone = false;
 
     // t = 100ms: Open curtains
@@ -1313,29 +1363,37 @@
       curtainRight.style.transition = 'none';
     }, 2200);
 
-    // 5. Live Server Status Check
+    // 6. Live Server Status Check (Smart LAN vs Cloud detection)
     async function checkLiveServer() {
+      const isLan = location.hostname === '192.168.31.100' || location.hostname === 'localhost' || location.hostname.startsWith('192.168.');
+      if (isLan && ecoTunnelTag) {
+        ecoTunnelTag.innerHTML = `<i class="fa-solid fa-network-wired"></i> <strong>LAN 192.168.31.100</strong> (1Gbps)`;
+      }
+
       try {
         const res = await fetch(`server-status.json?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
           if (data.cloudUrl && ecoTunnelTag) {
-            ecoTunnelTag.innerHTML = `<i class="fa-solid fa-cloud"></i> <a href="${data.cloudUrl}" target="_blank" style="color:inherit; text-decoration:underline;">Cloud Tunnel</a>`;
+            if (isLan) {
+              ecoTunnelTag.innerHTML = `<i class="fa-solid fa-network-wired"></i> LAN 192.168.31.100 · <a href="${data.cloudUrl}" target="_blank" style="color:inherit; text-decoration:underline;">Cloud Tunnel</a>`;
+            } else {
+              ecoTunnelTag.innerHTML = `<i class="fa-solid fa-cloud"></i> <a href="${data.cloudUrl}" target="_blank" style="color:inherit; text-decoration:underline;">Cloud Tunnel Online</a>`;
+            }
           }
         }
       } catch (err) {}
     }
     checkLiveServer();
 
-    // 6. Main Parallax Render Loop
+    // 7. Main Parallax Render Loop (60/120 FPS Optimized)
     function renderLoop() {
       // Smooth mouse lerp
       smoothMouseX = lerp(smoothMouseX, rawMouseX, 0.07);
       smoothMouseY = lerp(smoothMouseY, rawMouseY, 0.07);
 
-      // Scroll Progress inside 480vh track
-      const totalScroll = container.scrollHeight - window.innerHeight;
-      const scrollProgress = clamp(window.scrollY / Math.max(1, totalScroll), 0, 1);
+      // Scroll Progress inside 480vh track (uses cached totalScroll)
+      const scrollProgress = clamp(window.scrollY / totalScroll, 0, 1);
       const ep = easeInOut(scrollProgress);
 
       // Mouse MAG offsets (reverse direction)
@@ -1347,21 +1405,26 @@
       // 1. World Background (z 0): scale 1.05 -> 1.24 to ensure no edge leaks
       const worldMouse = mouseOffset(6);
       const worldScale = lerp(1.05, 1.24, ep);
-      worldBg.style.transform = `translate(${worldMouse.x}px, ${worldMouse.y}px) scale(${worldScale})`;
+      worldBg.style.transform = `translate3d(${worldMouse.x.toFixed(1)}px, ${worldMouse.y.toFixed(1)}px, 0) scale(${worldScale.toFixed(3)})`;
 
       // 2. Bottom Clouds (z 10): scale 1 -> 1.45, MAG = 9 (Y x0.4), Opacity 0.7 -> 1 in first 5%
       const cloudsMouse = mouseOffset(9, 0.4);
       const cloudsScale = lerp(1, 1.45, ep);
       const cloudsOpacity = clamp(0.7 + (scrollProgress / 0.05) * 0.3, 0.7, 1);
-      bottomClouds.style.transform = `translate(${cloudsMouse.x}px, ${cloudsMouse.y}px) scale(${cloudsScale})`;
-      bottomClouds.style.opacity = cloudsOpacity;
+      bottomClouds.style.transform = `translate3d(${cloudsMouse.x.toFixed(1)}px, ${cloudsMouse.y.toFixed(1)}px, 0) scale(${cloudsScale.toFixed(3)})`;
+      bottomClouds.style.opacity = cloudsOpacity.toFixed(2);
 
       // 3. Portal Frame (z 15): scale 1 -> 7.5, MAG = 7, Opacity 1 -> 0 between 0.60 and 0.82
-      const portalMouse = mouseOffset(7);
-      const portalScale = lerp(1, 7.5, ep);
       const portalOpacity = clamp(1 - (scrollProgress - 0.60) / 0.22, 0, 1);
-      portalBg.style.transform = `translate(${portalMouse.x}px, ${portalMouse.y}px) scale(${portalScale})`;
-      portalBg.style.opacity = portalOpacity;
+      if (portalOpacity > 0.01) {
+        portalBg.style.visibility = 'visible';
+        const portalMouse = mouseOffset(7);
+        const portalScale = lerp(1, 7.5, ep);
+        portalBg.style.transform = `translate3d(${portalMouse.x.toFixed(1)}px, ${portalMouse.y.toFixed(1)}px, 0) scale(${portalScale.toFixed(3)})`;
+        portalBg.style.opacity = portalOpacity.toFixed(2);
+      } else {
+        portalBg.style.visibility = 'hidden';
+      }
 
       // 4 & 5. Curtains Left & Right (z 16)
       if (entranceDone) {
@@ -1370,61 +1433,81 @@
         const curtainScrollPercent = lerp(0, 150, ep);
         const curtainScale = lerp(1, 1.3, ep);
 
-        curtainLeft.style.transform = `translateX(-${62 + curtainScrollPercent}%) translate(${cLeftMouse.x}px, ${cLeftMouse.y}px) scale(${curtainScale})`;
-        curtainRight.style.transform = `translateX(${62 + curtainScrollPercent}%) translate(${cRightMouse.x}px, ${cRightMouse.y}px) scale(${curtainScale})`;
+        curtainLeft.style.transform = `translateX(-${(62 + curtainScrollPercent).toFixed(1)}%) translate3d(${cLeftMouse.x.toFixed(1)}px, ${cLeftMouse.y.toFixed(1)}px, 0) scale(${curtainScale.toFixed(3)})`;
+        curtainRight.style.transform = `translateX(${(62 + curtainScrollPercent).toFixed(1)}%) translate3d(${cRightMouse.x.toFixed(1)}px, ${cRightMouse.y.toFixed(1)}px, 0) scale(${curtainScale.toFixed(3)})`;
       }
 
       // 6. Scene 1 UI: Opacity = clamp(1 - scrollProgress / 0.22, 0, 1)
       const scene1Opacity = clamp(1 - scrollProgress / 0.22, 0, 1);
-      scene1UI.style.opacity = scene1Opacity;
-      scene1UI.style.pointerEvents = scene1Opacity > 0.05 ? 'auto' : 'none';
+      if (scene1Opacity > 0.01) {
+        scene1UI.style.visibility = 'visible';
+        scene1UI.style.opacity = scene1Opacity.toFixed(2);
+        scene1UI.style.pointerEvents = 'auto';
+      } else {
+        scene1UI.style.visibility = 'hidden';
+        scene1UI.style.opacity = '0';
+        scene1UI.style.pointerEvents = 'none';
+      }
 
       // 7. Scene 2 UI: Opacity = clamp((scrollProgress - 0.58) / 0.18, 0, 1)
       const scene2Opacity = clamp((scrollProgress - 0.58) / 0.18, 0, 1);
-      scene2UI.style.opacity = scene2Opacity;
+      if (scene2Opacity > 0.01) {
+        scene2UI.style.visibility = 'visible';
+        scene2UI.style.opacity = scene2Opacity.toFixed(2);
+      } else {
+        scene2UI.style.visibility = 'hidden';
+        scene2UI.style.opacity = '0';
+      }
 
-      // 8. Arc Card Slider Geometry (z 12)
-      arcCardSlider.style.opacity = scene2Opacity;
-      arcCardSlider.style.pointerEvents = scene2Opacity > 0.1 ? 'auto' : 'none';
+      // 8. Arc Card Slider Geometry (z 25)
+      if (scene2Opacity > 0.02) {
+        arcCardSlider.style.visibility = 'visible';
+        arcCardSlider.style.opacity = scene2Opacity.toFixed(2);
+        arcCardSlider.style.pointerEvents = 'auto';
 
-      const mobile = isMobile();
-      const cardSpacingDeg = mobile ? 11 : 8.5;
-      const arcRadius = mobile ? 650 : 960;
-      const cardW = mobile ? 160 : 210;
-      const halfW = cardW / 2;
-      const baselineY = mobile ? 100 : 130;
+        const cardSpacingDeg = cachedIsMobile ? 11 : 8.5;
+        const arcRadius = cachedIsMobile ? 650 : 960;
+        const cardW = cachedIsMobile ? 160 : 210;
+        const halfW = cardW / 2;
+        const baselineY = cachedIsMobile ? 100 : 130;
 
-      // Rotation drives across all cards from 0.60 to 0.98
-      const maxRotation = (CARDS_DATA.length - 1) * cardSpacingDeg;
-      const rotProgress = clamp((scrollProgress - 0.60) / 0.38, 0, 1);
-      const rotationOffset = lerp(0, maxRotation, rotProgress);
+        // Rotation drives across all cards from 0.60 to 0.98
+        const maxRotation = (CARDS_DATA.length - 1) * cardSpacingDeg;
+        const rotProgress = clamp((scrollProgress - 0.60) / 0.38, 0, 1);
+        const rotationOffset = lerp(0, maxRotation, rotProgress);
 
-      const cardNodes = arcCardSlider.querySelectorAll('.arc-card');
-      cardNodes.forEach((node, i) => {
-        const deg = (i * cardSpacingDeg) - rotationOffset;
-        const rad = (deg * Math.PI) / 180;
-        const x = Math.sin(rad) * arcRadius;
-        const y = arcRadius - Math.cos(rad) * arcRadius;
+        const cardNodes = arcCardSlider.querySelectorAll('.arc-card');
+        cardNodes.forEach((node, i) => {
+          const deg = (i * cardSpacingDeg) - rotationOffset;
+          const rad = (deg * Math.PI) / 180;
+          const x = Math.sin(rad) * arcRadius;
+          const y = arcRadius - Math.cos(rad) * arcRadius;
 
-        node.style.bottom = `${-y + baselineY}px`;
-        node.style.left = `calc(50% + ${x.toFixed(1)}px - ${halfW}px)`;
-        node.style.transform = `rotate(${deg.toFixed(2)}deg)`;
-        node.style.transformOrigin = `${halfW}px ${arcRadius}px`;
+          node.style.bottom = `${(-y + baselineY).toFixed(1)}px`;
+          node.style.left = `calc(50% + ${x.toFixed(1)}px - ${halfW}px)`;
+          node.style.transform = `rotate(${deg.toFixed(2)}deg)`;
+          node.style.transformOrigin = `${halfW}px ${arcRadius}px`;
 
-        // Softly fade cards that curve far to the sides so they look graceful
-        const absDeg = Math.abs(deg);
-        if (absDeg > 35) {
-          node.style.opacity = Math.max(0, 1 - (absDeg - 35) / 15);
-        } else {
-          node.style.opacity = 1;
-        }
-      });
+          // Softly fade cards that curve far to the sides so they look graceful
+          const absDeg = Math.abs(deg);
+          if (absDeg > 35) {
+            node.style.opacity = Math.max(0, 1 - (absDeg - 35) / 15).toFixed(2);
+          } else {
+            node.style.opacity = '1';
+          }
+        });
+      } else {
+        arcCardSlider.style.visibility = 'hidden';
+        arcCardSlider.style.opacity = '0';
+        arcCardSlider.style.pointerEvents = 'none';
+      }
 
       requestAnimationFrame(renderLoop);
     }
 
     // Start loop on load
     window.addEventListener('DOMContentLoaded', () => {
+      onResize();
       requestAnimationFrame(renderLoop);
     });
   </script>
