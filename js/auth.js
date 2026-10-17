@@ -87,7 +87,7 @@ const DEFAULT_NOTES = [
     category: "account",
     categoryName: "Tài khoản",
     date: "07/09/2026",
-    content: "Server Backup IP: 192.168.1.100\nCấu hình GitHub Token có hạn sử dụng đến cuối năm.\n(Lưu ý: Luôn đổi mật khẩu định kỳ để đảm bảo an toàn tối đa)."
+    content: "Server Backup IP: 192.168.31.100\nCấu hình GitHub Token có hạn sử dụng đến cuối năm.\n(Lưu ý: Luôn đổi mật khẩu định kỳ để đảm bảo an toàn tối đa)."
   }
 ];
 

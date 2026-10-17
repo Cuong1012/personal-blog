@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Server & Smart Home Hub | cuongtv.</title>
+  <meta name="description" content="Trung tâm điều khiển máy chủ gia đình, kho lưu trữ NAS 1TB và hệ thống Nhà thông minh của Cường." />
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    /* Compact Layout Overhauls */
+    body {
+      background: var(--bg-body);
+      color: var(--text-main);
+    }
+    .container {
+      max-width: 1360px;
+    }
+    .main-wrapper {
+      padding-top: 6px;
+      padding-bottom: 24px;
+    }
+
+    /* Top Compact Hero & Quick Bar */
+    .server-hero-compact {
+      padding: 2px 0 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 10px;
+    }
+    .server-hero-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .server-hero-title h1 {
+      font-size: 1.45rem;
+      font-weight: 800;
+      margin: 0;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .hero-badge-live {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .status-pulse {
+      width: 7px;
+      height: 7px;
+      background: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #10b981;
+      animation: pulseAnim 2s infinite;
+      flex-shrink: 0;
+    }
+    @keyframes pulseAnim {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* IP Pills Toolbar */
+    .ip-pills-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ip-pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 5px 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .ip-pill-label {
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+    .ip-pill-val {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .copy-pill-btn {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      transition: var(--transition);
+    }
+    .copy-pill-btn:hover {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Telemetry Metrics Wrapper */
+    .metrics-card-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 14px;
+    }
+    .metrics-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .metrics-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .metrics-uptime-tag {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px;
+    }
+    .metric-item {
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: var(--transition);
+    }
+    .metric-item:hover {
+      border-color: var(--primary);
+    }
+    .metric-item-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .metric-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .metric-main-val {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      line-height: 1.1;
+    }
+    .metric-main-val small {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+    .metric-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      background: rgba(37, 99, 235, 0.12);
+      color: #2563eb;
+      white-space: nowrap;
+    }
+    .metric-progress-track {
+      width: 100%;
+      height: 5px;
+      background: var(--border-color);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .metric-progress-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+    .metric-sub-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* Section Headers */
+    .section-compact-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .section-compact-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    /* Compact Smart Grid: 4 items per row on desktop */
+    .smart-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 1100px) {
+      .smart-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 580px) {
+      .smart-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .device-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+      justify-content: flex-start;
+    }
+    .device-card:hover {
+      border-color: var(--primary);
+    }
+    .device-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 34px;
+      min-height: 34px;
+      max-height: 34px;
+    }
+    .device-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+    .device-title-wrap > div {
+      min-width: 0;
+      overflow: hidden;
+    }
+    .device-icon-box {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .icon-box-wled1 { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
+    .icon-box-wled2 { background: rgba(168, 85, 247, 0.12); color: #a855f7; }
+    .icon-box-sonoff { background: rgba(16, 185, 129, 0.12); color: #10b981; }
+    .icon-box-speaker { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+    .icon-box-climate { background: rgba(14, 165, 233, 0.12); color: #0284c7; }
+    
+    .device-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      color: var(--text-main);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .device-ip {
+      font-size: 0.67rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.2;
+    }
+    .device-badge-status {
+      font-size: 0.67rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: var(--radius-full);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .status-online { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    .status-offline { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+    /* Unified Power Toggle Buttons (Green when ON, Soft Red when OFF) */
+    .power-toggle-btn {
+      width: 100%;
+      height: 30px;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: var(--transition);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      box-sizing: border-box;
+    }
+    .power-toggle-btn:hover {
+      background: rgba(239, 68, 68, 0.22);
+    }
+    .power-toggle-btn.is-on {
+      background: #10b981 !important;
+      color: #fff !important;
+      border-color: #059669 !important;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    }
+    .power-toggle-btn.is-on:hover {
+      background: #059669 !important;
+    }
+
+    /* WLED Controls Compact */
+    .control-slider-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .control-slider-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .control-slider {
+      width: 100%;
+      height: 4px;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      background: var(--border-color);
+      cursor: pointer;
+    }
+    .control-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+    }
+    .color-presets-row {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .color-dot-btn {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    }
+    .color-dot-btn:hover {
+      transform: scale(1.2);
+    }
+    .fx-select {
+      width: 100%;
+      height: 26px;
+      padding: 2px 6px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-body);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    /* 4-Channel Sonoff Switch Grid (Unified Green when ON, Soft Red when OFF) */
+    .sonoff-channels-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+    }
+    .sonoff-btn {
+      height: 28px;
+      padding: 0 4px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      font-weight: 600;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: var(--transition);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sonoff-btn:hover {
+      background: rgba(239, 68, 68, 0.22);
+    }
+    .sonoff-btn.active {
+      background: #10b981 !important;
+      color: #fff !important;
+      border-color: #059669 !important;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
+    }
+    .sonoff-btn.active:hover {
+      background: #059669 !important;
+    }
+    .sonoff-btn.offline,
+    .power-toggle-btn.offline {
+      background: rgba(148, 163, 184, 0.15) !important;
+      color: #94a3b8 !important;
+      border-color: rgba(148, 163, 184, 0.35) !important;
+      cursor: not-allowed;
+      box-shadow: none !important;
+    }
+    .sonoff-btn.offline:hover,
+    .power-toggle-btn.offline:hover {
+      background: rgba(148, 163, 184, 0.22) !important;
+    }
+
+    /* Panasonic AC Controls Ultra Compact */
+    .ac-temp-controller {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      padding: 2px 8px;
+      height: 28px;
+      box-sizing: border-box;
+    }
+    .ac-temp-btn {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1px solid var(--border-color);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+    .ac-temp-btn:hover {
+      background: #0284c7;
+      color: #fff;
+      border-color: #0284c7;
+    }
+    .ac-temp-display {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0284c7;
+      font-family: var(--font-mono);
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      line-height: 1;
+    }
+    .ac-temp-unit {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .ac-modes-row {
+      display: flex;
+      gap: 4px;
+      height: 26px;
+    }
+    .ac-mode-btn {
+      flex: 1;
+      height: 100%;
+      padding: 0 2px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background: var(--bg-body);
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+    .ac-mode-btn.active {
+      background: rgba(14, 165, 233, 0.15);
+      color: #0284c7;
+      border-color: #0284c7;
+    }
+
+    /* Services Shortcuts Grid (Ultra Compact) */
+    .services-compact-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .service-compact-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: var(--transition);
+    }
+    .service-compact-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-1px);
+    }
+    .service-compact-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+    .service-compact-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .service-compact-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0;
+    }
+    .service-compact-sub {
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      margin-top: 1px;
+    }
+    .btn-pill-action {
+      background: var(--primary);
+      color: #fff;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-pill-action:hover {
+      background: var(--primary-hover);
+    }
+    .btn-pill-secondary {
+      background: var(--bg-hover);
+      color: var(--text-body);
+      border: 1px solid var(--border-color);
+    }
+    .btn-pill-secondary:hover {
+      background: var(--border-color);
+    }
+
+  </style>
+</head>
+<body>
+  <!-- HEADER & NAVIGATION -->
+  <header class="header" id="header">
+    <div class="container nav-container">
+      <a href="index.html" class="brand-logo">
+        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
+        <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
+      </a>
+
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-list">
+          <li><a href="index.html" class="nav-link">Trang chủ</a></li>
+          <li><a href="server.html" class="nav-link active" style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-server"></i> Home Server</a></li>
+          <li><a href="form.html" class="nav-link"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
+          <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Xem ảnh Clipboard</a></li>
+          <li><a href="image-to-pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf"></i> Ảnh sang PDF</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <!-- Private Portal Link -->
+        <a href="login.html" class="icon-btn" title="Khu vực riêng tư" aria-label="Khu vực riêng tư">
+          <i class="fa-solid fa-lock"></i>
+        </a>
+
+        <!-- Theme Toggle Button -->
+        <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Chuyển chế độ giao diện" title="Chuyển chế độ Sáng / Tối">
+          <i class="fa-regular fa-moon dark-icon"></i>
+          <i class="fa-regular fa-sun light-icon"></i>
+        </button>
+
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Mở menu điều hướng">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-wrapper">
+    <div class="container">
+
+      <!-- TOP COMPACT HERO BAR (TITLE + IP PILLS) -->
+      <section class="server-hero-compact">
+        <div class="server-hero-title">
+          <h1><i class="fa-solid fa-server" style="color: #10b981;"></i> Home Server & Smart Hub</h1>
+          <span class="hero-badge-live">
+            <span class="status-pulse"></span> 24/7 Online
+          </span>
+        </div>
+
+        <!-- IP Quick Bar -->
+        <div class="ip-pills-bar">
+          <div class="ip-pill">
+            <span class="ip-pill-label">LAN:</span>
+            <span class="ip-pill-val" id="lanIp">192.168.31.100</span>
+            <button class="copy-pill-btn" onclick="copyText('192.168.31.100', this)" title="Copy LAN IP">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+          <div class="ip-pill" id="cfPill" style="display: none; border-color: rgba(245, 158, 11, 0.4);">
+            <span class="ip-pill-label" style="color: #f59e0b;"><i class="fa-solid fa-cloud"></i> 4G Cloud:</span>
+            <a href="#" target="_blank" class="ip-pill-val" id="cfUrlLink" style="color: #f59e0b; text-decoration: none; font-size: 0.78rem;">Đang kết nối...</a>
+            <button class="copy-pill-btn" id="cfCopyBtn" title="Copy link 4G Cloudflare">
+              <i class="fa-regular fa-copy"></i>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SERVER HARDWARE METRICS SECTION -->
+      <section id="server-telemetry">
+        <div class="metrics-card-wrapper">
+          <div class="metrics-header">
+            <div class="metrics-title" style="flex-wrap: wrap; gap: 6px 10px; align-items: baseline;">
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-weight: 800;">
+                <i class="fa-solid fa-microchip" style="color: #2563eb;"></i> Giám Sát Phần Cứng
+              </span>
+              <span style="font-size: 0.76rem; color: var(--text-muted); font-weight: 500;">
+                &bull; Máy Chủ: <strong style="color: var(--text-main);">Dell OptiPlex 7040 Micro</strong> (Win 10 IoT LTSC 64-bit)
+                &bull; <strong style="color: var(--text-main);">Core i5-6500T</strong> &bull; 8GB RAM &bull; SSD 128GB + HDD 1TB
+                &bull; Uptime: <strong id="metric-uptime" style="color: var(--text-main);">--</strong>
+              </span>
+            </div>
+            <button class="copy-pill-btn" style="width: auto; padding: 4px 10px; gap: 5px; flex-shrink: 0;" onclick="fetchMetrics(true)" title="Làm mới ngay">
+              <i class="fa-solid fa-arrows-rotate" id="metric-refresh-icon"></i> <span style="font-size: 0.72rem;">Làm mới</span>
+            </button>
+          </div>
+
+          <div class="metrics-grid">
+            <!-- ITEM 1: RAM USAGE -->
+            <div class="metric-item">
+              <div class="metric-item-top">
+                <div class="metric-icon-box" style="background: rgba(37, 99, 235, 0.12); color: #2563eb;">
+                  <i class="fa-solid fa-memory"></i>
+                </div>
+                <div>
+                  <div class="metric-label">RAM (8GB)</div>
+                  <div class="metric-main-val"><span id="metric-ram-used">--</span> <small>/ <span id="metric-ram-total">7.9 GB</span></small></div>
+                </div>
+                <span class="metric-badge" id="metric-ram-badge">--%</span>
+              </div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-bar" id="metric-ram-bar" style="width: 0%; background: #2563eb;"></div>
+              </div>
+              <div class="metric-sub-info">
+                <span>Trống: <strong id="metric-ram-free" style="color: var(--text-main);">--</strong></span>
+                <span id="metric-ram-status">Ổn định</span>
+              </div>
+            </div>
+
+            <!-- ITEM 2: CPU & TEMPERATURE -->
+            <div class="metric-item">
+              <div class="metric-item-top">
+                <div class="metric-icon-box" style="background: rgba(16, 185, 129, 0.12); color: #10b981;">
+                  <i class="fa-solid fa-gauge-high"></i>
+                </div>
+                <div>
+                  <div class="metric-label">CPU i5-6500T</div>
+                  <div class="metric-main-val"><span id="metric-cpu-load">--</span>% <small>&bull; <span id="metric-cpu-temp" style="color: #10b981;">--°C</span></small></div>
+                </div>
+                <span class="metric-badge" id="metric-cpu-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                  <i class="fa-solid fa-temperature-half"></i> <span id="metric-temp-text">Mát</span>
+                </span>
+              </div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-bar" id="metric-cpu-bar" style="width: 0%; background: #10b981;"></div>
+              </div>
+              <div class="metric-sub-info">
+                <span>4 Cores / 4 Threads</span>
+                <span>Tải CPU & Nhiệt độ</span>
+              </div>
+            </div>
+
+            <!-- ITEM 3: DISK C (OS SSD) -->
+            <div class="metric-item">
+              <div class="metric-item-top">
+                <div class="metric-icon-box" style="background: rgba(168, 85, 247, 0.12); color: #a855f7;">
+                  <i class="fa-solid fa-hard-drive"></i>
+                </div>
+                <div>
+                  <div class="metric-label">Ổ C: SSD</div>
+                  <div class="metric-main-val"><span id="metric-diskc-used">--</span> <small>/ <span id="metric-diskc-total">99.5 GB</span></small></div>
+                </div>
+                <span class="metric-badge" id="metric-diskc-badge">--%</span>
+              </div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-bar" id="metric-diskc-bar" style="width: 0%; background: #a855f7;"></div>
+              </div>
+              <div class="metric-sub-info">
+                <span>Trống: <strong id="metric-diskc-free" style="color: var(--text-main);">--</strong></span>
+                <span>Hệ điều hành</span>
+              </div>
+            </div>
+
+            <!-- ITEM 4: DISK E (NAS 1TB) -->
+            <div class="metric-item">
+              <div class="metric-item-top">
+                <div class="metric-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                  <i class="fa-solid fa-database"></i>
+                </div>
+                <div>
+                  <div class="metric-label">Ổ E: Kho NAS</div>
+                  <div class="metric-main-val"><span id="metric-diske-used">--</span> <small>/ <span id="metric-diske-total">931.5 GB</span></small></div>
+                </div>
+                <span class="metric-badge" id="metric-diske-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">Trống 99%</span>
+              </div>
+              <div class="metric-progress-track">
+                <div class="metric-progress-bar" id="metric-diske-bar" style="width: 0.5%; background: #f59e0b;"></div>
+              </div>
+              <div class="metric-sub-info">
+                <span>Trống: <strong id="metric-diske-free" style="color: var(--text-main);">--</strong></span>
+                <span>Kho lưu trữ 1TB</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SMART HOME CONTROLS SECTION -->
+      <section id="smart-controls">
+        <div class="section-compact-header">
+          <h2 class="section-compact-title">
+            <i class="fa-solid fa-house-signal" style="color: #ec4899;"></i>
+            Thiết Bị Thông Minh
+          </h2>
+          <div style="display: flex; gap: 6px;">
+            <a href="http://192.168.31.200" target="_blank" class="btn-pill-action btn-pill-secondary" title="Web WLED 1">
+              <i class="fa-solid fa-lightbulb"></i> LED Tường
+            </a>
+            <a href="http://192.168.31.201" target="_blank" class="btn-pill-action btn-pill-secondary" title="Web WLED 2">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> LED Bàn
+            </a>
+            <a href="http://192.168.31.100:8123" target="_blank" class="btn-pill-action" style="background: #0284c7;">
+              <i class="fa-solid fa-house"></i> Home Assistant
+            </a>
+          </div>
+        </div>
+
+        <div class="smart-grid">
+          
+          <!-- DEVICE 1: WLED 1 (.200) -->
+          <div class="device-card" id="card-wled1">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box icon-box-wled1">
+                  <i class="fa-solid fa-lightbulb"></i>
+                </div>
+                <div>
+                  <div class="device-name">LED Tường</div>
+                  <div class="device-ip">192.168.31.200 &bull; 81 LEDs</div>
+                </div>
+              </div>
+              <span class="device-badge-status status-online" id="wled1-badge">
+                <span class="status-pulse"></span> Online
+              </span>
+            </div>
+
+            <!-- Master Power Toggle -->
+            <button class="power-toggle-btn is-on" id="wled1-power-btn" onclick="toggleWled(1)">
+              <i class="fa-solid fa-power-off"></i> <span id="wled1-power-text">Đang Bật</span>
+            </button>
+
+            <!-- Brightness Slider -->
+            <div class="control-slider-group">
+              <div class="control-slider-header">
+                <span>Độ sáng</span>
+                <span id="wled1-bri-val" style="font-family: var(--font-mono);">100%</span>
+              </div>
+              <input type="range" min="1" max="255" value="255" class="control-slider" id="wled1-bri-slider" oninput="changeWledBrightness(1, this.value)" />
+            </div>
+
+            <!-- Color Presets -->
+            <div class="color-presets-row">
+              <button class="color-dot-btn" style="background: #ffffff;" title="Trắng sáng" onclick="setWledColor(1, 255,255,255)"></button>
+              <button class="color-dot-btn" style="background: #ffb74d;" title="Vàng ấm" onclick="setWledColor(1, 255,183,77)"></button>
+              <button class="color-dot-btn" style="background: #ef4444;" title="Đỏ" onclick="setWledColor(1, 255,0,0)"></button>
+              <button class="color-dot-btn" style="background: #10b981;" title="Xanh lá" onclick="setWledColor(1, 0,255,100)"></button>
+              <button class="color-dot-btn" style="background: #3b82f6;" title="Xanh dương" onclick="setWledColor(1, 0,120,255)"></button>
+              <button class="color-dot-btn" style="background: #a855f7;" title="Tím huyền ảo" onclick="setWledColor(1, 168,85,247)"></button>
+              <button class="color-dot-btn" style="background: #f43f5e;" title="Hồng neon" onclick="setWledColor(1, 244,63,94)"></button>
+              <button class="color-dot-btn" style="background: #06b6d4;" title="Xanh ngọc" onclick="setWledColor(1, 6,182,212)"></button>
+            </div>
+
+            <!-- Effects Dropdown -->
+            <select class="fx-select" id="wled1-fx-select" onchange="setWledEffect(1, this.value)">
+              <option value="0">Hiệu ứng: Tĩnh (Solid Color)</option>
+              <option value="1">Blink (Nhấp nháy)</option>
+              <option value="2">Breathe (Thở chậm)</option>
+              <option value="8">Colorloop (Tuần hoàn màu)</option>
+              <option value="9">Rainbow (Cầu vồng)</option>
+              <option value="10">Scan (Quét qua lại)</option>
+              <option value="12">Chase (Chạy nối đuôi)</option>
+              <option value="20">Lightning (Chớp sét)</option>
+              <option value="38">Fire (Ánh lửa)</option>
+              <option value="56">Candle (Ánh nến)</option>
+            </select>
+          </div>
+
+          <!-- DEVICE 2: WLED 2 (.201) -->
+          <div class="device-card" id="card-wled2">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box icon-box-wled2">
+                  <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <div>
+                  <div class="device-name">LED Bàn</div>
+                  <div class="device-ip">192.168.31.201 &bull; 60 LEDs</div>
+                </div>
+              </div>
+              <span class="device-badge-status status-online" id="wled2-badge">
+                <span class="status-pulse"></span> Online
+              </span>
+            </div>
+
+            <!-- Master Power Toggle -->
+            <button class="power-toggle-btn is-on" id="wled2-power-btn" onclick="toggleWled(2)">
+              <i class="fa-solid fa-power-off"></i> <span id="wled2-power-text">Đang Bật</span>
+            </button>
+
+            <!-- Brightness Slider -->
+            <div class="control-slider-group">
+              <div class="control-slider-header">
+                <span>Độ sáng</span>
+                <span id="wled2-bri-val" style="font-family: var(--font-mono);">100%</span>
+              </div>
+              <input type="range" min="1" max="255" value="255" class="control-slider" id="wled2-bri-slider" oninput="changeWledBrightness(2, this.value)" />
+            </div>
+
+            <!-- Color Presets -->
+            <div class="color-presets-row">
+              <button class="color-dot-btn" style="background: #ffffff;" title="Trắng sáng" onclick="setWledColor(2, 255,255,255)"></button>
+              <button class="color-dot-btn" style="background: #ffb74d;" title="Vàng ấm" onclick="setWledColor(2, 255,183,77)"></button>
+              <button class="color-dot-btn" style="background: #ef4444;" title="Đỏ" onclick="setWledColor(2, 255,0,0)"></button>
+              <button class="color-dot-btn" style="background: #10b981;" title="Xanh lá" onclick="setWledColor(2, 0,255,100)"></button>
+              <button class="color-dot-btn" style="background: #3b82f6;" title="Xanh dương" onclick="setWledColor(2, 0,120,255)"></button>
+              <button class="color-dot-btn" style="background: #a855f7;" title="Tím huyền ảo" onclick="setWledColor(2, 168,85,247)"></button>
+              <button class="color-dot-btn" style="background: #f43f5e;" title="Hồng neon" onclick="setWledColor(2, 244,63,94)"></button>
+              <button class="color-dot-btn" style="background: #06b6d4;" title="Xanh ngọc" onclick="setWledColor(2, 6,182,212)"></button>
+            </div>
+
+            <!-- Effects Dropdown -->
+            <select class="fx-select" id="wled2-fx-select" onchange="setWledEffect(2, this.value)">
+              <option value="0">Hiệu ứng: Tĩnh (Solid Color)</option>
+              <option value="1">Blink (Nhấp nháy)</option>
+              <option value="2">Breathe (Thở chậm)</option>
+              <option value="8">Colorloop (Tuần hoàn màu)</option>
+              <option value="9">Rainbow (Cầu vồng)</option>
+              <option value="10">Scan (Quét qua lại)</option>
+              <option value="12">Chase (Chạy nối đuôi)</option>
+              <option value="20">Lightning (Chớp sét)</option>
+              <option value="38">Fire (Ánh lửa)</option>
+              <option value="56">Candle (Ánh nến)</option>
+            </select>
+          </div>
+
+          <!-- DEVICE 3: PANASONIC AIR CONDITIONER -->
+          <div class="device-card" id="card-ac">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box icon-box-climate">
+                  <i class="fa-solid fa-snowflake"></i>
+                </div>
+                <div>
+                  <div class="device-name" id="ac-device-name">Điều Hòa Panasonic</div>
+                  <div class="device-ip" id="ac-sensor-info">Cảm biến nhiệt</div>
+                </div>
+              </div>
+              <span class="device-badge-status status-online" id="ac-badge" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+                <span class="status-pulse"></span> <span id="ac-badge-text">28°C</span>
+              </span>
+            </div>
+
+            <!-- Master AC Power Toggle -->
+            <button class="power-toggle-btn is-on" id="ac-power-btn" onclick="toggleAcPower()">
+              <i class="fa-solid fa-power-off"></i> <span id="ac-power-text">Đang Bật (COOL)</span>
+            </button>
+
+            <!-- Temperature Adjuster (- / +) -->
+            <div class="ac-temp-controller">
+              <button class="ac-temp-btn" onclick="changeAcTemp(-1)" title="Giảm 1°C">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <div class="ac-temp-display">
+                <span id="ac-temp-val">28</span><span class="ac-temp-unit">°C</span>
+              </div>
+              <button class="ac-temp-btn" onclick="changeAcTemp(1)" title="Tăng 1°C">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+
+            <!-- Modes Selector Row -->
+            <div class="ac-modes-row">
+              <button class="ac-mode-btn active" id="ac-mode-cool" onclick="setAcMode('cool')">
+                <i class="fa-solid fa-snowflake"></i> Lạnh
+              </button>
+              <button class="ac-mode-btn" id="ac-mode-dry" onclick="setAcMode('dry')">
+                <i class="fa-solid fa-droplet"></i> Ẩm
+              </button>
+              <button class="ac-mode-btn" id="ac-mode-fan" onclick="setAcMode('fan')">
+                <i class="fa-solid fa-fan"></i> Quạt
+              </button>
+              <button class="ac-mode-btn" id="ac-mode-auto" onclick="setAcMode('auto')">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto
+              </button>
+            </div>
+          </div>
+
+          <!-- DEVICE 4: EWELINK (4 THIẾT BỊ) -->
+          <div class="device-card">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box icon-box-sonoff">
+                  <i class="fa-solid fa-plug"></i>
+                </div>
+                <div>
+                  <div class="device-name">eWeLink (4 Thiết Bị)</div>
+                  <div class="device-ip">Sonoff Cloud Bridge</div>
+                </div>
+              </div>
+              <span class="device-badge-status status-online" id="ewelink-status-badge">
+                <span class="status-pulse"></span> <span id="ewelink-status-text">Đang đồng bộ...</span>
+              </span>
+            </div>
+
+            <div class="sonoff-channels-grid">
+              <button class="sonoff-btn" id="sw-btn-1" onclick="toggleSonoffSwitch(1)">
+                <i class="fa-solid fa-laptop-code"></i> LED Bàn
+              </button>
+              <button class="sonoff-btn" id="sw-btn-2" onclick="toggleSonoffSwitch(2)">
+                <i class="fa-solid fa-fan"></i> Quạt Bể Cá
+              </button>
+              <button class="sonoff-btn offline" id="sw-btn-3" onclick="toggleSonoffSwitch(3)" title="Thiết bị chưa cắm nguồn">
+                <i class="fa-solid fa-fire"></i> Đèn Nến: Mất kết nối
+              </button>
+              <button class="sonoff-btn offline" id="sw-btn-4" onclick="toggleSonoffSwitch(4)" title="Thiết bị chưa cắm nguồn">
+                <i class="fa-solid fa-water"></i> Bơm Cá: Mất kết nối
+              </button>
+            </div>
+
+            <div style="margin-top: auto;">
+              <a href="http://192.168.31.100:8123" target="_blank" class="btn-pill-action btn-pill-secondary" style="width: 100%; justify-content: center; height: 26px; font-size: 0.74rem;">
+                <i class="fa-solid fa-toggle-on"></i> Mở Sonoff Trên HA
+              </a>
+            </div>
+          </div>
+
+          <!-- DEVICE 5: GOOGLE HOME MINI (.237) -->
+          <div class="device-card" id="card-google-home">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box icon-box-speaker">
+                  <i class="fa-solid fa-volume-high"></i>
+                </div>
+                <div>
+                  <div class="device-name">Loa Google Home</div>
+                  <div class="device-ip">192.168.31.237 &bull; "Loa GG"</div>
+                </div>
+              </div>
+              <span class="device-badge-status status-online" id="google-speaker-badge">
+                <span class="status-pulse"></span> Google Cast
+              </span>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 6px;">
+                <input type="text" id="tts-input" placeholder="Nhập câu tiếng Việt..." value="Xin chào anh Cường! Nhà thông minh đã sẵn sàng." style="flex: 1; padding: 7px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-main); font-size: 0.8rem; outline: none;" />
+                <button class="btn-pill-action" id="tts-send-btn" onclick="sendTTS()" style="background: #3b82f6;">
+                  <i class="fa-solid fa-bullhorn"></i> Phát
+                </button>
+              </div>
+              <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                <button class="copy-pill-btn" style="width: auto; height: 24px; padding: 0 8px;" onclick="setPresetTTS('Xin chào anh Cường, chúc bạn một ngày tốt lành!')">👋 Chào</button>
+                <button class="copy-pill-btn" style="width: auto; height: 24px; padding: 0 8px;" onclick="setPresetTTS('Đã bật đèn và quạt bể cá thành công!')">🔔 Thiết bị</button>
+                <button class="copy-pill-btn" style="width: auto; height: 24px; padding: 0 8px;" onclick="setPresetTTS('Đã đến giờ nghỉ ngơi rồi anh Cường ơi!')">🌙 Nghỉ ngơi</button>
+              </div>
+            </div>
+
+            <div style="margin-top: auto;">
+              <a href="http://192.168.31.100:8123" target="_blank" class="btn-pill-action btn-pill-secondary" style="width: 100%; justify-content: center;">
+                <i class="fa-solid fa-sliders"></i> Mở Media Trên HA
+              </a>
+            </div>
+          </div>
+
+          <!-- DEVICE 6: ROBOROCK -->
+          <div class="device-card">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                  <i class="fa-solid fa-robot"></i>
+                </div>
+                <div>
+                  <div class="device-name">Robot Roborock</div>
+                  <div class="device-ip">Roborock Cloud</div>
+                </div>
+              </div>
+              <span class="device-badge-status" style="background: rgba(245, 158, 11, 0.15); color: #d97706;">
+                <i class="fa-solid fa-cloud"></i> Sẵn Sàng
+              </span>
+            </div>
+
+            <div style="display: flex; gap: 8px; margin-top: auto;">
+              <a href="http://192.168.31.100:8123" target="_blank" class="btn-pill-action" style="flex: 1; justify-content: center; background: #d97706;">
+                <i class="fa-solid fa-play"></i> Ra Lệnh Dọn Dẹp
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- SERVICES SHORTCUTS SECTION (CLEAN & COMPACT) -->
+      <section>
+        <div class="section-compact-header">
+          <h2 class="section-compact-title">
+            <i class="fa-solid fa-cubes" style="color: #2563eb;"></i>
+            Dịch Vụ Máy Chủ
+          </h2>
+        </div>
+
+        <div class="services-compact-grid">
+          <!-- SERVICE 1: NAS -->
+          <div class="service-compact-card">
+            <div class="service-compact-left">
+              <div class="service-compact-icon" style="background: rgba(59, 130, 246, 0.12); color: #2563eb;">
+                <i class="fa-solid fa-folder-open"></i>
+              </div>
+              <div>
+                <h4 class="service-compact-title">Kho NAS (FileBrowser)</h4>
+                <div class="service-compact-sub">Web UI /nas &bull; Ổ E: 1TB</div>
+              </div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+              <button class="copy-pill-btn" onclick="copyText('\\\\192.168.31.100\\NAS_Data', this)" title="Copy SMB">
+                <i class="fa-solid fa-network-wired"></i>
+              </button>
+              <a href="/nas/" target="_blank" class="btn-pill-action">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở
+              </a>
+            </div>
+          </div>
+
+          <!-- SERVICE 2: HOME ASSISTANT -->
+          <div class="service-compact-card">
+            <div class="service-compact-left">
+              <div class="service-compact-icon" style="background: rgba(14, 165, 233, 0.12); color: #0284c7;">
+                <i class="fa-solid fa-house-signal"></i>
+              </div>
+              <div>
+                <h4 class="service-compact-title">Home Assistant OS</h4>
+                <div class="service-compact-sub">Port 8123 &bull; Hyper-V 2GB</div>
+              </div>
+            </div>
+            <a href="http://192.168.31.100:8123" target="_blank" class="btn-pill-action" style="background: #0284c7;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở
+            </a>
+          </div>
+
+          <!-- SERVICE 3: ADGUARD HOME -->
+          <div class="service-compact-card">
+            <div class="service-compact-left">
+              <div class="service-compact-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <div>
+                <h4 class="service-compact-title">AdGuard DNS</h4>
+                <div class="service-compact-sub">Port 3000 &bull; Chặn Ad LAN</div>
+              </div>
+            </div>
+            <a href="http://192.168.31.100:3000" target="_blank" class="btn-pill-action" style="background: #059669;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Mở
+            </a>
+          </div>
+
+          <!-- SERVICE 4: MARIADB -->
+          <div class="service-compact-card">
+            <div class="service-compact-left">
+              <div class="service-compact-icon" style="background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div>
+                <h4 class="service-compact-title">MariaDB LTS</h4>
+                <div class="service-compact-sub">Port 3306 &bull; MySQL LAN</div>
+              </div>
+            </div>
+            <button class="btn-pill-action btn-pill-secondary" onclick="alert('MariaDB đang chạy cổng 3306. Kết nối tại 192.168.31.100:3306 (user: root)!')">
+              <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> 3306
+            </button>
+          </div>
+        </div>
+      </section>
+
+
+    </div>
+  </main>
+
+  <!-- JAVASCRIPT -->
+  <script src="js/main.js"></script>
+  <script>
+    function copyText(text, btn) {
+      navigator.clipboard.writeText(text).then(() => {
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check" style="color: #10b981;"></i>';
+        setTimeout(() => {
+          btn.innerHTML = originalHtml;
+        }, 1800);
+      }).catch(err => {
+        alert('Không thể sao chép: ' + text);
+      });
+    }
+
+    /* === SMART HOME CONTROLLER (WLED 1, WLED 2 & EWELINK) === */
+    let wledState = {
+      1: { on: true, bri: 255 },
+      2: { on: true, bri: 255 }
+    };
+    let debounceTimers = {};
+    let sonoffState = { 1: true, 2: true, 3: false, 4: false };
+
+    // Initial load for both WLEDs
+    async function initWled(id) {
+      try {
+        const res = await fetch('/api/wled' + id + '/json/state', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          updateWledUI(id, data);
+        }
+      } catch (e) {
+        console.warn('WLED' + id + ' offline', e);
+      }
+    }
+
+    function updateWledUI(id, data) {
+      wledState[id].on = !!data.on;
+      const btn = document.getElementById('wled' + id + '-power-btn');
+      const text = document.getElementById('wled' + id + '-power-text');
+      const badge = document.getElementById('wled' + id + '-badge');
+      const slider = document.getElementById('wled' + id + '-bri-slider');
+      const briVal = document.getElementById('wled' + id + '-bri-val');
+      const fxSelect = document.getElementById('wled' + id + '-fx-select');
+
+      if (wledState[id].on) {
+        btn.classList.add('is-on');
+        text.innerText = 'Đang Bật (Tắt)';
+        badge.className = 'device-badge-status status-online';
+        badge.innerHTML = '<span class="status-pulse"></span> Bật';
+      } else {
+        btn.classList.remove('is-on');
+        text.innerText = 'Đang Tắt (Bật)';
+        badge.className = 'device-badge-status status-offline';
+        badge.innerHTML = '<i class="fa-solid fa-moon"></i> Tắt';
+      }
+
+      if (data.bri !== undefined) {
+        wledState[id].bri = data.bri;
+        slider.value = data.bri;
+        briVal.innerText = Math.round((data.bri / 255) * 100) + '%';
+      }
+
+      if (data.seg && data.seg[0] && data.seg[0].fx !== undefined) {
+        fxSelect.value = data.seg[0].fx;
+      }
+    }
+
+    async function toggleWled(id) {
+      wledState[id].on = !wledState[id].on;
+      const btn = document.getElementById('wled' + id + '-power-btn');
+      const text = document.getElementById('wled' + id + '-power-text');
+      const badge = document.getElementById('wled' + id + '-badge');
+
+      if (wledState[id].on) {
+        btn.classList.add('is-on');
+        text.innerText = 'Đang Bật...';
+        badge.className = 'device-badge-status status-online';
+      } else {
+        btn.classList.remove('is-on');
+        text.innerText = 'Đang Tắt...';
+        badge.className = 'device-badge-status status-offline';
+      }
+
+      try {
+        const res = await fetch('/api/wled' + id + '/json/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ on: wledState[id].on })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          updateWledUI(id, data);
+        }
+      } catch (err) {
+        console.error('Failed to toggle WLED ' + id, err);
+      }
+    }
+
+    function changeWledBrightness(id, val) {
+      document.getElementById('wled' + id + '-bri-val').innerText = Math.round((val / 255) * 100) + '%';
+      clearTimeout(debounceTimers[id]);
+      debounceTimers[id] = setTimeout(async () => {
+        try {
+          await fetch('/api/wled' + id + '/json/state', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ on: true, bri: parseInt(val) })
+          });
+          wledState[id].on = true;
+          document.getElementById('wled' + id + '-power-btn').classList.add('is-on');
+        } catch (e) {
+          console.error(e);
+        }
+      }, 100);
+    }
+
+    async function setWledColor(id, r, g, b) {
+      try {
+        await fetch('/api/wled' + id + '/json/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            on: true,
+            seg: [{ col: [[r, g, b]] }]
+          })
+        });
+        wledState[id].on = true;
+        document.getElementById('wled' + id + '-power-btn').classList.add('is-on');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function setWledEffect(id, fxId) {
+      try {
+        await fetch('/api/wled' + id + '/json/state', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            on: true,
+            seg: [{ fx: parseInt(fxId) }]
+          })
+        });
+        wledState[id].on = true;
+        document.getElementById('wled' + id + '-power-btn').classList.add('is-on');
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    const ewelinkDevices = {
+      1: { id: '10025e91d7', name: 'LED Bàn', icon: 'fa-laptop-code' },
+      2: { id: '10025e91e4', name: 'Quạt Cá', icon: 'fa-fan' },
+      3: { id: '1002a52523', name: 'Đèn Nến', icon: 'fa-fire' },
+      4: { id: '1002a52a9b', name: 'Bơm Cá', icon: 'fa-water' }
+    };
+    let ewelinkState = { 1: 'off', 2: 'off', 3: 'off', 4: 'off' };
+
+    async function initEwelink() {
+      try {
+        const res = await fetch('/api/ewelink/devices', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.devices) {
+            data.devices.forEach(d => {
+              for (const [key, dev] of Object.entries(ewelinkDevices)) {
+                if (dev.id === d.id) {
+                  ewelinkState[key] = d.state || 'off';
+                  updateEwelinkUI(key, d.state === 'on', d.online);
+                }
+              }
+            });
+          }
+        }
+      } catch (err) {
+        console.warn('eWeLink init error', err);
+      }
+    }
+
+    let ewelinkOnline = { 1: true, 2: true, 3: false, 4: false };
+
+    function updateEwelinkUI(num, isOn, isOnline = true) {
+      const btn = document.getElementById('sw-btn-' + num);
+      if (!btn) return;
+      const dev = ewelinkDevices[num];
+      ewelinkOnline[num] = !!isOnline;
+
+      if (!isOnline) {
+        btn.className = 'sonoff-btn offline';
+        btn.innerHTML = `<i class="fa-solid ${dev.icon}"></i> ${dev.name}: Mất kết nối`;
+        btn.title = 'Thiết bị chưa cắm nguồn hoặc mất kết nối WiFi';
+      } else if (isOn) {
+        btn.className = 'sonoff-btn active';
+        btn.innerHTML = `<i class="fa-solid ${dev.icon}"></i> ${dev.name}: Bật`;
+        btn.title = 'Đang bật (Nhấn để tắt)';
+      } else {
+        btn.className = 'sonoff-btn';
+        btn.innerHTML = `<i class="fa-solid ${dev.icon}"></i> ${dev.name}: Tắt`;
+        btn.title = 'Đang tắt (Nhấn để bật)';
+      }
+      updateEwelinkCardBadge();
+    }
+
+    function updateEwelinkCardBadge() {
+      const badge = document.getElementById('ewelink-status-badge');
+      if (!badge) return;
+      const onlineCount = Object.values(ewelinkOnline).filter(Boolean).length;
+      if (onlineCount === 4) {
+        badge.className = 'device-badge-status status-online';
+        badge.style.background = '';
+        badge.style.color = '';
+        badge.innerHTML = '<span class="status-pulse"></span> 4 Kênh Online';
+      } else if (onlineCount > 0) {
+        badge.className = 'device-badge-status';
+        badge.style.background = 'rgba(245, 158, 11, 0.15)';
+        badge.style.color = '#d97706';
+        badge.innerHTML = `<span class="status-pulse" style="background: #d97706; box-shadow: 0 0 6px #d97706;"></span> ${onlineCount}/4 Kênh Online`;
+      } else {
+        badge.className = 'device-badge-status status-offline';
+        badge.style.background = 'rgba(148, 163, 184, 0.15)';
+        badge.style.color = '#64748b';
+        badge.innerHTML = '<i class="fa-solid fa-power-off"></i> Offline';
+      }
+    }
+
+    async function toggleSonoffSwitch(num) {
+      const dev = ewelinkDevices[num];
+      if (ewelinkOnline[num] === false) {
+        alert(dev.name + ' đang không cắm nguồn hoặc mất kết nối WiFi!');
+        return;
+      }
+      const currentState = ewelinkState[num] === 'on';
+      const targetState = currentState ? 'off' : 'on';
+      const btn = document.getElementById('sw-btn-' + num);
+      
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> ${dev.name}...`;
+      
+      try {
+        const res = await fetch('/api/ewelink/toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            deviceId: dev.id,
+            state: targetState
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          ewelinkState[num] = targetState;
+          updateEwelinkUI(num, targetState === 'on', true);
+        } else {
+          alert('Lỗi điều khiển ' + dev.name + ': ' + (data.error || 'Thiết bị offline'));
+          const isNowOnline = !data.error || !data.error.includes('offline');
+          updateEwelinkUI(num, currentState, isNowOnline);
+        }
+      } catch (err) {
+        console.error('Toggle error', err);
+        updateEwelinkUI(num, currentState, false);
+      }
+    }
+
+    function setPresetTTS(text) {
+      document.getElementById('tts-input').value = text;
+      sendTTS();
+    }
+
+    async function sendTTS() {
+      const input = document.getElementById('tts-input');
+      const text = input.value.trim();
+      if (!text) return;
+      const btn = document.getElementById('tts-send-btn');
+      const originalHtml = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+      try {
+        const res = await fetch('/api/ewelink/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, lang: 'vi' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+          btn.style.background = '#10b981';
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.background = '#3b82f6';
+            btn.disabled = false;
+          }, 2000);
+        } else {
+          alert('Lỗi phát loa: ' + (data.error || 'Không kết nối được'));
+          btn.innerHTML = originalHtml;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới bridge service: ' + err.message);
+        btn.innerHTML = originalHtml;
+        btn.disabled = false;
+      }
+    }
+
+    // Panasonic AC Controller State & Functions
+    let acState = {
+      on: true,
+      temp: 28,
+      mode: 'cool',
+      insideTemp: null,
+      outTemp: null
+    };
+
+    function updateAcUI() {
+      const tempVal = document.getElementById('ac-temp-val');
+      const pwrBtn = document.getElementById('ac-power-btn');
+      const pwrText = document.getElementById('ac-power-text');
+      const badge = document.getElementById('ac-badge');
+      const sensorInfo = document.getElementById('ac-sensor-info');
+
+      if (tempVal) tempVal.textContent = acState.temp;
+
+      if (sensorInfo && acState.insideTemp !== null) {
+        sensorInfo.innerHTML = `Trong: <strong>${acState.insideTemp}°C</strong> &bull; Ngoài: <strong>${acState.outTemp}°C</strong>`;
+      }
+
+      if (acState.on) {
+        if (pwrBtn) {
+          pwrBtn.classList.add('is-on');
+        }
+        if (pwrText) {
+          pwrText.textContent = `Đang Bật (${acState.mode.toUpperCase()})`;
+        }
+        if (badge) {
+          badge.style.background = 'rgba(16, 185, 129, 0.15)';
+          badge.style.color = '#10b981';
+          badge.innerHTML = `<span class="status-pulse"></span> <span id="ac-badge-text">${acState.temp}°C ${acState.mode.toUpperCase()}</span>`;
+        }
+      } else {
+        if (pwrBtn) {
+          pwrBtn.classList.remove('is-on');
+        }
+        if (pwrText) {
+          pwrText.textContent = 'Đang Tắt';
+        }
+        if (badge) {
+          badge.style.background = 'rgba(239, 68, 68, 0.15)';
+          badge.style.color = '#ef4444';
+          badge.innerHTML = `<i class="fa-solid fa-power-off"></i> <span id="ac-badge-text">TẮT</span>`;
+        }
+      }
+
+      // Update mode buttons active state
+      ['cool', 'dry', 'fan', 'auto'].forEach(m => {
+        const btn = document.getElementById('ac-mode-' + m);
+        if (btn) {
+          if (acState.mode === m && acState.on) {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        }
+      });
+    }
+
+    async function initAc() {
+      try {
+        const res = await fetch('/api/ewelink/ac/status', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            acState.on = !!data.operate;
+            acState.temp = data.temperatureSet || 28;
+            acState.mode = data.mode || 'cool';
+            acState.insideTemp = data.insideTemperature;
+            acState.outTemp = data.outTemperature;
+            updateAcUI();
+          }
+        }
+      } catch (err) {
+        console.warn('AC init error', err);
+      }
+    }
+
+    let acDebounceTimer = null;
+    async function sendAcCommand(payload) {
+      try {
+        const res = await fetch('/api/ewelink/ac/control', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!data.success) {
+          console.error('AC control failed', data);
+        }
+      } catch (err) {
+        console.error('AC send error', err);
+      }
+    }
+
+    async function toggleAcPower() {
+      const targetState = !acState.on;
+      acState.on = targetState;
+      updateAcUI();
+      const pwrText = document.getElementById('ac-power-text');
+      if (pwrText) pwrText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi lệnh...';
+      await sendAcCommand({ operate: targetState });
+      updateAcUI();
+    }
+
+    function changeAcTemp(delta) {
+      if (!acState.on) acState.on = true;
+      let newTemp = acState.temp + delta;
+      if (newTemp < 16) newTemp = 16;
+      if (newTemp > 30) newTemp = 30;
+      acState.temp = newTemp;
+      updateAcUI();
+      
+      clearTimeout(acDebounceTimer);
+      acDebounceTimer = setTimeout(() => {
+        sendAcCommand({ temperatureSet: acState.temp });
+      }, 500);
+    }
+
+    function setAcExactTemp(t) {
+      if (!acState.on) acState.on = true;
+      acState.temp = t;
+      updateAcUI();
+      clearTimeout(acDebounceTimer);
+      acDebounceTimer = setTimeout(() => {
+        sendAcCommand({ temperatureSet: acState.temp });
+      }, 300);
+    }
+
+    function setAcMode(mode) {
+      if (!acState.on) acState.on = true;
+      acState.mode = mode;
+      updateAcUI();
+      sendAcCommand({ mode: mode });
+    }
+
+    // === SYSTEM HARDWARE TELEMETRY LOGIC ===
+    let isFetchingMetrics = false;
+    async function fetchMetrics(isManual = false) {
+      if (isFetchingMetrics) return;
+      isFetchingMetrics = true;
+      const refreshIcon = document.getElementById('metric-refresh-icon');
+      if (refreshIcon && isManual) refreshIcon.classList.add('fa-spin');
+
+      try {
+        const url = isManual ? '/api/ewelink/system/metrics?force=1' : '/api/ewelink/system/metrics';
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            updateMetricsUI(data);
+          }
+        }
+      } catch (err) {
+        console.warn('Metrics fetch error', err);
+      } finally {
+        isFetchingMetrics = false;
+        if (refreshIcon && isManual) {
+          setTimeout(() => refreshIcon.classList.remove('fa-spin'), 600);
+        }
+      }
+    }
+
+    function updateMetricsUI(data) {
+      // Uptime
+      const uptimeEl = document.getElementById('metric-uptime');
+      if (uptimeEl && data.uptime) uptimeEl.textContent = data.uptime;
+
+      // RAM
+      if (data.ram) {
+        const ramUsedEl = document.getElementById('metric-ram-used');
+        const ramTotalEl = document.getElementById('metric-ram-total');
+        const ramFreeEl = document.getElementById('metric-ram-free');
+        const ramBadgeEl = document.getElementById('metric-ram-badge');
+        const ramBarEl = document.getElementById('metric-ram-bar');
+        const ramStatusEl = document.getElementById('metric-ram-status');
+
+        if (ramUsedEl) ramUsedEl.textContent = data.ram.usedGB + ' GB';
+        if (ramTotalEl) ramTotalEl.textContent = data.ram.totalGB + ' GB';
+        if (ramFreeEl) ramFreeEl.textContent = data.ram.freeGB + ' GB';
+        if (ramBadgeEl) ramBadgeEl.textContent = data.ram.percent + '%';
+        if (ramBarEl) {
+          ramBarEl.style.width = data.ram.percent + '%';
+          if (data.ram.percent > 90) {
+            ramBarEl.style.background = '#ef4444';
+            ramBadgeEl.style.background = 'rgba(239, 68, 68, 0.15)';
+            ramBadgeEl.style.color = '#ef4444';
+            if (ramStatusEl) ramStatusEl.textContent = 'Tải cao';
+          } else if (data.ram.percent > 75) {
+            ramBarEl.style.background = '#f59e0b';
+            ramBadgeEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            ramBadgeEl.style.color = '#d97706';
+            if (ramStatusEl) ramStatusEl.textContent = 'Bình thường';
+          } else {
+            ramBarEl.style.background = '#2563eb';
+            ramBadgeEl.style.background = 'rgba(37, 99, 235, 0.15)';
+            ramBadgeEl.style.color = '#2563eb';
+            if (ramStatusEl) ramStatusEl.textContent = 'Mượt mà';
+          }
+        }
+      }
+
+      // CPU & Temp
+      if (data.cpu) {
+        const cpuLoadEl = document.getElementById('metric-cpu-load');
+        const cpuTempEl = document.getElementById('metric-cpu-temp');
+        const cpuBarEl = document.getElementById('metric-cpu-bar');
+        const cpuBadgeEl = document.getElementById('metric-cpu-badge');
+        const tempTextEl = document.getElementById('metric-temp-text');
+
+        if (cpuLoadEl) cpuLoadEl.textContent = data.cpu.usagePercent;
+        if (cpuBarEl) cpuBarEl.style.width = data.cpu.usagePercent + '%';
+
+        const temp = data.cpu.tempC || 0;
+        if (cpuTempEl) cpuTempEl.textContent = temp + '°C';
+
+        if (cpuBadgeEl) {
+          if (temp > 75) {
+            cpuBadgeEl.style.background = 'rgba(239, 68, 68, 0.15)';
+            cpuBadgeEl.style.color = '#ef4444';
+            if (tempTextEl) tempTextEl.textContent = 'Nóng';
+          } else if (temp > 55) {
+            cpuBadgeEl.style.background = 'rgba(245, 158, 11, 0.15)';
+            cpuBadgeEl.style.color = '#d97706';
+            if (tempTextEl) tempTextEl.textContent = 'Ấm';
+          } else {
+            cpuBadgeEl.style.background = 'rgba(16, 185, 129, 0.15)';
+            cpuBadgeEl.style.color = '#10b981';
+            if (tempTextEl) tempTextEl.textContent = 'Rất Mát';
+          }
+        }
+      }
+
+      // Disks
+      if (Array.isArray(data.disks)) {
+        const diskC = data.disks.find(d => d.drive === 'C:');
+        if (diskC) {
+          const usedEl = document.getElementById('metric-diskc-used');
+          const totalEl = document.getElementById('metric-diskc-total');
+          const freeEl = document.getElementById('metric-diskc-free');
+          const badgeEl = document.getElementById('metric-diskc-badge');
+          const barEl = document.getElementById('metric-diskc-bar');
+
+          if (usedEl) usedEl.textContent = diskC.usedGB + ' GB';
+          if (totalEl) totalEl.textContent = diskC.totalGB + ' GB';
+          if (freeEl) freeEl.textContent = diskC.freeGB + ' GB';
+          if (badgeEl) badgeEl.textContent = diskC.percent + '%';
+          if (barEl) barEl.style.width = diskC.percent + '%';
+        }
+
+        const diskE = data.disks.find(d => d.drive === 'E:');
+        if (diskE) {
+          const usedEl = document.getElementById('metric-diske-used');
+          const totalEl = document.getElementById('metric-diske-total');
+          const freeEl = document.getElementById('metric-diske-free');
+          const barEl = document.getElementById('metric-diske-bar');
+
+          if (usedEl) usedEl.textContent = diskE.usedGB + ' GB';
+          if (totalEl) totalEl.textContent = diskE.totalGB + ' GB';
+          if (freeEl) freeEl.textContent = diskE.freeGB + ' GB';
+          if (barEl) barEl.style.width = Math.max(diskE.percent, 0.5) + '%';
+        }
+      }
+    }
+
+    async function initCloudflareUrl() {
+      let cloudUrl = null;
+      const isLocalHost = window.location.hostname === '192.168.31.100' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+      // 1. Thử lấy trực tiếp từ API eWeLink trên server nếu đang chạy nội bộ
+      if (isLocalHost) {
+        try {
+          const res = await fetch('/api/ewelink/tunnel/url', { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.url) {
+              cloudUrl = data.url;
+            } else if (data.restarting) {
+              const link = document.getElementById('cfUrlLink');
+              if (link) link.textContent = 'Đang tạo link mới...';
+              setTimeout(initCloudflareUrl, 6000);
+            }
+          }
+        } catch (e) {
+          console.warn('Local tunnel check error', e);
+        }
+      }
+
+      // 2. Nếu chạy trên GitHub Pages hoặc chưa lấy được từ local, đọc từ server-status.json
+      if (!cloudUrl) {
+        try {
+          const res = await fetch('server-status.json?t=' + Date.now(), { cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.cloudUrl) {
+              cloudUrl = data.cloudUrl;
+            }
+          }
+        } catch (e) {
+          console.warn('server-status.json check error', e);
+        }
+      }
+
+      // 3. Cập nhật giao diện thanh IP và nút bấm 4G Cloud
+      const pill = document.getElementById('cfPill');
+      const link = document.getElementById('cfUrlLink');
+      const btn = document.getElementById('cfCopyBtn');
+      if (cloudUrl && pill && link) {
+        pill.style.display = 'flex';
+        link.href = cloudUrl + '/server.html';
+        const displayHost = cloudUrl.replace('https://', '');
+        link.textContent = displayHost.length > 28 ? displayHost.substring(0, 25) + '...' : displayHost;
+        link.title = 'Mở Home Server qua 4G: ' + cloudUrl;
+        if (btn) btn.onclick = () => copyText(cloudUrl + '/server.html', btn);
+
+        if (!isLocalHost) {
+          // Khi mở trên GitHub Pages, cập nhật link NAS FileBrowser trực tiếp sang Cloudflare Tunnel
+          const nasLinks = document.querySelectorAll('a[href*="/nas"]');
+          nasLinks.forEach(a => {
+            if (!a.href.startsWith('http://192.168.31.100')) {
+              a.href = cloudUrl + '/nas';
+            }
+          });
+        }
+      }
+    }
+
+    // Auto-init WLEDs, eWeLink, AC and System Metrics on load
+    document.addEventListener('DOMContentLoaded', () => {
+      initWled(1);
+      initWled(2);
+      initAc();
+      initEwelink();
+      fetchMetrics();
+      initCloudflareUrl();
+      // Auto-refresh server metrics every 10 minutes (hoặc khi bấm Làm mới)
+      setInterval(fetchMetrics, 10 * 60 * 1000);
+      // Auto-check 4G tunnel URL every 1 hour (60 phút)
+      setInterval(initCloudflareUrl, 60 * 60 * 1000);
+    });
+  </script>
+</body>
+</html>
