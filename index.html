@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="dark">
+<html lang="vi" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +9,7 @@
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
@@ -19,16 +19,46 @@
 
   <style>
     /* ========================================================
-       HIGH-CONTRAST LIQUID GLASS (iOS / visionOS DARK GLASS)
+       HIGH-CONTRAST LIGHT LIQUID GLASS (iOS FROSTED CRYSTAL)
        ======================================================== */
     :root {
-      /* Deep Obsidian Midnight Space */
+      /* Deeper Cool Slate-Silver Canvas so White Glass Cards Pop with High Contrast */
+      --liquid-bg: #dde5f0;
+      --liquid-surface: rgba(255, 255, 255, 0.82);
+      --liquid-surface-hover: rgba(255, 255, 255, 0.96);
+      --liquid-border: rgba(100, 116, 139, 0.3);
+      --liquid-border-hover: #2563eb;
+      --liquid-blur: 24px;
+      --liquid-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+      --liquid-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.1), 0 2px 6px -1px rgba(15, 23, 42, 0.06);
+      --liquid-shadow-hover: 0 14px 32px -4px rgba(37, 99, 235, 0.2), 0 4px 10px -2px rgba(15, 23, 42, 0.08);
+
+      --text-main: #0f172a;
+      --text-body: #1e293b;
+      --text-muted: #334155;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-glow: rgba(37, 99, 235, 0.25);
+
+      --pill-bg: #eff6ff;
+      --pill-border: #bfdbfe;
+      --pill-text: #1d4ed8;
+      --badge-bg: #f1f5f9;
+      --badge-border: #cbd5e1;
+      --badge-text: #1e293b;
+      --track-bg: rgba(203, 213, 225, 0.65);
+
+      --ios-radius: 16px;
+      --ios-radius-pill: 9999px;
+      --ios-squircle: 13px;
+    }
+
+    [data-theme="dark"] {
       --liquid-bg: #04070d;
       --liquid-surface: rgba(13, 19, 33, 0.78);
       --liquid-surface-hover: rgba(22, 32, 54, 0.88);
       --liquid-border: rgba(255, 255, 255, 0.16);
       --liquid-border-hover: rgba(59, 130, 246, 0.55);
-      --liquid-blur: 26px;
       --liquid-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.32);
       --liquid-shadow: 0 10px 32px -8px rgba(0, 0, 0, 0.7);
       --liquid-shadow-hover: 0 18px 45px -8px rgba(0, 0, 0, 0.85);
@@ -40,31 +70,18 @@
       --primary-hover: #2563eb;
       --primary-glow: rgba(59, 130, 246, 0.4);
 
-      --ios-radius: 16px;
-      --ios-radius-pill: 9999px;
-      --ios-squircle: 13px;
-    }
-
-    [data-theme="light"] {
-      --liquid-bg: #e2e8f0;
-      --liquid-surface: rgba(255, 255, 255, 0.88);
-      --liquid-surface-hover: #ffffff;
-      --liquid-border: rgba(148, 163, 184, 0.5);
-      --liquid-border-hover: #2563eb;
-      --liquid-specular: inset 0 1px 2px 0 #ffffff;
-      --liquid-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.12);
-      --liquid-shadow-hover: 0 14px 32px -4px rgba(37, 99, 235, 0.22);
-
-      --text-main: #090d16;
-      --text-body: #1e293b;
-      --text-muted: #475569;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --primary-glow: rgba(37, 99, 235, 0.25);
+      --pill-bg: rgba(59, 130, 246, 0.15);
+      --pill-border: rgba(59, 130, 246, 0.35);
+      --pill-text: #60a5fa;
+      --badge-bg: rgba(255, 255, 255, 0.09);
+      --badge-border: rgba(255, 255, 255, 0.16);
+      --badge-text: #cbd5e1;
+      --track-bg: rgba(13, 19, 33, 0.78);
     }
 
     body {
       background-color: var(--liquid-bg);
+      background-image: linear-gradient(135deg, #dbe4f0 0%, #e6edf7 50%, #d8e2ef 100%);
       color: var(--text-main);
       font-family: var(--font-main);
       min-height: 100vh;
@@ -75,7 +92,11 @@
       transition: background-color 0.3s ease;
     }
 
-    /* Ambient Fluid Glow Orbs (High Depth Refraction) */
+    [data-theme="dark"] body {
+      background-image: none;
+    }
+
+    /* Ambient Fluid Glow Orbs for Glass Refraction */
     .liquid-mesh-bg {
       position: fixed;
       inset: 0;
@@ -87,33 +108,33 @@
     .liquid-orb {
       position: absolute;
       border-radius: 50%;
-      filter: blur(90px);
-      opacity: 0.75;
+      filter: blur(85px);
+      opacity: 0.7;
       will-change: transform;
       animation: floatFluid 20s ease-in-out infinite alternate;
     }
 
     .orb-1 {
-      width: 520px;
-      height: 520px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.22) 0%, rgba(6, 182, 212, 0.1) 45%, transparent 75%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, rgba(6, 182, 212, 0.12) 50%, transparent 75%);
       top: -120px;
-      left: 8%;
+      left: 6%;
     }
 
     .orb-2 {
-      width: 550px;
-      height: 550px;
-      background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, rgba(139, 92, 246, 0.12) 45%, transparent 75%);
+      width: 540px;
+      height: 540px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.26) 0%, rgba(139, 92, 246, 0.15) 50%, transparent 75%);
       top: 10%;
       right: 4%;
       animation-duration: 24s;
     }
 
     .orb-3 {
-      width: 480px;
-      height: 480px;
-      background: radial-gradient(circle, rgba(236, 72, 153, 0.15) 0%, rgba(249, 115, 22, 0.08) 50%, transparent 75%);
+      width: 460px;
+      height: 460px;
+      background: radial-gradient(circle, rgba(244, 63, 94, 0.16) 0%, rgba(245, 158, 11, 0.12) 50%, transparent 75%);
       bottom: -80px;
       left: 28%;
       animation-duration: 22s;
@@ -121,8 +142,8 @@
 
     @keyframes floatFluid {
       0% { transform: translate(0, 0) scale(1); }
-      50% { transform: translate(35px, 25px) scale(1.06); }
-      100% { transform: translate(-30px, 18px) scale(0.96); }
+      50% { transform: translate(35px, 25px) scale(1.05); }
+      100% { transform: translate(-30px, 18px) scale(0.95); }
     }
 
     /* Container */
@@ -150,8 +171,8 @@
       height: 58px;
       padding: 0 20px;
       background: var(--liquid-surface);
-      backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
-      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
       border: 1px solid var(--liquid-border);
       border-radius: var(--ios-radius-pill);
       box-shadow: var(--liquid-specular), var(--liquid-shadow);
@@ -175,13 +196,13 @@
       width: 34px;
       height: 34px;
       border-radius: 10px;
-      background: linear-gradient(135deg, #2563eb, #6366f1);
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
       color: #fff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1rem;
-      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.45);
+      box-shadow: 0 3px 10px rgba(37, 99, 235, 0.35);
     }
 
     .nav-list {
@@ -195,7 +216,7 @@
 
     .nav-link {
       font-size: 0.88rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-muted);
       text-decoration: none;
       transition: color 0.2s ease;
@@ -205,10 +226,6 @@
     }
 
     .nav-link:hover, .nav-link.active {
-      color: var(--text-main);
-    }
-
-    .nav-link.active {
       color: var(--primary);
     }
 
@@ -224,44 +241,49 @@
       align-items: center;
       gap: 7px;
       padding: 5px 13px;
-      background: rgba(16, 185, 129, 0.16);
-      border: 1px solid rgba(16, 185, 129, 0.4);
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(5, 150, 105, 0.4);
       border-radius: var(--ios-radius-pill);
-      color: #34d399;
+      color: #047857;
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.02em;
       text-decoration: none;
-      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.6);
       transition: var(--transition);
       white-space: nowrap;
     }
 
+    [data-theme="dark"] .glass-status-pill {
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+
     .glass-status-pill:hover {
-      background: rgba(16, 185, 129, 0.28);
+      background: rgba(16, 185, 129, 0.25);
       transform: scale(1.02);
     }
 
     .pulse-dot {
       width: 7px;
       height: 7px;
-      background-color: #10b981;
+      background-color: #059669;
       border-radius: 50%;
-      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8);
+      box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.8);
       animation: pulseGreen 1.8s infinite;
     }
 
     @keyframes pulseGreen {
-      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.8); }
-      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
-      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(5, 150, 105, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(5, 150, 105, 0); }
     }
 
     .icon-glass-btn {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      background: var(--liquid-surface);
+      background: var(--badge-bg);
       border: 1px solid var(--liquid-border);
       color: var(--text-main);
       display: flex;
@@ -276,20 +298,21 @@
     .icon-glass-btn:hover {
       background: var(--liquid-surface-hover);
       border-color: var(--liquid-border-hover);
+      color: var(--primary);
       transform: scale(1.08);
     }
 
     /* Main Container */
     .main-content {
       flex: 1;
-      padding: 24px 0 40px;
+      padding: 22px 0 40px;
     }
 
     /* COMPACT HERO BAR (HIGH-CONTRAST) */
     .compact-hero-glass {
       background: var(--liquid-surface);
-      backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
-      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
       border: 1px solid var(--liquid-border);
       border-radius: var(--ios-radius);
       box-shadow: var(--liquid-specular), var(--liquid-shadow);
@@ -309,33 +332,34 @@
     }
 
     .hero-avatar-squircle {
-      width: 44px;
-      height: 44px;
+      width: 46px;
+      height: 46px;
       border-radius: var(--ios-squircle);
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.35), rgba(139, 92, 246, 0.35));
-      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: #ffffff;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 1.25rem;
-      color: #60a5fa;
-      box-shadow: var(--liquid-specular);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.4);
       flex-shrink: 0;
     }
 
     .hero-title-group h1 {
-      font-size: 1.3rem;
+      font-size: 1.32rem;
       font-weight: 800;
       letter-spacing: -0.02em;
       margin: 0 0 3px 0;
       color: var(--text-main);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
 
     .hero-subtext {
-      font-size: 0.84rem;
+      font-size: 0.85rem;
+      font-weight: 500;
       color: var(--text-muted);
       margin: 0;
     }
@@ -348,12 +372,12 @@
     }
 
     .glass-chip {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid var(--liquid-border);
+      background: var(--badge-bg);
+      border: 1px solid var(--badge-border);
       border-radius: var(--ios-radius-pill);
       padding: 6px 13px;
-      font-size: 0.78rem;
-      font-weight: 600;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--text-body);
       display: inline-flex;
       align-items: center;
@@ -364,15 +388,15 @@
     }
 
     .glass-chip:hover {
-      background: var(--liquid-surface-hover);
-      border-color: var(--liquid-border-hover);
-      color: #60a5fa;
+      background: var(--pill-bg);
+      border-color: var(--primary);
+      color: var(--primary);
       transform: translateY(-1px);
     }
 
     .glass-chip i {
       font-size: 0.85rem;
-      color: #3b82f6;
+      color: var(--primary);
     }
 
     /* CONTROLS: iOS Segmented Tabs + Spotlight Search */
@@ -386,7 +410,7 @@
     }
 
     .ios-segmented-control {
-      background: var(--liquid-surface);
+      background: var(--track-bg);
       backdrop-filter: blur(var(--liquid-blur));
       -webkit-backdrop-filter: blur(var(--liquid-blur));
       border: 1px solid var(--liquid-border);
@@ -394,7 +418,6 @@
       padding: 4px;
       display: inline-flex;
       gap: 4px;
-      box-shadow: var(--liquid-specular);
     }
 
     .segmented-btn {
@@ -403,8 +426,8 @@
       border: none;
       background: transparent;
       font-family: inherit;
-      font-size: 0.82rem;
-      font-weight: 600;
+      font-size: 0.84rem;
+      font-weight: 700;
       color: var(--text-muted);
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -419,53 +442,58 @@
     }
 
     .segmented-btn.active {
-      background: rgba(255, 255, 255, 0.2);
-      color: #ffffff;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35), inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    [data-theme="light"] .segmented-btn.active {
       background: #ffffff;
       color: var(--primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.14);
+    }
+
+    [data-theme="dark"] .segmented-btn.active {
+      background: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
     }
 
     .spotlight-search-wrap {
       position: relative;
-      min-width: 250px;
-      flex: 0 1 290px;
+      min-width: 260px;
+      flex: 0 1 300px;
     }
 
     .spotlight-input {
       width: 100%;
-      height: 38px;
-      padding: 0 14px 0 34px;
+      height: 40px;
+      padding: 0 14px 0 36px;
       background: var(--liquid-surface);
       backdrop-filter: blur(var(--liquid-blur));
       -webkit-backdrop-filter: blur(var(--liquid-blur));
       border: 1px solid var(--liquid-border);
       border-radius: var(--ios-radius-pill);
-      font-size: 0.82rem;
+      font-size: 0.84rem;
+      font-weight: 500;
       font-family: inherit;
       color: var(--text-main);
       outline: none;
-      box-shadow: var(--liquid-specular);
+      box-shadow: var(--liquid-specular), 0 2px 6px rgba(15, 23, 42, 0.05);
       transition: var(--transition);
     }
 
+    .spotlight-input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.8;
+    }
+
     .spotlight-input:focus {
-      border-color: rgba(59, 130, 246, 0.65);
+      border-color: var(--primary);
       background: var(--liquid-surface-hover);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25), var(--liquid-specular);
+      box-shadow: 0 0 0 3px var(--primary-glow);
     }
 
     .spotlight-icon {
       position: absolute;
-      left: 12px;
+      left: 13px;
       top: 50%;
       transform: translateY(-50%);
       color: var(--text-muted);
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       pointer-events: none;
     }
 
@@ -490,11 +518,11 @@
       }
     }
 
-    /* iOS Liquid Glass Tile (High Contrast) */
+    /* iOS Liquid Glass Tile (Crisp Contrast) */
     .ios-tile {
       background: var(--liquid-surface);
-      backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
-      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(200%);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
       border: 1px solid var(--liquid-border);
       border-radius: var(--ios-radius);
       box-shadow: var(--liquid-specular), var(--liquid-shadow);
@@ -513,21 +541,8 @@
                   box-shadow 0.22s ease;
     }
 
-    .ios-tile::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
-      pointer-events: none;
-      opacity: 0.6;
-      transition: opacity 0.25s ease;
-    }
-
     .ios-tile:hover {
-      transform: translateY(-3px) scale(1.01);
+      transform: translateY(-4px);
       border-color: var(--liquid-border-hover);
       background: var(--liquid-surface-hover);
       box-shadow: var(--liquid-specular), var(--liquid-shadow-hover);
@@ -555,7 +570,7 @@
       font-size: 1.25rem;
       color: #ffffff;
       flex-shrink: 0;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), inset 0 1px 1px 0 rgba(255, 255, 255, 0.45);
+      box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.45);
       transition: transform 0.25s ease;
     }
 
@@ -564,13 +579,13 @@
     }
 
     .icon-server-ios { background: linear-gradient(135deg, #10b981, #059669); }
-    .icon-pdf-ios { background: linear-gradient(135deg, #f43f5e, #be123c); }
+    .icon-pdf-ios { background: linear-gradient(135deg, #f43f5e, #e11d48); }
     .icon-clip-ios { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-    .icon-nas-ios { background: linear-gradient(135deg, #f59e0b, #b45309); }
+    .icon-nas-ios { background: linear-gradient(135deg, #f59e0b, #d97706); }
     .icon-ha-ios { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
     .icon-form-ios { background: linear-gradient(135deg, #06b6d4, #0891b2); }
     .icon-vault-ios { background: linear-gradient(135deg, #ec4899, #be185d); }
-    .icon-wol-ios { background: linear-gradient(135deg, #f97316, #c2410c); }
+    .icon-wol-ios { background: linear-gradient(135deg, #f97316, #ea580c); }
 
     .tile-title-group {
       flex: 1;
@@ -578,10 +593,10 @@
     }
 
     .tile-title {
-      font-size: 1.05rem;
-      font-weight: 700;
+      font-size: 1.06rem;
+      font-weight: 800;
       color: var(--text-main);
-      margin: 0 0 2px 0;
+      margin: 0 0 3px 0;
       letter-spacing: -0.01em;
       white-space: nowrap;
       overflow: hidden;
@@ -593,23 +608,28 @@
       font-weight: 700;
       letter-spacing: 0.03em;
       text-transform: uppercase;
-      padding: 2.5px 8px;
+      padding: 2px 8px;
       border-radius: var(--ios-radius-pill);
-      background: rgba(255, 255, 255, 0.09);
-      color: var(--text-muted);
-      border: 1px solid var(--liquid-border);
+      background: var(--badge-bg);
+      color: var(--badge-text);
+      border: 1px solid var(--badge-border);
       display: inline-block;
       white-space: nowrap;
     }
 
     .badge-live-green {
-      background: rgba(16, 185, 129, 0.18);
+      background: rgba(16, 185, 129, 0.15);
+      color: #047857;
+      border-color: rgba(5, 150, 105, 0.35);
+    }
+
+    [data-theme="dark"] .badge-live-green {
       color: #34d399;
-      border-color: rgba(16, 185, 129, 0.45);
     }
 
     .tile-desc {
-      font-size: 0.82rem;
+      font-size: 0.83rem;
+      font-weight: 500;
       color: var(--text-muted);
       line-height: 1.5;
       margin: 0 0 12px 0;
@@ -625,13 +645,13 @@
       align-items: center;
       justify-content: space-between;
       gap: 8px;
-      padding-top: 9px;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 10px;
+      border-top: 1px solid var(--badge-border);
     }
 
     .tile-tag {
-      font-size: 0.74rem;
-      font-weight: 600;
+      font-size: 0.76rem;
+      font-weight: 700;
       color: var(--text-body);
       display: inline-flex;
       align-items: center;
@@ -639,8 +659,8 @@
     }
 
     .tile-tag i {
-      font-size: 0.78rem;
-      color: #38bdf8;
+      font-size: 0.8rem;
+      color: var(--primary);
     }
 
     .tile-action-pill {
@@ -649,13 +669,12 @@
       gap: 5px;
       padding: 5px 12px;
       border-radius: var(--ios-radius-pill);
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid var(--liquid-border);
-      color: var(--text-main);
+      background: var(--pill-bg);
+      border: 1px solid var(--pill-border);
+      color: var(--pill-text);
       font-size: 0.78rem;
       font-weight: 700;
       text-decoration: none;
-      box-shadow: var(--liquid-specular);
       transition: var(--transition);
       white-space: nowrap;
     }
@@ -664,7 +683,7 @@
       background: var(--primary);
       border-color: var(--primary);
       color: #ffffff;
-      box-shadow: 0 3px 12px var(--primary-glow);
+      box-shadow: 0 3px 10px var(--primary-glow);
     }
 
     .tile-action-pill i {
@@ -694,19 +713,21 @@
       -webkit-backdrop-filter: blur(var(--liquid-blur));
       border: 1px solid var(--liquid-border);
       border-radius: var(--ios-radius);
-      box-shadow: var(--liquid-specular);
+      box-shadow: var(--liquid-specular), var(--liquid-shadow);
       padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
       gap: 10px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
+      font-weight: 500;
       color: var(--text-muted);
     }
 
     .bottom-info-strip strong {
       color: var(--text-main);
+      font-weight: 700;
     }
 
     .strip-links {
@@ -715,13 +736,14 @@
     }
 
     .strip-links a {
-      color: var(--text-muted);
+      color: var(--text-body);
+      font-weight: 600;
       text-decoration: none;
       transition: color 0.2s ease;
     }
 
     .strip-links a:hover {
-      color: var(--text-main);
+      color: var(--primary);
     }
 
     /* Responsive */
@@ -788,15 +810,15 @@
     <div class="nav-glass-bar">
       <a href="index.html" class="brand-logo" title="Trang chủ Cuongtv Portal">
         <div class="logo-squircle"><i class="fa-solid fa-code"></i></div>
-        <span>cuongtv<span style="color: #3b82f6;">.</span></span>
+        <span>cuongtv<span style="color: #2563eb;">.</span></span>
       </a>
 
       <!-- Quick Nav Links -->
       <nav class="nav-desktop-links">
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link active"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
-          <li><a href="server.html" class="nav-link" style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-server"></i> Home Server</a></li>
-          <li><a href="image-to-pdf.html" class="nav-link" style="color: #f43f5e; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Scanner PDF</a></li>
+          <li><a href="server.html" class="nav-link" style="color: #059669; font-weight: 700;"><i class="fa-solid fa-server"></i> Home Server</a></li>
+          <li><a href="image-to-pdf.html" class="nav-link" style="color: #e11d48; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Scanner PDF</a></li>
           <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Clipboard</a></li>
           <li><a href="/nas" class="nav-link"><i class="fa-solid fa-hard-drive"></i> NAS</a></li>
           <li><a href="form.html" class="nav-link"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
@@ -812,15 +834,10 @@
           <span id="navServerText">192.168.31.100</span>
         </a>
 
-        <!-- Dark / Light Theme Toggle -->
+        <!-- Light / Dark Theme Toggle -->
         <button id="themeToggle" class="icon-glass-btn theme-toggle" aria-label="Chuyển chế độ giao diện" title="Chuyển chế độ Sáng / Tối">
           <i class="fa-regular fa-moon dark-icon"></i>
           <i class="fa-regular fa-sun light-icon"></i>
-        </button>
-
-        <!-- Mobile Menu Toggle -->
-        <button id="mobileMenuBtn" class="icon-glass-btn mobile-menu-btn" aria-label="Mở menu" style="display: none;">
-          <i class="fa-solid fa-bars"></i>
         </button>
       </div>
     </div>
@@ -841,7 +858,7 @@
           <div class="hero-title-group">
             <h1>
               Cổng Tiện Ích Số Hóa
-              <span class="glass-status-pill" id="livePillStatus" style="font-size: 0.72rem; padding: 3px 9px;">
+              <span class="glass-status-pill" id="livePillStatus" style="font-size: 0.72rem; padding: 3px 10px;">
                 <span class="pulse-dot"></span>
                 <span id="livePillText">LAN 192.168.31.100 (Online)</span>
               </span>
@@ -1110,13 +1127,12 @@
        JAVASCRIPT LOGIC
        ======================================================== -->
   <script>
-    // 1. THEME INITIALIZATION (DEFAULT TO HIGH-CONTRAST DARK MODE)
+    // 1. THEME INITIALIZATION (DEFAULT TO HIGH-CONTRAST LIGHT MODE)
     function initTheme() {
-      // Use dedicated portal theme key, default to dark
-      let savedTheme = localStorage.getItem('portal-theme');
+      let savedTheme = localStorage.getItem('portal-light-theme');
       if (!savedTheme) {
-        savedTheme = 'dark';
-        localStorage.setItem('portal-theme', 'dark');
+        savedTheme = 'light';
+        localStorage.setItem('portal-light-theme', 'light');
       }
       document.documentElement.setAttribute('data-theme', savedTheme);
     }
@@ -1125,7 +1141,7 @@
       const current = document.documentElement.getAttribute('data-theme');
       const nextTheme = current === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', nextTheme);
-      localStorage.setItem('portal-theme', nextTheme);
+      localStorage.setItem('portal-light-theme', nextTheme);
     }
 
     const themeToggleBtn = document.getElementById('themeToggle');
