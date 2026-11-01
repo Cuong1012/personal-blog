@@ -1134,6 +1134,45 @@
             </div>
           </div>
 
+          <!-- DEVICE 7: PC LÀM VIỆC (WAKE ON LAN - 192.168.31.145) -->
+          <div class="device-card" id="card-pc-wol">
+            <div class="device-header">
+              <div class="device-title-wrap">
+                <div class="device-icon-box" id="pc-icon-box" style="background: rgba(59, 130, 246, 0.12); color: #2563eb;">
+                  <i class="fa-solid fa-desktop"></i>
+                </div>
+                <div>
+                  <div class="device-name">PC Làm Việc</div>
+                  <div class="device-ip">192.168.31.145 &bull; WoL</div>
+                </div>
+              </div>
+              <span class="device-badge-status" id="pc-status-badge" style="background: rgba(100, 116, 139, 0.15); color: #64748b;">
+                <span class="status-pulse" id="pc-status-pulse" style="display: none;"></span>
+                <span id="pc-status-text">Đang check...</span>
+              </span>
+            </div>
+
+            <!-- Master Power Toggle / Wake Button -->
+            <button class="power-toggle-btn" id="pc-wol-btn" onclick="sendWakeOnLan()">
+              <i class="fa-solid fa-bolt"></i> <span id="pc-wol-text">Bật Nguồn PC</span>
+            </button>
+
+            <!-- MAC & Manual Check bar -->
+            <div style="font-size: 0.72rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: var(--bg-body); border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <span style="font-family: var(--font-mono);"><i class="fa-solid fa-network-wired" style="color: #3b82f6;"></i> 50:EB:F6:ED:D9:70</span>
+              <button class="copy-pill-btn" style="width: auto; height: 20px; font-size: 0.68rem; padding: 0 6px;" onclick="checkPcOnlineStatus(true)" title="Kiểm tra trạng thái máy">
+                <i class="fa-solid fa-rotate-right"></i> Check
+              </button>
+            </div>
+
+            <!-- Remote Access Link -->
+            <div style="margin-top: auto; display: flex; gap: 6px;">
+              <a href="https://remotedesktop.google.com/access" target="_blank" class="btn-pill-action btn-pill-secondary" style="flex: 1; justify-content: center; height: 26px; font-size: 0.74rem;" title="Mở Chrome Remote Desktop">
+                <i class="fa-brands fa-chrome" style="color: #ea4335;"></i> Remote Desktop
+              </a>
+            </div>
+          </div>
+
         </div>
       </section>
 
@@ -1791,6 +1830,105 @@
       }
     }
 
+    // === WAKE ON LAN (PC 192.168.31.145) ===
+    let isPcPinging = false;
+    async function checkPcOnlineStatus(manual = false) {
+      if (isPcPinging) return;
+      isPcPinging = true;
+      const badge = document.getElementById('pc-status-badge');
+      const text = document.getElementById('pc-status-text');
+      const pulse = document.getElementById('pc-status-pulse');
+      const btn = document.getElementById('pc-wol-btn');
+      const btnText = document.getElementById('pc-wol-text');
+      const iconBox = document.getElementById('pc-icon-box');
+
+      if (manual && text) {
+        text.textContent = 'Đang check...';
+      }
+
+      try {
+        const res = await fetch('/api/ewelink/wol/status', { cache: 'no-store' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.online) {
+            if (badge) {
+              badge.style.background = 'rgba(16, 185, 129, 0.15)';
+              badge.style.color = '#10b981';
+            }
+            if (pulse) pulse.style.display = 'inline-block';
+            if (text) text.textContent = 'Online';
+            if (iconBox) {
+              iconBox.style.background = 'rgba(16, 185, 129, 0.12)';
+              iconBox.style.color = '#10b981';
+            }
+            if (btn) {
+              btn.classList.add('is-on');
+              btn.style.background = '';
+            }
+            if (btnText) btnText.innerHTML = '<i class="fa-solid fa-power-off"></i> Đang Bật (Gửi lại WoL)';
+          } else {
+            if (badge) {
+              badge.style.background = 'rgba(239, 68, 68, 0.15)';
+              badge.style.color = '#ef4444';
+            }
+            if (pulse) pulse.style.display = 'none';
+            if (text) text.textContent = 'Đang Tắt';
+            if (iconBox) {
+              iconBox.style.background = 'rgba(100, 116, 139, 0.12)';
+              iconBox.style.color = '#64748b';
+            }
+            if (btn) {
+              btn.classList.remove('is-on');
+              btn.style.background = '';
+            }
+            if (btnText) btnText.innerHTML = '<i class="fa-solid fa-bolt"></i> Bật Nguồn PC';
+          }
+        }
+      } catch (e) {
+        console.warn('WoL status check error', e);
+        if (text) text.textContent = 'Không rõ';
+      } finally {
+        isPcPinging = false;
+      }
+    }
+
+    async function sendWakeOnLan() {
+      const btn = document.getElementById('pc-wol-btn');
+      const btnText = document.getElementById('pc-wol-text');
+
+      if (btn) btn.disabled = true;
+      if (btnText) btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi tín hiệu...';
+
+      try {
+        const res = await fetch('/api/ewelink/wol/wake', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ mac: '50:EB:F6:ED:D9:70', ip: '192.168.31.255' })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (btnText) btnText.innerHTML = '<i class="fa-solid fa-check"></i> Đã gửi tín hiệu bật!';
+          if (btn) btn.style.background = '#10b981';
+          
+          setTimeout(() => { checkPcOnlineStatus(); }, 5000);
+          setTimeout(() => { checkPcOnlineStatus(); }, 15000);
+          setTimeout(() => { checkPcOnlineStatus(); }, 30000);
+        } else {
+          alert('Lỗi gửi lệnh WoL: ' + (data.error || 'Thất bại'));
+        }
+      } catch (err) {
+        alert('Lỗi kết nối tới server: ' + err.message);
+      } finally {
+        setTimeout(() => {
+          if (btn) {
+            btn.disabled = false;
+            btn.style.background = '';
+          }
+          checkPcOnlineStatus();
+        }, 3500);
+      }
+    }
+
     async function initCloudflareUrl() {
       let cloudUrl = null;
       const isLocalHost = window.location.hostname === '192.168.31.100' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -1853,14 +1991,17 @@
       }
     }
 
-    // Auto-init WLEDs, eWeLink, AC and System Metrics on load
+    // Auto-init WLEDs, eWeLink, AC, PC WoL and System Metrics on load
     document.addEventListener('DOMContentLoaded', () => {
       initWled(1);
       initWled(2);
       initAc();
       initEwelink();
+      checkPcOnlineStatus();
       fetchMetrics();
       initCloudflareUrl();
+      // Auto-refresh PC online status every 30 seconds
+      setInterval(checkPcOnlineStatus, 30 * 1000);
       // Auto-refresh server metrics every 10 minutes (hoặc khi bấm Làm mới)
       setInterval(fetchMetrics, 10 * 60 * 1000);
       // Auto-check 4G tunnel URL every 1 hour (60 phút)
