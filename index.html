@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cổng Điều Khiển & Tiện Ích Trực Tuyến | cuongtv.</title>
-  <meta name="description" content="Cổng quản lý Home Server Dell OptiPlex, kho lưu trữ NAS và bộ công cụ tiện ích số hóa của Trịnh Việt Cường." />
+  <title>Cổng Tiện Ích & Điều Khiển | cuongtv.</title>
+  <meta name="description" content="Cổng quản lý Home Server Dell OptiPlex, kho lưu trữ NAS và bộ công cụ số hóa cá nhân của Trịnh Việt Cường." />
 
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -19,65 +19,215 @@
 
   <style>
     /* ========================================================
-       CLEAN, MODERN & INTUITIVE PORTAL LAYOUT
+       LIQUID GLASS & COMPACT iOS STYLE DESIGN SYSTEM
        ======================================================== */
+    :root {
+      --liquid-bg: #07090e;
+      --liquid-surface: rgba(255, 255, 255, 0.05);
+      --liquid-surface-hover: rgba(255, 255, 255, 0.09);
+      --liquid-border: rgba(255, 255, 255, 0.11);
+      --liquid-border-hover: rgba(255, 255, 255, 0.28);
+      --liquid-blur: 24px;
+      --liquid-specular: inset 0 1px 1px 0 rgba(255, 255, 255, 0.25);
+      --liquid-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45);
+      --liquid-shadow-hover: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+      --ios-radius: 16px;
+      --ios-radius-pill: 9999px;
+      --ios-squircle: 13px;
+    }
+
+    [data-theme="light"] {
+      --liquid-bg: #f3f5f9;
+      --liquid-surface: rgba(255, 255, 255, 0.75);
+      --liquid-surface-hover: rgba(255, 255, 255, 0.92);
+      --liquid-border: rgba(255, 255, 255, 0.7);
+      --liquid-border-hover: rgba(37, 99, 235, 0.35);
+      --liquid-specular: inset 0 1px 2px 0 #ffffff;
+      --liquid-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.08);
+      --liquid-shadow-hover: 0 14px 32px -6px rgba(37, 99, 235, 0.16);
+    }
+
     body {
-      background: var(--bg-body);
+      background-color: var(--liquid-bg);
       color: var(--text-main);
       font-family: var(--font-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
     }
 
-    .main-content {
-      flex: 1;
-      padding: 32px 0 60px;
+    /* Ambient Fluid Background Refraction Orbs */
+    .liquid-mesh-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
     }
 
+    .liquid-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.65;
+      will-change: transform;
+      animation: floatFluid 20s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.18) 0%, rgba(6, 182, 212, 0.08) 50%, transparent 75%);
+      top: -100px;
+      left: 10%;
+    }
+
+    .orb-2 {
+      width: 480px;
+      height: 480px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.18) 0%, rgba(139, 92, 246, 0.08) 50%, transparent 75%);
+      top: 15%;
+      right: 5%;
+      animation-duration: 25s;
+    }
+
+    .orb-3 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.12) 0%, rgba(249, 115, 22, 0.06) 50%, transparent 75%);
+      bottom: -60px;
+      left: 30%;
+      animation-duration: 22s;
+    }
+
+    @keyframes floatFluid {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, 20px) scale(1.05); }
+      100% { transform: translate(-25px, 15px) scale(0.95); }
+    }
+
+    /* Container */
     .container {
-      max-width: 1280px;
+      max-width: 1240px;
       margin: 0 auto;
+      padding: 0 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Floating Liquid Header */
+    .header {
+      position: sticky;
+      top: 12px;
+      z-index: 100;
+      background: transparent;
+      border-bottom: none;
+      padding: 0 16px;
+    }
+
+    .nav-glass-bar {
+      max-width: 1240px;
+      margin: 0 auto;
+      height: 58px;
       padding: 0 20px;
-    }
-
-    /* Top Server Banner */
-    .portal-hero {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 28px 32px;
-      margin-bottom: 28px;
-      box-shadow: var(--shadow-sm);
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius-pill);
+      box-shadow: var(--liquid-specular), var(--liquid-shadow);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-      gap: 20px;
+      justify-content: space-between;
+      transition: var(--transition);
     }
 
-    .portal-hero-info {
-      max-width: 680px;
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: var(--text-main);
+      text-decoration: none;
     }
 
-    .portal-live-pill {
+    .logo-squircle {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #2563eb, #6366f1);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+    }
+
+    .nav-list {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--text-main);
+    }
+
+    .nav-link.active {
+      color: var(--primary);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* iOS Glass Dynamic Island Status Pill */
+    .glass-status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      padding: 4px 14px;
+      gap: 7px;
+      padding: 5px 12px;
       background: rgba(16, 185, 129, 0.12);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      border-radius: var(--radius-full);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+      border-radius: var(--ios-radius-pill);
       color: #10b981;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.03em;
-      margin-bottom: 12px;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .glass-status-pill:hover {
+      background: rgba(16, 185, 129, 0.2);
+      transform: scale(1.02);
     }
 
     .pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       background-color: #10b981;
       border-radius: 50%;
       box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
@@ -86,441 +236,553 @@
 
     @keyframes pulseGreen {
       0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      70% { transform: scale(1); box-shadow: 0 0 0 7px rgba(16, 185, 129, 0); }
       100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
     }
 
-    .portal-title {
-      font-size: 1.85rem;
-      font-weight: 800;
+    .icon-glass-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--liquid-surface);
+      border: 1px solid var(--liquid-border);
       color: var(--text-main);
-      margin-bottom: 8px;
-      letter-spacing: -0.02em;
-      line-height: 1.25;
-    }
-
-    .portal-desc {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      line-height: 1.55;
-      margin: 0;
-    }
-
-    .portal-hero-metrics {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .metric-chip {
-      background: var(--bg-hover);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--text-body);
-      text-decoration: none;
-      transition: var(--transition);
-    }
-
-    .metric-chip:hover {
-      border-color: var(--primary);
-      color: var(--primary);
-      transform: translateY(-2px);
-    }
-
-    .metric-chip i {
-      font-size: 1.1rem;
-      color: var(--primary);
-    }
-
-    /* Filter & Search Bar */
-    .controls-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .category-tabs {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .category-tab {
-      padding: 8px 18px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-full);
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: var(--transition);
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      user-select: none;
-    }
-
-    .category-tab:hover {
-      color: var(--text-main);
-      border-color: var(--border-subtle);
-      background: var(--bg-hover);
-    }
-
-    .category-tab.active {
-      background: var(--primary);
-      color: #ffffff;
-      border-color: var(--primary);
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
-
-    .search-wrapper {
-      position: relative;
-      min-width: 280px;
-      flex: 0 1 320px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 10px 14px 10px 38px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-full);
-      font-size: 0.88rem;
-      font-family: inherit;
-      color: var(--text-main);
-      outline: none;
-      transition: var(--transition);
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px var(--primary-glow);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 14px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      pointer-events: none;
-    }
-
-    /* Services Grid */
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
-      margin-bottom: 36px;
-    }
-
-    .service-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 22px 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .service-card:hover {
-      transform: translateY(-4px);
-      border-color: var(--primary);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .service-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .service-icon-box {
-      width: 48px;
-      height: 48px;
-      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.3rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      box-shadow: var(--liquid-specular);
+      transition: var(--transition);
+    }
+
+    .icon-glass-btn:hover {
+      background: var(--liquid-surface-hover);
+      border-color: var(--liquid-border-hover);
+      transform: scale(1.06);
+    }
+
+    /* Main Container */
+    .main-content {
+      flex: 1;
+      padding: 24px 0 40px;
+    }
+
+    /* COMPACT HERO BAR (GỌN GÀNG, KHÔNG CHIẾM DIỆN TÍCH) */
+    .compact-hero-glass {
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius);
+      box-shadow: var(--liquid-specular), var(--liquid-shadow);
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .hero-text-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .hero-avatar-squircle {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--ios-squircle);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25), rgba(139, 92, 246, 0.25));
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: var(--primary);
+      box-shadow: var(--liquid-specular);
       flex-shrink: 0;
+    }
+
+    .hero-title-group h1 {
+      font-size: 1.28rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin: 0 0 3px 0;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-subtext {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .hero-chips-cluster {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .glass-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius-pill);
+      padding: 6px 12px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-body);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      box-shadow: var(--liquid-specular);
+      transition: var(--transition);
+    }
+
+    .glass-chip:hover {
+      background: var(--liquid-surface-hover);
+      border-color: var(--liquid-border-hover);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .glass-chip i {
+      font-size: 0.85rem;
+      color: var(--primary);
+    }
+
+    /* COMPACT CONTROLS: iOS Segmented Tab + Spotlight Search */
+    .controls-glass-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .ios-segmented-control {
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur));
+      -webkit-backdrop-filter: blur(var(--liquid-blur));
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius-pill);
+      padding: 4px;
+      display: inline-flex;
+      gap: 4px;
+      box-shadow: var(--liquid-specular);
+    }
+
+    .segmented-btn {
+      padding: 6px 14px;
+      border-radius: var(--ios-radius-pill);
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+
+    .segmented-btn:hover {
+      color: var(--text-main);
+    }
+
+    .segmented-btn.active {
+      background: rgba(255, 255, 255, 0.16);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    [data-theme="light"] .segmented-btn.active {
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .spotlight-search-wrap {
+      position: relative;
+      min-width: 250px;
+      flex: 0 1 290px;
+    }
+
+    .spotlight-input {
+      width: 100%;
+      height: 38px;
+      padding: 0 14px 0 34px;
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur));
+      -webkit-backdrop-filter: blur(var(--liquid-blur));
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius-pill);
+      font-size: 0.82rem;
+      font-family: inherit;
+      color: var(--text-main);
+      outline: none;
+      box-shadow: var(--liquid-specular);
+      transition: var(--transition);
+    }
+
+    .spotlight-input:focus {
+      border-color: rgba(59, 130, 246, 0.5);
+      background: var(--liquid-surface-hover);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2), var(--liquid-specular);
+    }
+
+    .spotlight-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      pointer-events: none;
+    }
+
+    /* COMPACT 4-COLUMN iOS TILE GRID */
+    .compact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 1100px) {
+      .compact-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .compact-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+    }
+
+    /* iOS Liquid Glass Tile */
+    .ios-tile {
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      -webkit-backdrop-filter: blur(var(--liquid-blur)) saturate(190%);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius);
+      box-shadow: var(--liquid-specular), var(--liquid-shadow);
+      padding: 16px 16px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                  border-color 0.22s ease,
+                  background 0.22s ease,
+                  box-shadow 0.22s ease;
+    }
+
+    .ios-tile::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, transparent 60%);
+      pointer-events: none;
+      opacity: 0.5;
+      transition: opacity 0.25s ease;
+    }
+
+    .ios-tile:hover {
+      transform: translateY(-3px) scale(1.01);
+      border-color: var(--liquid-border-hover);
+      background: var(--liquid-surface-hover);
+      box-shadow: var(--liquid-specular), var(--liquid-shadow-hover);
+    }
+
+    .ios-tile:active {
+      transform: scale(0.985);
+    }
+
+    .tile-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* iOS Squircle App Icons */
+    .app-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--ios-squircle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: #ffffff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 1px 0 rgba(255, 255, 255, 0.4);
       transition: transform 0.25s ease;
     }
 
-    .service-card:hover .service-icon-box {
-      transform: scale(1.08);
+    .ios-tile:hover .app-icon {
+      transform: scale(1.06);
     }
 
-    /* Specific Icon Theme Colors */
-    .icon-server-emerald { background: rgba(16, 185, 129, 0.12); color: #10b981; }
-    .icon-pdf-rose { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
-    .icon-clip-blue { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
-    .icon-nas-amber { background: rgba(245, 158, 11, 0.12); color: #f59e0b; }
-    .icon-ha-violet { background: rgba(139, 92, 246, 0.12); color: #8b5cf6; }
-    .icon-form-cyan { background: rgba(6, 182, 212, 0.12); color: #06b6d4; }
-    .icon-vault-pink { background: rgba(236, 72, 153, 0.12); color: #ec4899; }
-    .icon-wol-orange { background: rgba(249, 115, 22, 0.12); color: #f97316; }
+    .icon-server-ios { background: linear-gradient(135deg, #10b981, #059669); }
+    .icon-pdf-ios { background: linear-gradient(135deg, #f43f5e, #e11d48); }
+    .icon-clip-ios { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    .icon-nas-ios { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .icon-ha-ios { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+    .icon-form-ios { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+    .icon-vault-ios { background: linear-gradient(135deg, #ec4899, #be185d); }
+    .icon-wol-ios { background: linear-gradient(135deg, #f97316, #ea580c); }
 
-    .service-badge {
-      font-size: 0.72rem;
+    .tile-title-group {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .tile-title {
+      font-size: 1.02rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 3.5px 10px;
-      border-radius: var(--radius-full);
-      background: var(--bg-hover);
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      margin: 0 0 2px 0;
+      letter-spacing: -0.01em;
       white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .badge-online {
-      background: rgba(16, 185, 129, 0.12);
+    .tile-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: var(--ios-radius-pill);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      border: 1px solid var(--liquid-border);
+      display: inline-block;
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .badge-live-green {
+      background: rgba(16, 185, 129, 0.15);
       color: #10b981;
       border-color: rgba(16, 185, 129, 0.3);
     }
 
-    .service-card-body {
-      flex-grow: 1;
-      margin-bottom: 16px;
-    }
-
-    .service-title {
-      font-size: 1.18rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-      line-height: 1.3;
-    }
-
-    .service-desc {
-      font-size: 0.88rem;
+    .tile-desc {
+      font-size: 0.8rem;
       color: var(--text-muted);
-      line-height: 1.5;
-      margin-bottom: 12px;
+      line-height: 1.45;
+      margin: 0 0 12px 0;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
+      flex-grow: 1;
     }
 
-    .service-tags {
+    .tile-footer {
       display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    .tag-item {
-      font-size: 0.74rem;
+    .tile-tag {
+      font-size: 0.72rem;
       font-weight: 600;
-      background: var(--bg-hover);
       color: var(--text-body);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 2.5px 8px;
       display: inline-flex;
       align-items: center;
       gap: 4px;
     }
 
-    .service-card-footer {
-      display: flex;
-      gap: 8px;
-      margin-top: auto;
+    .tile-tag i {
+      font-size: 0.75rem;
+      color: var(--primary);
     }
 
-    .card-btn {
-      flex: 1;
+    .tile-action-pill {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 9px 14px;
-      border-radius: var(--radius-md);
-      font-size: 0.88rem;
-      font-weight: 600;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--ios-radius-pill);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--liquid-border);
+      color: var(--text-main);
+      font-size: 0.76rem;
+      font-weight: 700;
       text-decoration: none;
+      box-shadow: var(--liquid-specular);
       transition: var(--transition);
-      cursor: pointer;
-      border: 1px solid transparent;
       white-space: nowrap;
     }
 
-    .card-btn.primary {
+    .ios-tile:hover .tile-action-pill {
       background: var(--primary);
-      color: #ffffff;
-    }
-
-    .card-btn.primary:hover {
-      background: var(--primary-hover);
-      box-shadow: 0 4px 12px var(--primary-glow);
-    }
-
-    .card-btn.secondary {
-      background: var(--bg-hover);
-      color: var(--text-main);
-      border-color: var(--border-color);
-      flex: 0 0 auto;
-      padding: 9px 12px;
-    }
-
-    .card-btn.secondary:hover {
       border-color: var(--primary);
-      color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 10px var(--primary-glow);
+    }
+
+    .tile-action-pill i {
+      font-size: 0.7rem;
+      transition: transform 0.2s ease;
+    }
+
+    .ios-tile:hover .tile-action-pill i {
+      transform: translateX(2px);
     }
 
     /* Empty state */
     .empty-state {
       display: none;
       text-align: center;
-      padding: 48px 20px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      margin-bottom: 30px;
+      padding: 36px 20px;
+      background: var(--liquid-surface);
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius);
+      margin-bottom: 24px;
     }
 
-    .empty-icon {
-      font-size: 2.5rem;
-      color: var(--text-muted);
-      margin-bottom: 12px;
-    }
-
-    .empty-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-main);
-      margin-bottom: 6px;
-    }
-
-    .empty-desc {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 16px;
-    }
-
-    /* System Quick Specs Box */
-    .system-specs-bar {
-      background: var(--bg-surface);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-lg);
-      padding: 20px 24px;
+    /* Compact Bottom Info Strip */
+    .bottom-info-strip {
+      background: var(--liquid-surface);
+      backdrop-filter: blur(var(--liquid-blur));
+      -webkit-backdrop-filter: blur(var(--liquid-blur));
+      border: 1px solid var(--liquid-border);
+      border-radius: var(--ios-radius);
+      box-shadow: var(--liquid-specular);
+      padding: 12px 18px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      gap: 16px;
-    }
-
-    .specs-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    .specs-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: rgba(37, 99, 235, 0.12);
-      color: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-    }
-
-    .specs-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }
-
-    .specs-sub {
-      font-size: 0.82rem;
+      gap: 10px;
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
 
-    .specs-items {
+    .bottom-info-strip strong {
+      color: var(--text-main);
+    }
+
+    .strip-links {
       display: flex;
       gap: 16px;
-      flex-wrap: wrap;
     }
 
-    .specs-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: var(--text-body);
+    .strip-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s ease;
     }
 
-    .specs-item i {
-      color: #10b981;
+    .strip-links a:hover {
+      color: var(--text-main);
     }
 
-    /* Responsive adjustments */
+    /* Responsive */
     @media (max-width: 768px) {
-      .portal-hero {
-        padding: 20px;
+      .header {
+        top: 8px;
+        padding: 0 10px;
       }
-      .portal-title {
-        font-size: 1.45rem;
+      .nav-glass-bar {
+        height: 52px;
+        padding: 0 14px;
       }
-      .controls-bar {
+      .nav-desktop-links {
+        display: none !important;
+      }
+      .compact-hero-glass {
+        padding: 14px 16px;
+      }
+      .hero-title-group h1 {
+        font-size: 1.12rem;
+      }
+      .hero-chips-cluster {
+        display: none;
+      }
+      .controls-glass-bar {
         flex-direction: column;
         align-items: stretch;
       }
-      .search-wrapper {
+      .ios-segmented-control {
+        width: 100%;
+        justify-content: space-between;
+        overflow-x: auto;
+      }
+      .segmented-btn {
+        padding: 5px 8px;
+        font-size: 0.74rem;
+        flex: 1;
+        justify-content: center;
+      }
+      .spotlight-search-wrap {
         min-width: 100%;
         flex: 1 1 100%;
       }
-      .services-grid {
-        grid-template-columns: 1fr;
-        gap: 14px;
-      }
-      .system-specs-bar {
+      .bottom-info-strip {
         flex-direction: column;
-        align-items: flex-start;
+        text-align: center;
       }
     }
   </style>
 </head>
 <body>
 
+  <!-- Ambient Liquid Glass Mesh Orbs -->
+  <div class="liquid-mesh-bg" aria-hidden="true">
+    <div class="liquid-orb orb-1"></div>
+    <div class="liquid-orb orb-2"></div>
+    <div class="liquid-orb orb-3"></div>
+  </div>
+
   <!-- ========================================================
-       HEADER & NAVIGATION
+       FLOATING iOS LIQUID GLASS NAVIGATION BAR
        ======================================================== -->
   <header class="header" id="header">
-    <div class="container nav-container">
+    <div class="nav-glass-bar">
       <a href="index.html" class="brand-logo" title="Trang chủ Cuongtv Portal">
-        <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
-        <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
+        <div class="logo-squircle"><i class="fa-solid fa-code"></i></div>
+        <span>cuongtv<span style="color: var(--primary);">.</span></span>
       </a>
 
-      <!-- Navigation Links -->
-      <nav class="nav-menu" id="navMenu">
+      <!-- Quick Nav Links -->
+      <nav class="nav-desktop-links">
         <ul class="nav-list">
           <li><a href="index.html" class="nav-link active"><i class="fa-solid fa-house"></i> Trang chủ</a></li>
           <li><a href="server.html" class="nav-link" style="color: #10b981; font-weight: 700;"><i class="fa-solid fa-server"></i> Home Server</a></li>
-          <li><a href="image-to-pdf.html" class="nav-link" style="color: #ef4444; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Ảnh sang PDF</a></li>
+          <li><a href="image-to-pdf.html" class="nav-link" style="color: #f43f5e; font-weight: 700;"><i class="fa-solid fa-file-pdf"></i> Scanner PDF</a></li>
           <li><a href="clipboard.html" class="nav-link"><i class="fa-regular fa-image"></i> Clipboard</a></li>
           <li><a href="/nas" class="nav-link"><i class="fa-solid fa-hard-drive"></i> NAS</a></li>
           <li><a href="form.html" class="nav-link"><i class="fa-solid fa-id-card"></i> Khai báo</a></li>
@@ -530,20 +792,20 @@
 
       <!-- Nav Actions -->
       <div class="nav-actions">
-        <!-- Live Server Status Indicator -->
-        <a href="server.html" class="metric-chip" id="navServerStatus" title="Xem telemetry máy chủ" style="padding: 6px 12px; font-size: 0.8rem;">
+        <!-- Live Dynamic Island Status Pill -->
+        <a href="server.html" class="glass-status-pill" id="navServerStatus" title="Xem telemetry máy chủ">
           <span class="pulse-dot"></span>
           <span id="navServerText">192.168.31.100</span>
         </a>
 
         <!-- Dark / Light Theme Toggle -->
-        <button id="themeToggle" class="icon-btn theme-toggle" aria-label="Chuyển chế độ giao diện" title="Chuyển chế độ Sáng / Tối">
+        <button id="themeToggle" class="icon-glass-btn theme-toggle" aria-label="Chuyển chế độ giao diện" title="Chuyển chế độ Sáng / Tối">
           <i class="fa-regular fa-moon dark-icon"></i>
           <i class="fa-regular fa-sun light-icon"></i>
         </button>
 
-        <!-- Mobile Menu Button -->
-        <button id="mobileMenuBtn" class="icon-btn mobile-menu-btn" aria-label="Mở menu điều hướng">
+        <!-- Mobile Menu Toggle -->
+        <button id="mobileMenuBtn" class="icon-glass-btn mobile-menu-btn" aria-label="Mở menu" style="display: none;">
           <i class="fa-solid fa-bars"></i>
         </button>
       </div>
@@ -551,364 +813,284 @@
   </header>
 
   <!-- ========================================================
-       MAIN PORTAL CONTENT
+       MAIN CONTENT CONTAINER
        ======================================================== -->
   <main class="main-content">
     <div class="container">
 
-      <!-- TOP SUMMARY HERO -->
-      <section class="portal-hero">
-        <div class="portal-hero-info">
-          <div class="portal-live-pill" id="livePillStatus">
-            <span class="pulse-dot"></span>
-            <span id="livePillText">Home Server 192.168.31.100 · Đang trực tuyến</span>
+      <!-- COMPACT LIQUID GLASS HERO BAR -->
+      <section class="compact-hero-glass">
+        <div class="hero-text-wrap">
+          <div class="hero-avatar-squircle">
+            <i class="fa-solid fa-cube"></i>
           </div>
-          <h1 class="portal-title">Cổng Điều Khiển & Tiện Ích Cá Nhân</h1>
-          <p class="portal-desc">
-            Không gian kết nối máy chủ Dell OptiPlex 7040 Micro, kho lưu trữ NAS và bộ công cụ xử lý tài liệu, hình ảnh trực tuyến.
-          </p>
+          <div class="hero-title-group">
+            <h1>
+              Cổng Tiện Ích Số Hóa
+              <span class="glass-status-pill" id="livePillStatus" style="font-size: 0.72rem; padding: 3px 9px;">
+                <span class="pulse-dot"></span>
+                <span id="livePillText">Online</span>
+              </span>
+            </h1>
+            <p class="hero-subtext">
+              Dell OptiPlex 7040 Micro (192.168.31.100) &bull; Kho lưu trữ NAS &bull; Bộ công cụ cá nhân
+            </p>
+          </div>
         </div>
 
-        <div class="portal-hero-metrics">
-          <a href="server.html" class="metric-chip" title="Mở Dashboard Telemetry">
-            <i class="fa-solid fa-server"></i>
-            <div>
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">MÁY CHỦ</div>
-              <span>Dell OptiPlex 7040</span>
-            </div>
+        <!-- Metric Chips -->
+        <div class="hero-chips-cluster">
+          <a href="server.html" class="glass-chip" title="Mở Dashboard Telemetry">
+            <i class="fa-solid fa-microchip"></i>
+            <span>Core i5 &bull; 8GB RAM</span>
           </a>
-          <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="metric-chip" title="Mở Home Assistant">
-            <i class="fa-solid fa-house-signal"></i>
-            <div>
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">SMART HOME</div>
-              <span>Home Assistant</span>
-            </div>
-          </a>
-          <a href="/nas" class="metric-chip" title="Mở Ổ Cứng NAS FileBrowser">
+          <a href="/nas" class="glass-chip" title="Mở FileBrowser Ổ Cứng NAS">
             <i class="fa-solid fa-hard-drive"></i>
-            <div>
-              <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">LƯU TRỮ</div>
-              <span>NAS_Data 1Gbps</span>
-            </div>
+            <span>NAS 1Gbps</span>
+          </a>
+          <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="glass-chip" title="Mở Home Assistant">
+            <i class="fa-solid fa-house-signal"></i>
+            <span>HA :8123</span>
           </a>
         </div>
       </section>
 
-      <!-- CONTROLS: CATEGORIES & QUICK SEARCH -->
-      <div class="controls-bar">
-        <div class="category-tabs" id="categoryTabs">
-          <button class="category-tab active" data-category="all">
-            <i class="fa-solid fa-layer-group"></i> Tất cả (<span id="countAll">8</span>)
+      <!-- CONTROLS: iOS SEGMENTED TABS & SPOTLIGHT SEARCH -->
+      <div class="controls-glass-bar">
+        <div class="ios-segmented-control" id="categoryTabs">
+          <button class="segmented-btn active" data-category="all">
+            <i class="fa-solid fa-layer-group"></i> Tất cả (8)
           </button>
-          <button class="category-tab" data-category="server">
+          <button class="segmented-btn" data-category="server">
             <i class="fa-solid fa-server"></i> Máy chủ & IoT
           </button>
-          <button class="category-tab" data-category="tools">
-            <i class="fa-solid fa-toolbox"></i> Công cụ Media
+          <button class="segmented-btn" data-category="tools">
+            <i class="fa-solid fa-toolbox"></i> Tiện ích Media
           </button>
-          <button class="category-tab" data-category="private">
-            <i class="fa-solid fa-shield-halved"></i> Bảo mật & Biểu mẫu
+          <button class="segmented-btn" data-category="private">
+            <i class="fa-solid fa-shield-halved"></i> Bảo mật
           </button>
         </div>
 
-        <div class="search-wrapper">
-          <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <div class="spotlight-search-wrap">
+          <i class="fa-solid fa-magnifying-glass spotlight-icon"></i>
           <input
             type="text"
             id="serviceSearch"
-            class="search-input"
-            placeholder="Tìm nhanh tiện ích (pdf, nas, server...)"
+            class="spotlight-input"
+            placeholder="Tìm kiếm (pdf, nas, server, wol...)"
             autocomplete="off"
           />
         </div>
       </div>
 
-      <!-- EMPTY SEARCH RESULT STATE -->
+      <!-- EMPTY SEARCH STATE -->
       <div class="empty-state" id="emptyState">
-        <div class="empty-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
-        <div class="empty-title">Không tìm thấy tiện ích phù hợp</div>
-        <div class="empty-desc">Không có công cụ nào khớp với từ khóa tìm kiếm của bạn.</div>
-        <button class="card-btn primary" id="clearSearchBtn" style="display: inline-flex; width: auto; padding: 8px 20px;">
+        <div style="font-size: 2rem; color: var(--text-muted); margin-bottom: 8px;"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div style="font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Không tìm thấy kết quả</div>
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px;">Hãy thử tìm với từ khóa khác như "server", "pdf", "nas"...</div>
+        <button class="tile-action-pill" id="clearSearchBtn" style="padding: 6px 16px; cursor: pointer;">
           <i class="fa-solid fa-rotate-left"></i> Xóa tìm kiếm
         </button>
       </div>
 
-      <!-- SERVICES GRID (8 DIRECT INTUITIVE CARDS) -->
-      <div class="services-grid" id="servicesGrid">
+      <!-- COMPACT 4-COLUMN TILE GRID (8 SERVICES) -->
+      <div class="compact-grid" id="servicesGrid">
 
         <!-- 1. HOME SERVER -->
-        <article class="service-card" data-category="server" data-keywords="home server dell optiplex telemetry 192.168.31.100 cpu ram nhiet do tunnel">
+        <a href="server.html" class="ios-tile" data-category="server" data-keywords="home server dell optiplex telemetry 192.168.31.100 cpu ram nhiet do tunnel">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-server-emerald">
+            <div class="tile-header">
+              <div class="app-icon icon-server-ios">
                 <i class="fa-solid fa-server"></i>
               </div>
-              <span class="service-badge badge-online" id="cardServerBadge">🟢 192.168.31.100</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Home Server Dell OptiPlex</h2>
-              <p class="service-desc">
-                Giám sát vi xử lý CPU, bộ nhớ RAM, nhiệt độ chip, dung lượng ổ đĩa, dịch vụ mạng Nginx và kết nối Cloudflare Tunnel.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-microchip"></i> Telemetry</span>
-                <span class="tag-item"><i class="fa-solid fa-network-wired"></i> LAN 1Gbps</span>
-                <span class="tag-item" id="tunnelTag"><i class="fa-solid fa-cloud"></i> Tunnel</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Home Server</h2>
+                <span class="tile-badge badge-live-green" id="cardServerBadge">🟢 192.168.31.100</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Giám sát CPU, RAM, nhiệt độ chip, dung lượng ổ đĩa & dịch vụ mạng Nginx Dell 7040.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="server.html" class="card-btn primary">
-              <i class="fa-solid fa-gauge-high"></i> Mở Dashboard
-            </a>
-            <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="card-btn secondary" title="Mở Home Assistant">
-              <i class="fa-solid fa-house-signal"></i>
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-microchip"></i> Telemetry</span>
+            <span class="tile-action-pill">Mở Dashboard <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 2. SCANNER PDF -->
-        <article class="service-card" data-category="tools" data-keywords="scanner pdf chuyen anh scan camera cat goc giu dau do van ban">
+        <a href="image-to-pdf.html" class="ios-tile" data-category="tools" data-keywords="scanner pdf chuyen anh scan camera cat goc giu dau do van ban">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-pdf-rose">
+            <div class="tile-header">
+              <div class="app-icon icon-pdf-ios">
                 <i class="fa-solid fa-file-pdf"></i>
               </div>
-              <span class="service-badge">MÁY QUÉT CAMERA</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Chuyển Ảnh Sang PDF (Scanner)</h2>
-              <p class="service-desc">
-                Quét tài liệu trực tiếp từ camera hoặc tải ảnh hàng loạt, tự động căn chỉnh 4 góc, làm sạch nền và giữ nguyên màu con dấu đỏ.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-camera"></i> Camera Scan</span>
-                <span class="tag-item"><i class="fa-solid fa-stamp"></i> Giữ dấu đỏ</span>
-                <span class="tag-item"><i class="fa-solid fa-crop-simple"></i> Căn 4 góc</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Scanner PDF</h2>
+                <span class="tile-badge">CĂN GÓC &bull; DẤU ĐỎ</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Quét camera hoặc tải ảnh hàng loạt, tự căn 4 góc phối cảnh & giữ nguyên con dấu đỏ.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="image-to-pdf.html" class="card-btn primary">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Mở Máy Quét
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-camera"></i> Camera Scan</span>
+            <span class="tile-action-pill">Mở Scanner <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 3. CLIPBOARD VIEWER -->
-        <article class="service-card" data-category="tools" data-keywords="clipboard xem anh ctrl+v chup man hinh pixel zoom download png">
+        <a href="clipboard.html" class="ios-tile" data-category="tools" data-keywords="clipboard xem anh ctrl+v chup man hinh pixel zoom download png">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-clip-blue">
+            <div class="tile-header">
+              <div class="app-icon icon-clip-ios">
                 <i class="fa-regular fa-image"></i>
               </div>
-              <span class="service-badge">CTRL + V TỨC THÌ</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Xem Ảnh Clipboard</h2>
-              <p class="service-desc">
-                Chỉ cần bấm Ctrl + V xem ngay hình ảnh chụp màn hình từ bộ nhớ tạm, hỗ trợ zoom chi tiết từng pixel và lưu tệp ảnh PNG nhanh gọn.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-paste"></i> Phím Ctrl+V</span>
-                <span class="tag-item"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom Pixel</span>
-                <span class="tag-item"><i class="fa-solid fa-download"></i> Tải PNG</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Clipboard View</h2>
+                <span class="tile-badge">CTRL + V TỨC THÌ</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Nhấn Ctrl + V xem ảnh chụp màn hình từ bộ nhớ tạm, zoom pixel & tải tệp PNG về máy.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="clipboard.html" class="card-btn primary">
-              <i class="fa-regular fa-eye"></i> Mở Clipboard
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-paste"></i> Phím tắt</span>
+            <span class="tile-action-pill">Mở Clipboard <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
-        <!-- 4. NAS FILEBROWSER -->
-        <article class="service-card" data-category="server" data-keywords="nas data filebrowser o cung chia se stream video 1gbps file">
+        <!-- 4. NAS DATA -->
+        <a href="/nas" class="ios-tile" data-category="server" data-keywords="nas data filebrowser o cung chia se stream video 1gbps file">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-nas-amber">
+            <div class="tile-header">
+              <div class="app-icon icon-nas-ios">
                 <i class="fa-solid fa-hard-drive"></i>
               </div>
-              <span class="service-badge">FILEBROWSER · 1GBPS</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Ổ Cứng Mạng NAS</h2>
-              <p class="service-desc">
-                Kho lưu trữ dữ liệu dung lượng lớn, quản lý tệp tin, xem video trực tuyến và chia sẻ tệp nội bộ mạng LAN với băng thông 1Gbps.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-folder-tree"></i> Quản lý tệp</span>
-                <span class="tag-item"><i class="fa-solid fa-bolt"></i> Tốc độ 1Gbps</span>
-                <span class="tag-item"><i class="fa-solid fa-network-wired"></i> SMB Share</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Ổ Cứng NAS</h2>
+                <span class="tile-badge">FILEBROWSER &bull; 1GBPS</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Kho dữ liệu dung lượng lớn, phát nhạc/video trực tuyến & chia sẻ tệp nội bộ tốc độ cao.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="/nas" class="card-btn primary">
-              <i class="fa-solid fa-folder-open"></i> Mở Ổ Cứng NAS
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-bolt"></i> 1Gbps LAN</span>
+            <span class="tile-action-pill">Mở NAS <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 5. HOME ASSISTANT -->
-        <article class="service-card" data-category="server" data-keywords="home assistant smart home wled sonoff tu dong hoa cong tac den">
+        <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="ios-tile" data-category="server" data-keywords="home assistant smart home wled sonoff tu dong hoa cong tac den">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-ha-violet">
+            <div class="tile-header">
+              <div class="app-icon icon-ha-ios">
                 <i class="fa-solid fa-house-signal"></i>
               </div>
-              <span class="service-badge">SMART HOME · :8123</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Home Assistant</h2>
-              <p class="service-desc">
-                Bảng điều khiển nhà thông minh, tự động hóa điều khiển dải đèn LED WLED, công tắc Sonoff, máy lạnh và theo dõi cảm biến gia đình.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-lightbulb"></i> Đèn WLED</span>
-                <span class="tag-item"><i class="fa-solid fa-toggle-on"></i> Công tắc</span>
-                <span class="tag-item"><i class="fa-solid fa-temperature-half"></i> Cảm biến</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Home Assistant</h2>
+                <span class="tile-badge">SMART HOME &bull; :8123</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Tự động hóa nhà thông minh, điều khiển đèn LED WLED, công tắc Sonoff & cảm biến.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" class="card-btn primary">
-              <i class="fa-solid fa-arrow-up-right-from-square"></i> Vào Home Assistant
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-lightbulb"></i> Đèn & Công tắc</span>
+            <span class="tile-action-pill">Vào HA <i class="fa-solid fa-arrow-up-right-from-square"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 6. KHAI BÁO BIỂU MẪU -->
-        <article class="service-card" data-category="private" data-keywords="khai bao bieu mau thong tin ho so form online xuat bao cao">
+        <a href="form.html" class="ios-tile" data-category="private" data-keywords="khai bao bieu mau thong tin ho so form online xuat bao cao">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-form-cyan">
+            <div class="tile-header">
+              <div class="app-icon icon-form-ios">
                 <i class="fa-solid fa-id-card"></i>
               </div>
-              <span class="service-badge">BIỂU MẪU CHUẨN</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Khai Báo Thông Tin</h2>
-              <p class="service-desc">
-                Cổng nhập liệu biểu mẫu trực tuyến chuẩn hóa: tự động xác thực các trường thông tin hợp lệ và hỗ trợ xuất báo cáo nhanh chóng.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-check-double"></i> Tự xác thực</span>
-                <span class="tag-item"><i class="fa-solid fa-file-export"></i> Xuất dữ liệu</span>
-                <span class="tag-item"><i class="fa-solid fa-shield-halved"></i> Chuẩn hóa</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Khai Báo Hồ Sơ</h2>
+                <span class="tile-badge">BIỂU MẪU CHUẨN</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Cổng nhập liệu trực tuyến chuẩn hóa: tự động xác thực trường dữ liệu & xuất báo cáo nhanh.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="form.html" class="card-btn primary">
-              <i class="fa-solid fa-pen-to-square"></i> Vào Biểu Mẫu
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-check-double"></i> Tự xác thực</span>
+            <span class="tile-action-pill">Vào Biểu Mẫu <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 7. PRIVATE VAULT -->
-        <article class="service-card" data-category="private" data-keywords="private vault bao mat dang nhap sonoff ewelink google cast tts">
+        <a href="login.html" class="ios-tile" data-category="private" data-keywords="private vault bao mat dang nhap sonoff ewelink google cast tts">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-vault-pink">
+            <div class="tile-header">
+              <div class="app-icon icon-vault-ios">
                 <i class="fa-solid fa-lock"></i>
               </div>
-              <span class="service-badge">BẢO MẬT CAO</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Khu Vực Riêng Tư (Vault)</h2>
-              <p class="service-desc">
-                Bảng điều khiển công tắc thông minh eWeLink/Sonoff, phát âm thanh loa thông minh Google Cast TTS và khu vực quản trị thiết bị gia đình.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-key"></i> Xác thực mã PIN</span>
-                <span class="tag-item"><i class="fa-solid fa-volume-high"></i> Google Cast</span>
-                <span class="tag-item"><i class="fa-solid fa-sliders"></i> eWeLink IoT</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Private Vault</h2>
+                <span class="tile-badge">BẢO MẬT &bull; MÃ PIN</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Bảng điều khiển Sonoff/eWeLink, phát âm thanh Google Cast TTS & quản trị thiết bị.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="login.html" class="card-btn primary">
-              <i class="fa-solid fa-arrow-right-to-bracket"></i> Đăng Nhập Vault
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-key"></i> Mã PIN</span>
+            <span class="tile-action-pill">Mở Vault <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
         <!-- 8. WAKE-ON-LAN -->
-        <article class="service-card" data-category="server" data-keywords="wake on lan wol bat may tinh tu xa magic packet 192.168.31.145">
+        <a href="server.html#wol" class="ios-tile" data-category="server" data-keywords="wake on lan wol bat may tinh tu xa magic packet 192.168.31.145">
           <div>
-            <div class="service-card-top">
-              <div class="service-icon-box icon-wol-orange">
+            <div class="tile-header">
+              <div class="app-icon icon-wol-ios">
                 <i class="fa-solid fa-power-off"></i>
               </div>
-              <span class="service-badge">WOL · 192.168.31.145</span>
-            </div>
-            <div class="service-card-body">
-              <h2 class="service-title">Bật Máy Tính Từ Xa (WoL)</h2>
-              <p class="service-desc">
-                Gửi gói tin Magic Packet qua mạng nội bộ để đánh thức máy tính để bàn (PC 192.168.31.145) làm việc từ xa chỉ với 1 click chuột.
-              </p>
-              <div class="service-tags">
-                <span class="tag-item"><i class="fa-solid fa-bolt"></i> Magic Packet</span>
-                <span class="tag-item"><i class="fa-solid fa-desktop"></i> PC .145</span>
-                <span class="tag-item"><i class="fa-solid fa-tower-broadcast"></i> Port 9 UDP</span>
+              <div class="tile-title-group">
+                <h2 class="tile-title">Bật Máy Từ Xa</h2>
+                <span class="tile-badge">WOL &bull; 192.168.31.145</span>
               </div>
             </div>
+            <p class="tile-desc">
+              Gửi gói tin Magic Packet qua mạng LAN để đánh thức PC làm việc từ xa chỉ với 1 click.
+            </p>
           </div>
-          <div class="service-card-footer">
-            <a href="server.html#wol" class="card-btn primary">
-              <i class="fa-solid fa-power-off"></i> Điều Khiển WoL
-            </a>
+          <div class="tile-footer">
+            <span class="tile-tag"><i class="fa-solid fa-bolt"></i> Port 9 UDP</span>
+            <span class="tile-action-pill">Bật WoL <i class="fa-solid fa-arrow-right"></i></span>
           </div>
-        </article>
+        </a>
 
       </div>
 
-      <!-- SYSTEM QUICK SPECS BAR -->
-      <section class="system-specs-bar">
-        <div class="specs-left">
-          <div class="specs-icon"><i class="fa-solid fa-circle-nodes"></i></div>
-          <div>
-            <div class="specs-title">Hệ Sinh Thái Vận Hành 24/7</div>
-            <div class="specs-sub">Dell OptiPlex 7040 Micro · Intel Core i5 · 8GB RAM · Nginx Web Server</div>
-          </div>
+      <!-- COMPACT BOTTOM INFO STRIP -->
+      <div class="bottom-info-strip">
+        <div>
+          &copy; <span id="currentYear"></span> Trịnh Việt Cường &bull; <strong>Dell OptiPlex 7040 Micro</strong> (LAN 192.168.31.100 &bull; Cloudflare Tunnel)
         </div>
-        <div class="specs-items">
-          <div class="specs-item"><i class="fa-solid fa-circle-check"></i> LAN 192.168.31.100</div>
-          <div class="specs-item"><i class="fa-solid fa-circle-check"></i> Cloudflare Tunnel</div>
-          <div class="specs-item"><i class="fa-solid fa-circle-check"></i> GitHub Pages Sync</div>
+        <div class="strip-links">
+          <a href="server.html"><i class="fa-solid fa-server"></i> Dashboard</a>
+          <a href="/nas"><i class="fa-solid fa-hard-drive"></i> NAS</a>
+          <a href="http://192.168.31.100:8123" target="_blank" rel="noopener"><i class="fa-solid fa-house-signal"></i> HA</a>
+          <a href="https://github.com/Cuong1012" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i> GitHub</a>
+          <a href="#header" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i> Top</a>
         </div>
-      </section>
+      </div>
 
     </div>
   </main>
-
-  <!-- ========================================================
-       FOOTER
-       ======================================================== -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-left">
-        <a href="index.html" class="brand-logo footer-logo">
-          <span class="logo-mark"><i class="fa-solid fa-code"></i></span>
-          <span class="logo-text">cuongtv<span class="accent-dot">.</span></span>
-        </a>
-        <p class="footer-copy">
-          &copy; <span id="currentYear"></span> Trịnh Việt Cường · Vận hành trên Dell OptiPlex 7040 Micro (LAN 192.168.31.100).
-        </p>
-      </div>
-      <div class="footer-right">
-        <div class="footer-socials">
-          <a href="server.html" title="Home Server"><i class="fa-solid fa-server"></i></a>
-          <a href="/nas" title="Ổ Cứng NAS"><i class="fa-solid fa-hard-drive"></i></a>
-          <a href="http://192.168.31.100:8123" target="_blank" rel="noopener" title="Home Assistant"><i class="fa-solid fa-house-signal"></i></a>
-          <a href="https://github.com/Cuong1012" target="_blank" rel="noopener" title="GitHub Profile"><i class="fa-brands fa-github"></i></a>
-          <a href="#" class="back-to-top" title="Lên đầu trang"><i class="fa-solid fa-arrow-up"></i></a>
-        </div>
-      </div>
-    </div>
-  </footer>
 
   <!-- ========================================================
        JAVASCRIPT LOGIC
@@ -934,52 +1116,38 @@
       themeToggleBtn.addEventListener('click', toggleTheme);
     }
 
-    // 2. MOBILE MENU TOGGLE
-    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-    const navMenu = document.getElementById('navMenu');
-    if (mobileMenuBtn && navMenu) {
-      mobileMenuBtn.addEventListener('click', () => {
-        navMenu.classList.toggle('open');
-      });
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-          navMenu.classList.remove('open');
-        });
-      });
-    }
-
-    // 3. CURRENT YEAR
+    // 2. CURRENT YEAR
     const currentYearEl = document.getElementById('currentYear');
     if (currentYearEl) {
       currentYearEl.textContent = new Date().getFullYear();
     }
 
-    // 4. CATEGORY FILTER & INSTANT SEARCH
+    // 3. CATEGORY FILTER & REAL-TIME SEARCH
     const searchInput = document.getElementById('serviceSearch');
-    const categoryTabs = document.querySelectorAll('.category-tab');
-    const cards = Array.from(document.querySelectorAll('.service-card'));
+    const categoryTabs = document.querySelectorAll('.segmented-btn');
+    const tiles = Array.from(document.querySelectorAll('.ios-tile'));
     const emptyState = document.getElementById('emptyState');
     const clearSearchBtn = document.getElementById('clearSearchBtn');
     let activeCategory = 'all';
 
-    function filterCards() {
+    function filterTiles() {
       const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
       let visibleCount = 0;
 
-      cards.forEach(card => {
-        const category = card.getAttribute('data-category');
-        const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
-        const title = (card.querySelector('.service-title')?.textContent || '').toLowerCase();
-        const desc = (card.querySelector('.service-desc')?.textContent || '').toLowerCase();
+      tiles.forEach(tile => {
+        const category = tile.getAttribute('data-category');
+        const keywords = (tile.getAttribute('data-keywords') || '').toLowerCase();
+        const title = (tile.querySelector('.tile-title')?.textContent || '').toLowerCase();
+        const desc = (tile.querySelector('.tile-desc')?.textContent || '').toLowerCase();
 
         const matchCategory = (activeCategory === 'all' || category === activeCategory);
         const matchSearch = (!query || title.includes(query) || desc.includes(query) || keywords.includes(query));
 
         if (matchCategory && matchSearch) {
-          card.style.display = 'flex';
+          tile.style.display = 'flex';
           visibleCount++;
         } else {
-          card.style.display = 'none';
+          tile.style.display = 'none';
         }
       });
 
@@ -993,58 +1161,54 @@
         categoryTabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         activeCategory = tab.getAttribute('data-category');
-        filterCards();
+        filterTiles();
       });
     });
 
     if (searchInput) {
-      searchInput.addEventListener('input', filterCards);
+      searchInput.addEventListener('input', filterTiles);
     }
 
     if (clearSearchBtn && searchInput) {
       clearSearchBtn.addEventListener('click', () => {
         searchInput.value = '';
         searchInput.focus();
-        filterCards();
+        filterTiles();
       });
     }
 
-    // 5. LIVE SERVER TELEMETRY & STATUS POLLING
+    // 4. LIVE SERVER TELEMETRY & AUTO-DETECTION
     async function checkServerStatus() {
       const isLan = location.hostname === '192.168.31.100' || location.hostname === 'localhost' || location.hostname.startsWith('192.168.');
       const navServerText = document.getElementById('navServerText');
       const livePillText = document.getElementById('livePillText');
       const cardServerBadge = document.getElementById('cardServerBadge');
-      const tunnelTag = document.getElementById('tunnelTag');
 
       if (isLan) {
         if (navServerText) navServerText.textContent = 'LAN 192.168.31.100';
-        if (livePillText) livePillText.textContent = 'Home Server LAN 192.168.31.100 · 1Gbps Trực tuyến';
+        if (livePillText) livePillText.textContent = 'LAN 192.168.31.100 (1Gbps)';
+        if (cardServerBadge) cardServerBadge.textContent = '🟢 LAN 192.168.31.100';
       } else {
-        if (navServerText) navServerText.textContent = 'Cloud Tunnel Online';
-        if (livePillText) livePillText.textContent = 'Home Server · Kết nối qua Cloudflare Tunnel';
+        if (navServerText) navServerText.textContent = 'Cloud Tunnel';
+        if (livePillText) livePillText.textContent = 'Cloudflare Tunnel';
+        if (cardServerBadge) cardServerBadge.textContent = '🟢 CLOUD TUNNEL';
       }
 
       try {
         const res = await fetch(`server-status.json?t=${Date.now()}`);
         if (res.ok) {
           const data = await res.json();
-          if (data.cloudUrl && tunnelTag) {
-            tunnelTag.innerHTML = `<i class="fa-solid fa-cloud"></i> <a href="${data.cloudUrl}" target="_blank" style="color:inherit; text-decoration:underline;">Cloud Tunnel</a>`;
-          }
           if (data.status === 'online') {
-            if (cardServerBadge) {
-              cardServerBadge.className = 'service-badge badge-online';
-              cardServerBadge.textContent = isLan ? '🟢 LAN 192.168.31.100' : '🟢 CLOUD ONLINE';
+            if (livePillText) {
+              livePillText.textContent = isLan ? 'LAN 192.168.31.100 (Online)' : 'Cloud Tunnel (Online)';
             }
           }
         }
       } catch (err) {
-        // Fallback to LAN display
+        // Cached fallback
       }
     }
 
-    // Initialize on load
     document.addEventListener('DOMContentLoaded', () => {
       initTheme();
       checkServerStatus();
